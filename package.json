@@ -6,11 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
 	  "start": "node app.js"
-  }
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "package": "^1.0.1"
+    "package": "^1.0.1",
+    "express": "^4.16.3"
   }
 }
