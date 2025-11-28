@@ -1,0 +1,88 @@
+openapi: 3.0.4
+info:
+  version: '1.0'
+  title: "Orticello OpenAPI 3.0"
+  description: API for managing book lendings.
+  license:
+    name: MIT
+servers:
+  - url: http://localhost:8080/api/
+    description: Localhost
+  - url: https://orticello.onrender.com/api/
+    description: render.com
+paths:
+  /orti:
+    get:
+      summary: Get list of green gardens
+      description: >-
+        Get list of green gardens with some parameters in request
+        It is possible to filter with some conditions like sensor or size
+      parameters:
+        - in: query
+          name: sensor
+          schema:
+            type: boolean
+            enum: [no, yes]
+      responses:
+        '200':
+          description: 'collection of green gardens'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/orto'
+
+components:
+  schemas:
+    orto:
+      type: object
+      required: 
+      - latitude
+      - longitude
+      - association
+      properties:
+        self:
+          type: string
+          description: 'link to green garden'
+        latitude:
+          type: string
+          description: 'latitude position of green garden'
+        longitude:
+          type: string
+          description: 'longitude position of green garden'
+        association:
+            type: object
+            $ref: '#/components/schemas/associazione'
+    lotto:
+      type: object
+      required:
+      - orto
+      - status
+      - size
+      properties:
+        self:
+          type: string
+          description: 'link to green garden, division'
+        orto:
+          type: object
+          description: 'link to green garden container'
+          $ref: '#/components/schemas/orto'
+        status:
+          type: string
+          enum: [available, assigned]
+        size:
+          type: number
+          description: 'size of green garden'
+    
+    associazione:
+      type: object
+      required:
+      - name
+      properties:
+        self:
+          type: string
+          description: 'link to association'
+        name:
+          type: string
+          description: 'association name'
