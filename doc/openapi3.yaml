@@ -11,7 +11,7 @@ servers:
   - url: https://orticello.onrender.com/api/
     description: render.com
 paths:
-  /orti:
+  /v1/orti:
     get:
       summary: Get list of green gardens
       description: >-
@@ -22,7 +22,7 @@ paths:
           name: sensor
           schema:
             type: boolean
-            enum: [no, yes]
+            enum: [false, true]
       responses:
         '200':
           description: 'collection of green gardens'
@@ -60,6 +60,7 @@ components:
       - orto
       - status
       - size
+      - sensors
       properties:
         self:
           type: string
@@ -74,6 +75,10 @@ components:
         size:
           type: number
           description: 'size of green garden'
+        sensors:
+          type: boolean
+          description: 'if the division has sensors in it'
+          enum: [false, true]
     
     associazione:
       type: object
