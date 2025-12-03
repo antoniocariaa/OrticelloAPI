@@ -1,5 +1,6 @@
 require('dotenv').config();
 var express = require('express');
+var cors = require('cors');
 var mongoose = require('mongoose');
 var ortoRoutes = require("./routes/ortoRoutes");
 
