@@ -1,8 +1,9 @@
+require('dotenv').config();
 var express = require('express');
+var cors = require('cors');
+var mongoose = require('mongoose');
 var app = express();
 const PORT = process.env.PORT || 8080
-
-
 
 
 // Handling GET requests
@@ -13,10 +14,43 @@ app.get('/api/v1/orti', function(req, res){
     console.log('/api/v1/orti');
 });
 
+// MongoDB connection
+console.log('Attempting to connect to MongoDB...');
+console.log('Connection string (without password):', process.env.MONGODB_URI.replace(/:([^@]+)@/, ':****@'));
+
+mongoose.connect(process.env.MONGODB_URI, {
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+})
+.then(() => console.log('✓ MongoDB connected successfully'))
+.catch(err => {
+  console.error('✗ MongoDB connection error:', err.message);
+  console.error('Error code:', err.code);
+  console.error('Error name:', err.name);
+});
+
+app.use(cors());
+
 // Handling GET requests
 app.get('/', function(req, res){
 	res.send('Hello World!');
     console.log('Hello World!');
+});
+
+// Handling GET requests
+app.get('/api/v1/orti', function(req, res){
+	res.send([
+  {
+    "self": "self",
+    "latitude": "1234",
+    "longitude": "5678",
+    "association": {
+      "self": "self",
+      "name": "amici di povo"
+    }
+  }
+]);
+    console.log('Amici di Povo');
 });
 
 //
