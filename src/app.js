@@ -1,19 +1,15 @@
 require('dotenv').config();
 var express = require('express');
-var cors = require('cors');
 var mongoose = require('mongoose');
 var ortoRoutes = require("./routes/ortoRoutes");
-
 var app = express();
 const PORT = process.env.PORT || 8080
 
 
 mongoose.connect(process.env.MONGODB_URI, {
-	serverSelectionTimeoutMS: 5000,
+  serverSelectionTimeoutMS: 5000,
 	socketTimeoutMS: 45000
 });
-
-const PORT = process.env.PORT || 8080
 
 
 mongoose.connect(process.env.MONGODB_URI, {
