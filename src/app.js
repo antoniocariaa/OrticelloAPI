@@ -11,18 +11,11 @@ mongoose.connect(process.env.MONGODB_URI, {
 	socketTimeoutMS: 45000
 });
 
-
-mongoose.connect(process.env.MONGODB_URI, {
-  serverSelectionTimeoutMS: 5000,
-	socketTimeoutMS: 45000
-});
-
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use("/api/orti", ortoRoutes);
+app.use("/api/v1/orti", ortoRoutes);
 
 
 // Handling GET requests

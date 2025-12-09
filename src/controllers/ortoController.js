@@ -1,4 +1,4 @@
-const Orto  = require('../models/Orto');
+const Orto  = require('../model/orto');
 
 exports.getAllOrtos = async (req, res) => {
     try {
