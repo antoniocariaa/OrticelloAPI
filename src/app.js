@@ -2,6 +2,7 @@ require('dotenv').config();
 var express = require('express');
 var mongoose = require('mongoose');
 var ortoRoutes = require("./routes/ortoRoutes");
+var lottoRoutes = require("./routes/lottoRoutes");
 var app = express();
 const PORT = process.env.PORT || 8080
 
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.use("/api/orti", ortoRoutes);
+app.use("/api/lotti", lottoRoutes);
 
 
 // Handling GET requests
