@@ -2,6 +2,21 @@ var mongoose = require("mongoose");
 var validator = require('validator');
 var Schema = mongoose.Schema;
 
+/**
+ * @typedef {Object} Utente
+ * @description Modello utente (utenteSchema) per Mongoose.
+ * @property {string} nome - Nome dell'utente. Obbligatorio.
+ * @property {string} cognome - Cognome dell'utente. Obbligatorio.
+ * @property {string} codicefiscale - Codice fiscale. Obbligatorio. Validato con validator.isTaxID.
+ * @property {string} email - Indirizzo email univoco. Obbligatorio. Validato con validator.isEmail.
+ * @property {string} password - Password (idealmente hash). Obbligatoria.
+ * @property {string} indirizzo - Indirizzo dell'utente. Obbligatorio.
+ * @property {string} telefono - Numero di telefono cellulare. Obbligatorio. Validato con validator.isMobilePhone.
+ * @property {"citt"|"asso"|"comu"} tipo - Tipologia utente; predefinito "citt". Obbligatorio.
+ * @property {import("mongoose").Types.ObjectId} [associazione] - Riferimento ad Associazione; richiesto quando tipo === "asso".
+ * @property {import("mongoose").Types.ObjectId} [comune] - Riferimento a Comune; richiesto quando tipo === "comu".
+ * @property {boolean} admin - Flag amministratore; richiesto quando tipo !== "citt". Predefinito false.
+ */
 var utenteSchema = new Schema({
   nome: {
     type: String,
