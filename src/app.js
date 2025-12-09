@@ -1,7 +1,12 @@
 require('dotenv').config();
 var express = require('express');
 var mongoose = require('mongoose');
+
 var ortoRoutes = require("./routes/ortoRoutes");
+var utentiRoutes = require("./routes/utenteRoutes");
+var associazioneRoutes = require("./routes/associazioneRoutes");
+var comuneRoutes = require("./routes/comuneRoutes");
+
 var app = express();
 const PORT = process.env.PORT || 8080
 
@@ -16,6 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.use("/api/v1/orti", ortoRoutes);
+app.use("/api/v1/utenti", utentiRoutes);
+app.use("/api/v1/associazioni", associazioneRoutes);
+app.use("/api/v1/comune", comuneRoutes);
 
 
 // Handling GET requests
