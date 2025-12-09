@@ -46,6 +46,10 @@ exports.updateOrto = async (req, res) => {
 exports.deleteOrto = async (req, res) => {
     try {
         const deletedOrto = await Orto.findByIdAndDelete(req.params.id);
+
+        //TO-DO: Verificare se ci sono utenti che possiedono questo orto prima di eliminarlo
+        
+
         if (!deletedOrto) {
             return res.status(404).json({ message: 'Orto not found' });
         }
