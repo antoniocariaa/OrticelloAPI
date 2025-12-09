@@ -4,6 +4,16 @@ var mongoose = require('mongoose');
 var ortoRoutes = require("./routes/ortoRoutes");
 
 var app = express();
+var mongoose = require('mongoose');
+var Orto = require('./model/orto');
+const orto = require('./model/orto');
+
+
+mongoose.connect(process.env.MONGODB_URI, {
+	serverSelectionTimeoutMS: 5000,
+	socketTimeoutMS: 45000
+});
+
 const PORT = process.env.PORT || 8080
 
 
