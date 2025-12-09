@@ -5,9 +5,7 @@ var mongoose = require('mongoose');
 var ortoRoutes = require("./routes/ortoRoutes");
 
 var app = express();
-var mongoose = require('mongoose');
-var Orto = require('./model/orto');
-const orto = require('./model/orto');
+const PORT = process.env.PORT || 8080
 
 
 mongoose.connect(process.env.MONGODB_URI, {
