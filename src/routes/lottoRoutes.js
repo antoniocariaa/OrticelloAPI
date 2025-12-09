@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const lottoController = require("../controllers/lottoController");
 
-router.get("/api/v1/lotti", lottoController.getAllLotti);
-router.get("/api/v1/lotti", lottoController.createLotto);
-router.get("/api/v1/lotti", lottoController.getLottoById);
-router.get("/api/v1/lotti", lottoController.updateLotto);
-router.get("/api/v1/lotti", lottoController.deleteLotto);
+router.get("/", lottoController.getAllLotti);
+router.get("/", lottoController.createLotto);
+router.get("/:id", lottoController.getLottoById);
+router.get("/:id", lottoController.updateLotto);
+router.get("/:id", lottoController.deleteLotto);
 
 module.exports = router;

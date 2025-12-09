@@ -1,4 +1,4 @@
-const Lotto = require('../models/Lotto');
+const Lotto = require('../model/lotto');
 
 exports.getAllLotti = async (req, res) => {
     try {
