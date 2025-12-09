@@ -3,18 +3,13 @@ var express = require('express');
 var cors = require('cors');
 var mongoose = require('mongoose');
 var app = express();
-var mongoose = require('mongoose');
-var Orto = require('./model/orto');
-const orto = require('./model/orto');
+const PORT = process.env.PORT || 8080
 
 
 mongoose.connect(process.env.MONGODB_URI, {
 	serverSelectionTimeoutMS: 5000,
 	socketTimeoutMS: 45000
 });
-
-const PORT = process.env.PORT || 8080
-
 
 // Handling GET requests
 app.get('/api/v1/orti', function(req, res){
@@ -24,47 +19,38 @@ app.get('/api/v1/orti', function(req, res){
     console.log('/api/v1/orti');
 });
 
-// MongoDB connection
-console.log('Attempting to connect to MongoDB...');
-console.log('Connection string (without password):', process.env.MONGODB_URI.replace(/:([^@]+)@/, ':****@'));
-
 mongoose.connect(process.env.MONGODB_URI, {
-  serverSelectionTimeoutMS: 5000,
-  socketTimeoutMS: 45000,
-})
-.then(() => console.log('✓ MongoDB connected successfully'))
-.catch(err => {
-  console.error('✗ MongoDB connection error:', err.message);
-  console.error('Error code:', err.code);
-  console.error('Error name:', err.name);
+	serverSelectionTimeoutMS: 5000,
+	socketTimeoutMS: 45000
 });
 
-app.use(cors());
+
+app.use("/api/orti", ortoRoutes);
+
 
 // Handling GET requests
 app.get('/', async function(req, res){
 	res.send('Hello World!');
-	
-	let newOrto = new Orto({
-		nome: "OrtoTest",
-		indirizzo: "Via di Test 123",
-		coordinate: {
-			lat: 41.90,
-			lng: 12.49
-		},
-		lotti: []  // opzionale
-	});
-
-	await newOrto.save();
-
-
-
     console.log('Hello World!');
 });
 
+// Handling GET requests
+app.get('/api/v1/orti', function(req, res){
+	res.send([
+  {
+    "self": "self",
+    "latitude": "1234",
+    "longitude": "5678",
+    "association": {
+      "self": "self",
+      "name": "amici di povo"
+    }
+  }
+]);
+    console.log('Amici di Povo');
+});
 
 
-//
 app.listen(PORT, function() {
 	console.log('Server running on port ', PORT);
 });
@@ -75,7 +61,6 @@ app.use((req, res) => {
     res.status(404);
     res.json({ error: 'Page Not found Error 404' });
 });
-
 
 
 /* Default error handler */
