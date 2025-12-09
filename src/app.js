@@ -57,3 +57,18 @@ app.get('/api/v1/orti', function(req, res){
 app.listen(PORT, function() {
 	console.log('Server running on port ', PORT);
 });
+
+
+/* Default 404 handler */
+app.use((req, res) => {
+    res.status(404);
+    res.json({ error: 'Page Not found Error 404' });
+});
+
+
+
+/* Default error handler */
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Internal Server Error 500!' });
+});
