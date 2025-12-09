@@ -21,7 +21,7 @@ const affidaLotto = new Schema({
         type: Date,
         required: true
     },
-    culture:[String]
+    colture:[String] // possible future implementation of a list of colture planted by the user
 
 }, { timestamps: true });
 
