@@ -63,11 +63,11 @@ exports.deleteAffidaLotto = async (req, res) => {
     }
 };
 
-exports.addCultura = async (req, res) => {
-    const { cultura } = req.body;  
+exports.addColtura = async (req, res) => {
+    const { coltura } = req.body;  
 
-    if (!cultura) {
-        return res.status(400).json({ message: "Cultura is required" });
+    if (!coltura) {
+        return res.status(400).json({ message: "Coltura is required" });
     }
 
     try {
@@ -76,21 +76,21 @@ exports.addCultura = async (req, res) => {
             return res.status(404).json({ message: "Affidamento not found" });
         }
 
-        affida.culture.push(cultura);
+        affida.culture.push(coltura);
         await affida.save();
 
         res.status(200).json({
-            message: "Cultura added successfully",
+            message: "Coltura added successfully",
             culture: affida.culture
         });
 
     } catch (error) {
-        res.status(500).json({ message: "Error adding cultura", error });
+        res.status(500).json({ message: "Error adding coltura", error });
     }
 };
 
-exports.removeCultura = async (req, res) => {
-    const culturaToRemove = req.params.cultura; 
+exports.removeColtura = async (req, res) => {
+    const colturaToRemove = req.params.coltura; 
 
     try {
         const affida = await AffidaLotto.findById(req.params.id);
@@ -98,21 +98,21 @@ exports.removeCultura = async (req, res) => {
             return res.status(404).json({ message: "Affidamento not found" });
         }
 
-        const index = affida.culture.indexOf(culturaToRemove);
+        const index = affida.culture.indexOf(colturaToRemove);
         if (index === -1) {
-            return res.status(404).json({ message: "Cultura not found" });
+            return res.status(404).json({ message: "Coltura not found" });
         }
 
         affida.culture.splice(index, 1);
         await affida.save();
 
         res.status(200).json({
-            message: "Cultura removed successfully",
+            message: "Coltura removed successfully",
             culture: affida.culture
         });
 
     } catch (error) {
-        res.status(500).json({ message: "Error removing cultura", error });
+        res.status(500).json({ message: "Error removing coltura", error });
     }
 };
 

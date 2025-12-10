@@ -9,7 +9,7 @@ router.put("/:id", affidaLottoController.updateAffidaLotto);
 router.delete("/:id", affidaLottoController.deleteAffidaLotto);
 
 // --- NUOVE ROTTE ---
-router.post("/api/v1/affida-lotti/:id/culture", affidaLottoController.addCultura);
-router.delete("/api/v1/affida-lotti/:id/culture/:cultura", affidaLottoController.removeCultura);
+router.post("/api/v1/affida-lotti/:id/colture", affidaLottoController.addColtura);
+router.delete("/api/v1/affida-lotti/:id/colture/:coltura", affidaLottoController.removeColtura);
 
 module.exports = router;
