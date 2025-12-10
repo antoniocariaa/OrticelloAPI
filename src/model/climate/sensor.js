@@ -23,4 +23,4 @@ var sensorSchema = new Schema({
   },
   rilev: String // TO DO
 });
-module.exports = mongoose.model("Meteo", sensorSchema, "meteo");
+module.exports = mongoose.model("Sensor", sensorSchema, "sensors");
