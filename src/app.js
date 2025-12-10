@@ -41,22 +41,22 @@ app.use("/api/v1/sensor", sensorRoutes);
 
 // Handling GET requests
 app.get('/', async function(req, res){
-	res.send('Hello World!');
-	
+	try{
+    res.status(200).json("Orticello API is running");
+  } catch(error){
+    res.status(500).json({ message: 'Error', error });
+  }
 });
-
 
 app.listen(PORT, function() {
 	console.log('Server running on port ', PORT);
 });
-
 
 /* Default 404 handler */
 app.use((req, res) => {
     res.status(404);
     res.json({ error: 'Page Not found Error 404' });
 });
-
 
 /* Default error handler */
 app.use((err, req, res, next) => {

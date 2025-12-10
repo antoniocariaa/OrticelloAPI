@@ -12,6 +12,7 @@ exports.getAllOrtos = async (req, res) => {
 exports.createOrto = async (req, res) => {
     try {
         const newOrto = new Orto(req.body);
+        console.log(req.body)
         const savedOrto = await newOrto.save();
         res.status(201).json(savedOrto);
     } catch (error) {
@@ -21,7 +22,7 @@ exports.createOrto = async (req, res) => {
 
 exports.getOrtoById = async (req, res) => {
     try {
-        const orto = await Orto.findById(req.params.id);    
+        const orto = await Orto.findById(req.params.id);
         if (!orto) {
             return res.status(404).json({ message: 'Orto not found' });
         }
