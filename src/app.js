@@ -9,6 +9,10 @@ var associazioneRoutes = require("./routes/associazioneRoutes");
 var comuneRoutes = require("./routes/comuneRoutes");
 var affidaLottoRoutes = require("./routes/affidaLottoRoutes");
 var affidaOrtoRoutes = require("./routes/affidaOrtoRoutes");
+var avvisoRoutes = require("./routes/avvisoRoutes");
+var bandoRoutes = require("./routes/bandoRoutes");
+var meteoRoutes = require("./routes/meteoRoutes");
+var sensorRoutes = require("./routes/sensorRoutes");
 
 var app = express();
 const PORT = process.env.PORT || 8080
@@ -30,7 +34,10 @@ app.use("/api/v1/associazioni", associazioneRoutes);
 app.use("/api/v1/comune", comuneRoutes);
 app.use("/api/v1/affidaLotti", affidaLottoRoutes);
 app.use("/api/v1/affidaOrti", affidaOrtoRoutes);
-
+app.use("/api/v1/avvisi", avvisoRoutes);
+app.use("/api/v1/bandi", bandoRoutes);
+app.use("/api/v1/meteo", meteoRoutes);
+app.use("/api/v1/sensor", sensorRoutes);
 
 // Handling GET requests
 app.get('/', async function(req, res){
