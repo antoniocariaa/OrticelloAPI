@@ -51,7 +51,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrtoInput'
+              $ref: '#/components/schemas/Orto'
       responses:
         '201':
           description: Orto created successfully
@@ -132,7 +132,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OrtoInput'
+              $ref: '#/components/schemas/Orto'
       responses:
         '200':
           description: Orto updated successfully
@@ -249,7 +249,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LottoInput'
+              $ref: '#/components/schemas/Lotto'
       responses:
         '201':
           description: Lotto created successfully
@@ -330,7 +330,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LottoInput'
+              $ref: '#/components/schemas/Lotto'
       responses:
         '200':
           description: Lotto updated successfully
@@ -447,7 +447,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AssociazioneInput'
+              $ref: '#/components/schemas/Associazione'
       responses:
         '201':
           description: Associazione created successfully
@@ -540,7 +540,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AssociazioneInput'
+              $ref: '#/components/schemas/Associazione'
       responses:
         '200':
           description: Associazione updated successfully
@@ -628,6 +628,228 @@ paths:
                     example: "Errore durante l'eliminazione"
                   error:
                     type: string
+  
+  /v1/comune:
+    get:
+      summary: Get list of comuni
+      description: >-
+        Retrieve a list of all comuni (municipalities). 
+        Returns an array of comune objects with their details.
+      tags:
+        - Comune
+      responses:
+        '200':
+          description: Successfully retrieved list of comuni
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comune'
+        '500':
+          description: Error retrieving comuni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Errore nel recupero dei comuni'
+                  error:
+                    type: string
+    
+    post:
+      summary: Create a new comune
+      description: Create a new municipality with the provided information
+      tags:
+        - Comune
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comune'
+      responses:
+        '201':
+          description: Comune created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comune'
+        '400':
+          description: Invalid data or duplicate entry
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Dati non validi o duplicati'
+                  error:
+                    type: string
+        '500':
+          description: Error creating comune
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Errore nella creazione del comune'
+                  error:
+                    type: string
+  
+  /v1/comune/{id}:
+    get:
+      summary: Get comune by ID
+      description: Retrieve a single municipality by its unique identifier
+      tags:
+        - Comune
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the comune
+      responses:
+        '200':
+          description: Successfully retrieved comune
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comune'
+        '404':
+          description: Comune not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Comune non trovato'
+        '500':
+          description: Error retrieving comune
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Errore nel recupero del comune'
+                  error:
+                    type: string
+    
+    put:
+      summary: Update comune by ID
+      description: Update an existing municipality with new information
+      tags:
+        - Comune
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the comune
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Comune'
+      responses:
+        '200':
+          description: Comune updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comune'
+        '400':
+          description: Invalid update data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Dati aggiornati non validi'
+                  error:
+                    type: string
+        '404':
+          description: Comune not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Comune non trovato'
+        '500':
+          description: Error updating comune
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Errore nell'aggiornamento del comune"
+                  error:
+                    type: string
+    
+    delete:
+      summary: Delete comune by ID
+      description: Delete a municipality by its unique identifier
+      tags:
+        - Comune
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the comune
+      responses:
+        '200':
+          description: Comune deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Comune eliminato con successo'
+        '404':
+          description: Comune not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Comune non trovato'
+        '500':
+          description: Error deleting comune
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Errore durante l'eliminazione"
+                  error:
+                    type: string
 
 
 components:
@@ -635,14 +857,14 @@ components:
     Orto:
       type: object
       required:
-        - _id
         - nome
         - indirizzo
         - coordinate
       properties:
         _id:
           type: string
-          description: MongoDB ObjectId
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
           example: '507f1f77bcf86cd799439011'
         nome:
           type: string
@@ -676,71 +898,17 @@ components:
             description: MongoDB ObjectId reference to Lotto
           example: ['507f1f77bcf86cd799439012', '507f1f77bcf86cd799439013']
     
-    OrtoInput:
-      type: object
-      required:
-        - nome
-        - indirizzo
-        - coordinate
-      properties:
-        nome:
-          type: string
-          description: Name of the green garden
-          example: 'Orto di Via Roma'
-        indirizzo:
-          type: string
-          description: Address of the green garden
-          example: 'Via Roma 123, Trento'
-        coordinate:
-          type: object
-          required:
-            - lat
-            - lng
-          properties:
-            lat:
-              type: number
-              format: double
-              description: Latitude in decimal degrees
-              example: 46.0664
-            lng:
-              type: number
-              format: double
-              description: Longitude in decimal degrees
-              example: 11.1257
-        lotti:
-          type: array
-          description: Array of references to Lotto documents
-          items:
-            type: string
-            description: MongoDB ObjectId reference to Lotto
-          example: []
-    
     Lotto:
       type: object
       required:
-        - _id
         - dimensione
         - sensori
       properties:
         _id:
           type: string
-          description: MongoDB ObjectId
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
           example: '507f1f77bcf86cd799439012'
-        dimensione:
-          type: number
-          description: Size of the plot in square meters
-          example: 50
-        sensori:
-          type: boolean
-          description: Whether the plot is equipped with sensors
-          example: true
-    
-    LottoInput:
-      type: object
-      required:
-        - dimensione
-        - sensori
-      properties:
         dimensione:
           type: number
           description: Size of the plot in square meters
@@ -753,7 +921,6 @@ components:
     Associazione:
       type: object
       required:
-        - _id
         - nome
         - indirizzo
         - telefono
@@ -761,7 +928,8 @@ components:
       properties:
         _id:
           type: string
-          description: MongoDB ObjectId
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
           example: '507f1f77bcf86cd799439014'
         nome:
           type: string
@@ -783,15 +951,17 @@ components:
         createdAt:
           type: string
           format: date-time
-          description: Timestamp of creation
+          description: Timestamp of creation (generated automatically)
+          readOnly: true
           example: '2025-12-11T10:30:00.000Z'
         updatedAt:
           type: string
           format: date-time
-          description: Timestamp of last update
+          description: Timestamp of last update (generated automatically)
+          readOnly: true
           example: '2025-12-11T10:30:00.000Z'
     
-    AssociazioneInput:
+    Comune:
       type: object
       required:
         - nome
@@ -799,58 +969,37 @@ components:
         - telefono
         - email
       properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: '507f1f77bcf86cd799439015'
         nome:
           type: string
-          description: Name of the association
-          example: 'Associazione Orti Urbani Trento'
+          description: Name of the municipality
+          example: 'Comune di Trento'
         indirizzo:
           type: string
-          description: Address of the association
-          example: 'Via delle Associazioni 45, Trento'
+          description: Address of the municipality
+          example: 'Piazza Duomo 1, Trento'
         telefono:
           type: string
-          description: Phone number (mobile format validated)
-          example: '+393331234567'
+          description: Phone number of the municipality
+          example: '+390461884111'
         email:
           type: string
           format: email
           description: Email address (unique, validated)
-          example: 'info@ortiurbanitrento.it'
-    
-    lotto:
-      type: object
-      required:
-      - orto
-      - status
-      - size
-      - sensors
-      properties:
-        self:
+          example: 'info@comune.trento.it'
+        createdAt:
           type: string
-          description: 'link to green garden, division'
-        orto:
-          type: object
-          description: 'link to green garden container'
-          $ref: '#/components/schemas/Orto'
-        status:
+          format: date-time
+          description: Timestamp of creation (generated automatically)
+          readOnly: true
+          example: '2025-12-11T10:30:00.000Z'
+        updatedAt:
           type: string
-          enum: [available, assigned]
-        size:
-          type: number
-          description: 'size of green garden'
-        sensors:
-          type: boolean
-          description: 'if the division has sensors in it'
-          enum: [false, true]
-    
-    associazione:
-      type: object
-      required:
-      - name
-      properties:
-        self:
-          type: string
-          description: 'link to association'
-        name:
-          type: string
-          description: 'association name'
+          format: date-time
+          description: Timestamp of last update (generated automatically)
+          readOnly: true
+          example: '2025-12-11T10:30:00.000Z'
