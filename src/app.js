@@ -1,6 +1,7 @@
 require('dotenv').config();
 var express = require('express');
 var mongoose = require('mongoose');
+var cors = require('cors');
 
 var ortoRoutes = require("./routes/ortoRoutes");
 var lottoRoutes = require("./routes/lottoRoutes");
@@ -22,6 +23,8 @@ mongoose.connect(process.env.MONGODB_URI, {
   serverSelectionTimeoutMS: 5000,
 	socketTimeoutMS: 45000
 });
+
+app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
