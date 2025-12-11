@@ -8,52 +8,815 @@ info:
 servers:
   - url: http://localhost:8080/api/
     description: Localhost
-  - url: https://orticello.onrender.com/api/
+  - url: https://orticelloapi.onrender.com/api/
     description: render.com
 paths:
   /v1/orti:
     get:
       summary: Get list of green gardens
       description: >-
-        Get list of green gardens with some parameters in request
-        It is possible to filter with some conditions like sensor or size
-      parameters:
-        - in: query
-          name: sensor
-          schema:
-            type: boolean
-            enum: [false, true]
+        Retrieve a list of all green gardens (orti). 
+        Returns an array of orto objects with their details.
+      tags:
+        - Orti
       responses:
         '200':
-          description: 'collection of green gardens'
+          description: Successfully retrieved list of orti
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/orto'
+                  $ref: '#/components/schemas/Orto'
+        '500':
+          description: Error retrieving orti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error retrieving ortos'
+                  error:
+                    type: object
+    
+    post:
+      summary: Create a new orto
+      description: Create a new green garden with the provided information
+      tags:
+        - Orti
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrtoInput'
+      responses:
+        '201':
+          description: Orto created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Orto'
+        '500':
+          description: Error creating orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error creating orto'
+                  error:
+                    type: object
+  
+  /v1/orti/{id}:
+    get:
+      summary: Get orto by ID
+      description: Retrieve a single green garden by its unique identifier
+      tags:
+        - Orti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the orto
+      responses:
+        '200':
+          description: Successfully retrieved orto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Orto'
+        '404':
+          description: Orto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Orto not found'
+        '500':
+          description: Error retrieving orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error retrieving orto'
+                  error:
+                    type: object
+    
+    put:
+      summary: Update orto by ID
+      description: Update an existing green garden with new information
+      tags:
+        - Orti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the orto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrtoInput'
+      responses:
+        '200':
+          description: Orto updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Orto'
+        '404':
+          description: Orto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Orto not found'
+        '500':
+          description: Error updating orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error updating orto'
+                  error:
+                    type: object
+    
+    delete:
+      summary: Delete orto by ID
+      description: Delete a green garden by its unique identifier
+      tags:
+        - Orti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the orto
+      responses:
+        '200':
+          description: Orto deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Orto deleted successfully'
+        '404':
+          description: Orto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Orto not found'
+        '500':
+          description: Error deleting orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error deleting orto'
+                  error:
+                    type: object
+  
+  /v1/lotti:
+    get:
+      summary: Get list of lotti
+      description: >-
+        Retrieve a list of all lotti (plots). 
+        Returns an array of lotto objects with their details.
+      tags:
+        - Lotti
+      responses:
+        '200':
+          description: Successfully retrieved list of lotti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lotto'
+        '500':
+          description: Error retrieving lotti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error retrieving lotti'
+                  error:
+                    type: object
+    
+    post:
+      summary: Create a new lotto
+      description: Create a new plot with the provided information
+      tags:
+        - Lotti
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LottoInput'
+      responses:
+        '201':
+          description: Lotto created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lotto'
+        '500':
+          description: Error creating lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error creating lotto'
+                  error:
+                    type: object
+  
+  /v1/lotti/{id}:
+    get:
+      summary: Get lotto by ID
+      description: Retrieve a single plot by its unique identifier
+      tags:
+        - Lotti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the lotto
+      responses:
+        '200':
+          description: Successfully retrieved lotto
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lotto'
+        '404':
+          description: Lotto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Lotto not found'
+        '500':
+          description: Error retrieving lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error retrieving lotto'
+                  error:
+                    type: object
+    
+    put:
+      summary: Update lotto by ID
+      description: Update an existing plot with new information
+      tags:
+        - Lotti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the lotto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LottoInput'
+      responses:
+        '200':
+          description: Lotto updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lotto'
+        '404':
+          description: Lotto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Lotto not found'
+        '500':
+          description: Error updating lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error updating lotto'
+                  error:
+                    type: object
+    
+    delete:
+      summary: Delete lotto by ID
+      description: Delete a plot by its unique identifier
+      tags:
+        - Lotti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the lotto
+      responses:
+        '200':
+          description: Lotto deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Lotto deleted successfully'
+        '404':
+          description: Lotto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Lotto not found'
+        '500':
+          description: Error deleting lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Error deleting lotto'
+                  error:
+                    type: object
+  
+  /v1/associazioni:
+    get:
+      summary: Get list of associazioni
+      description: >-
+        Retrieve a list of all associazioni (associations). 
+        Returns an array of associazione objects with their details.
+      tags:
+        - Associazioni
+      responses:
+        '200':
+          description: Successfully retrieved list of associazioni
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Associazione'
+        '500':
+          description: Error retrieving associazioni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Errore nel recupero delle associazioni'
+                  error:
+                    type: string
+    
+    post:
+      summary: Create a new associazione
+      description: Create a new association with the provided information
+      tags:
+        - Associazioni
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssociazioneInput'
+      responses:
+        '201':
+          description: Associazione created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Associazione'
+        '400':
+          description: Invalid data or duplicate entry
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Dati non validi o duplicati'
+                  error:
+                    type: string
+        '500':
+          description: Error creating associazione
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Errore nella creazione dell'associazione"
+                  error:
+                    type: string
+  
+  /v1/associazioni/{id}:
+    get:
+      summary: Get associazione by ID
+      description: Retrieve a single association by its unique identifier
+      tags:
+        - Associazioni
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the associazione
+      responses:
+        '200':
+          description: Successfully retrieved associazione
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Associazione'
+        '404':
+          description: Associazione not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Associazione non trovata'
+        '500':
+          description: Error retrieving associazione
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Errore nel recupero dell'associazione"
+                  error:
+                    type: string
+    
+    put:
+      summary: Update associazione by ID
+      description: Update an existing association with new information
+      tags:
+        - Associazioni
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the associazione
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssociazioneInput'
+      responses:
+        '200':
+          description: Associazione updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Associazione'
+        '400':
+          description: Invalid update data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Dati aggiornati non validi'
+                  error:
+                    type: string
+        '404':
+          description: Associazione not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Associazione non trovata'
+        '500':
+          description: Error updating associazione
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Errore nell'aggiornamento dell'associazione"
+                  error:
+                    type: string
+    
+    delete:
+      summary: Delete associazione by ID
+      description: Delete an association by its unique identifier
+      tags:
+        - Associazioni
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the associazione
+      responses:
+        '200':
+          description: Associazione deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Associazione eliminata con successo'
+        '404':
+          description: Associazione not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Associazione non trovata'
+        '500':
+          description: Error deleting associazione
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Errore durante l'eliminazione"
+                  error:
+                    type: string
+
 
 components:
   schemas:
-    orto:
+    Orto:
       type: object
-      required: 
-      - latitude
-      - longitude
-      - association
+      required:
+        - _id
+        - nome
+        - indirizzo
+        - coordinate
       properties:
-        self:
+        _id:
           type: string
-          description: 'link to green garden'
-        latitude:
+          description: MongoDB ObjectId
+          example: '507f1f77bcf86cd799439011'
+        nome:
           type: string
-          description: 'latitude position of green garden'
-        longitude:
+          description: Name of the green garden
+          example: 'Orto di Via Roma'
+        indirizzo:
           type: string
-          description: 'longitude position of green garden'
-        association:
-            type: object
-            $ref: '#/components/schemas/associazione'
+          description: Address of the green garden
+          example: 'Via Roma 123, Trento'
+        coordinate:
+          type: object
+          required:
+            - lat
+            - lng
+          properties:
+            lat:
+              type: number
+              format: double
+              description: Latitude in decimal degrees
+              example: 46.0664
+            lng:
+              type: number
+              format: double
+              description: Longitude in decimal degrees
+              example: 11.1257
+        lotti:
+          type: array
+          description: Array of references to Lotto documents
+          items:
+            type: string
+            description: MongoDB ObjectId reference to Lotto
+          example: ['507f1f77bcf86cd799439012', '507f1f77bcf86cd799439013']
+    
+    OrtoInput:
+      type: object
+      required:
+        - nome
+        - indirizzo
+        - coordinate
+      properties:
+        nome:
+          type: string
+          description: Name of the green garden
+          example: 'Orto di Via Roma'
+        indirizzo:
+          type: string
+          description: Address of the green garden
+          example: 'Via Roma 123, Trento'
+        coordinate:
+          type: object
+          required:
+            - lat
+            - lng
+          properties:
+            lat:
+              type: number
+              format: double
+              description: Latitude in decimal degrees
+              example: 46.0664
+            lng:
+              type: number
+              format: double
+              description: Longitude in decimal degrees
+              example: 11.1257
+        lotti:
+          type: array
+          description: Array of references to Lotto documents
+          items:
+            type: string
+            description: MongoDB ObjectId reference to Lotto
+          example: []
+    
+    Lotto:
+      type: object
+      required:
+        - _id
+        - dimensione
+        - sensori
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId
+          example: '507f1f77bcf86cd799439012'
+        dimensione:
+          type: number
+          description: Size of the plot in square meters
+          example: 50
+        sensori:
+          type: boolean
+          description: Whether the plot is equipped with sensors
+          example: true
+    
+    LottoInput:
+      type: object
+      required:
+        - dimensione
+        - sensori
+      properties:
+        dimensione:
+          type: number
+          description: Size of the plot in square meters
+          example: 50
+        sensori:
+          type: boolean
+          description: Whether the plot is equipped with sensors
+          example: true
+    
+    Associazione:
+      type: object
+      required:
+        - _id
+        - nome
+        - indirizzo
+        - telefono
+        - email
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId
+          example: '507f1f77bcf86cd799439014'
+        nome:
+          type: string
+          description: Name of the association
+          example: 'Associazione Orti Urbani Trento'
+        indirizzo:
+          type: string
+          description: Address of the association
+          example: 'Via delle Associazioni 45, Trento'
+        telefono:
+          type: string
+          description: Phone number (mobile format validated)
+          example: '+393331234567'
+        email:
+          type: string
+          format: email
+          description: Email address (unique, validated)
+          example: 'info@ortiurbanitrento.it'
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp of creation
+          example: '2025-12-11T10:30:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp of last update
+          example: '2025-12-11T10:30:00.000Z'
+    
+    AssociazioneInput:
+      type: object
+      required:
+        - nome
+        - indirizzo
+        - telefono
+        - email
+      properties:
+        nome:
+          type: string
+          description: Name of the association
+          example: 'Associazione Orti Urbani Trento'
+        indirizzo:
+          type: string
+          description: Address of the association
+          example: 'Via delle Associazioni 45, Trento'
+        telefono:
+          type: string
+          description: Phone number (mobile format validated)
+          example: '+393331234567'
+        email:
+          type: string
+          format: email
+          description: Email address (unique, validated)
+          example: 'info@ortiurbanitrento.it'
+    
     lotto:
       type: object
       required:
@@ -68,7 +831,7 @@ components:
         orto:
           type: object
           description: 'link to green garden container'
-          $ref: '#/components/schemas/orto'
+          $ref: '#/components/schemas/Orto'
         status:
           type: string
           enum: [available, assigned]
