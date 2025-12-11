@@ -2,6 +2,8 @@ require('dotenv').config();
 var express = require('express');
 var mongoose = require('mongoose');
 var cors = require('cors');
+var swaggerUi = require('swagger-ui-express');
+var { initializeSwagger } = require('./config/swagger');
 
 var ortoRoutes = require("./routes/ortoRoutes");
 var lottoRoutes = require("./routes/lottoRoutes");
@@ -56,7 +58,12 @@ app.use("/api/v1/avvisi", checkToken);
 app.use("/api/v1/bandi", checkToken);
 app.use("/api/v1/meteo", checkToken);
 app.use("/api/v1/sensor", checkToken);
+const swaggerSpec = initializeSwagger();
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "Orticello API Documentation"
+}));
 app.use("/api/v1/orti", ortoRoutes);
 app.use("/api/v1/lotti", lottoRoutes);
 //middleware di autenticazione separato per la creazione utenti (vedi utenteRoutes.js)
