@@ -31,9 +31,41 @@ var utenteSchema = new Schema({
     required: true,
     validate: {
       validator: function(v) {
-        return validator.isTaxID(v);
+        // EU countries tax ID validation
+        const euLocales = [
+          'it-IT', // Italy
+          'de-DE', // Germany
+          'fr-FR', // France
+          'es-ES', // Spain
+          'nl-NL', // Netherlands
+          'pt-PT', // Portugal
+          'el-GR', // Greece
+          'pl-PL', // Poland
+          'be-BE', // Belgium
+          'at-AT', // Austria
+          'bg-BG', // Bulgaria
+          'hr-HR', // Croatia
+          'cy-CY', // Cyprus
+          'cz-CZ', // Czech Republic
+          'dk-DK', // Denmark
+          'ee-EE', // Estonia
+          'fi-FI', // Finland
+          'hu-HU', // Hungary
+          'ie-IE', // Ireland
+          'lv-LV', // Latvia
+          'lt-LT', // Lithuania
+          'lu-LU', // Luxembourg
+          'mt-MT', // Malta
+          'ro-RO', // Romania
+          'sk-SK', // Slovakia
+          'si-SI', // Slovenia
+          'se-SE'  // Sweden
+        ];
+        
+        // Check if valid for any EU country
+        return euLocales.some(locale => validator.isTaxID(v, locale));
       },
-      message: '{VALUE} non è un codice fiscale valido'
+      message: '{VALUE} non è un codice fiscale valido per nessun paese dell\'UE'
     }
   },
   email: {
