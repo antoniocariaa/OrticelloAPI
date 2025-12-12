@@ -14,6 +14,8 @@ var avvisoRoutes = require("./routes/avvisoRoutes");
 var bandoRoutes = require("./routes/bandoRoutes");
 var meteoRoutes = require("./routes/meteoRoutes");
 var sensorRoutes = require("./routes/sensorRoutes");
+var authentication = require("./routes/authentication");
+var checkToken = require("./routes/checkToken");
 
 var app = express();
 const PORT = process.env.PORT || 8080
@@ -29,18 +31,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-app.use("/api/v1/orti", ortoRoutes);
-app.use("/api/v1/lotti", lottoRoutes);
-app.use("/api/v1/utenti", utentiRoutes);
-app.use("/api/v1/associazioni", associazioneRoutes);
-app.use("/api/v1/comune", comuneRoutes);
-app.use("/api/v1/affidaLotti", affidaLottoRoutes);
-app.use("/api/v1/affidaOrti", affidaOrtoRoutes);
-app.use("/api/v1/avvisi", avvisoRoutes);
-app.use("/api/v1/bandi", bandoRoutes);
-app.use("/api/v1/meteo", meteoRoutes);
-app.use("/api/v1/sensor", sensorRoutes);
+app.use('/api/v1/authentication', authentication);
 
 // Handling GET requests
 app.get('/', async function(req, res){
@@ -55,6 +46,30 @@ app.listen(PORT, function() {
 	console.log('Server running on port ', PORT);
 });
 
+app.use("/api/v1/orti", checkToken);
+app.use("/api/v1/lotti", checkToken);
+//app.use("/api/v1/utenti", checkToken);
+app.use("/api/v1/associazioni", checkToken);
+app.use("/api/v1/comune", checkToken);
+app.use("/api/v1/affidaLotti", checkToken);
+app.use("/api/v1/affidaOrti", checkToken);
+app.use("/api/v1/avvisi", checkToken);
+app.use("/api/v1/bandi", checkToken);
+app.use("/api/v1/meteo", checkToken);
+app.use("/api/v1/sensor", checkToken);
+
+app.use("/api/v1/orti", ortoRoutes);
+app.use("/api/v1/lotti", lottoRoutes);
+app.use("/api/v1/utenti", utentiRoutes);
+app.use("/api/v1/associazioni", associazioneRoutes);
+app.use("/api/v1/comune", comuneRoutes);
+app.use("/api/v1/affidaLotti", affidaLottoRoutes);
+app.use("/api/v1/affidaOrti", affidaOrtoRoutes);
+app.use("/api/v1/avvisi", avvisoRoutes);
+app.use("/api/v1/bandi", bandoRoutes);
+app.use("/api/v1/meteo", meteoRoutes);
+app.use("/api/v1/sensor", sensorRoutes);
+
 /* Default 404 handler */
 app.use((req, res) => {
     res.status(404);
@@ -66,3 +81,6 @@ app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({ error: 'Internal Server Error 500!' });
 });
+
+
+
