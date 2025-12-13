@@ -48,7 +48,6 @@ app.listen(PORT, function() {
 
 app.use("/api/v1/orti", checkToken);
 app.use("/api/v1/lotti", checkToken);
-//app.use("/api/v1/utenti", checkToken);
 app.use("/api/v1/associazioni", checkToken);
 app.use("/api/v1/comune", checkToken);
 app.use("/api/v1/affidaLotti", checkToken);
@@ -60,6 +59,7 @@ app.use("/api/v1/sensor", checkToken);
 
 app.use("/api/v1/orti", ortoRoutes);
 app.use("/api/v1/lotti", lottoRoutes);
+//middleware di autenticazione separato per la creazione utenti (vedi utenteRoutes.js)
 app.use("/api/v1/utenti", utentiRoutes);
 app.use("/api/v1/associazioni", associazioneRoutes);
 app.use("/api/v1/comune", comuneRoutes);
