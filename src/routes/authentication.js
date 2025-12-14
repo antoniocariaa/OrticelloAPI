@@ -1,6 +1,7 @@
 var express = require('express');
 var Utente = require('../model/utente');
 var jwt = require('jsonwebtoken');
+var bcrypt = require('bcrypt');
 var OAuth2Client = require('google-auth-library');
 
 const router = express.Router();
@@ -45,13 +46,14 @@ router.post('', async function(req, res) {
         console.log(req.body.email);
         user = await Utente.findOne({ email: req.body.email }).select('email password').exec();
         
-        console.log(user);
+        //console.log(user);
 
         if(!user){
             return res.status(401).json({ message: 'Authentication failed. User not found.' });
         }
 
-        if(user.password !== req.body.password){
+        const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
+        if(!isPasswordValid){
             return res.status(401).json({ message: 'Authentication failed. Wrong password.' });
         }
     }

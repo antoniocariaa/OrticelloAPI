@@ -34,7 +34,7 @@ exports.createUtente = async (req, res) => {
         }
 
         // Hash password
-        //const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Create new user object
         const nuovoUtente = new Utente({
@@ -42,7 +42,7 @@ exports.createUtente = async (req, res) => {
             cognome,
             codicefiscale,
             email,
-            password,
+            password: hashedPassword,
             indirizzo,
             telefono,
             tipo: tipo || 'citt'
