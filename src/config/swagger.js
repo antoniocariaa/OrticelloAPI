@@ -25,6 +25,7 @@ const swaggerOptions = {
       }
     ],
     tags: [
+      { name: 'Authentication', description: 'User authentication endpoints' },
       { name: 'Orti', description: 'Garden management endpoints' },
       { name: 'Lotti', description: 'Plot management endpoints' },
       { name: 'Utenti', description: 'User management endpoints' },
