@@ -4,6 +4,8 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var swaggerUi = require('swagger-ui-express');
 var { initializeSwagger } = require('./config/swagger');
+var swaggerUi = require('swagger-ui-express');
+var { initializeSwagger } = require('./config/swagger');
 
 var ortoRoutes = require("./routes/ortoRoutes");
 var lottoRoutes = require("./routes/lottoRoutes");

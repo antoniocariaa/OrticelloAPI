@@ -84,6 +84,52 @@ router.get("/", utenteController.getAllUtenti);
  *                 error:
  *                   type: object
  */
+
+/**
+ * @swagger
+ * /api/v1/utenti/{id}:
+ *   get:
+ *     summary: Get utente by ID
+ *     description: Retrieve a single user by its unique identifier
+ *     tags:
+ *       - Utenti
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB ObjectId of the utente
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved utente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Utente'
+ *       404:
+ *         description: Utente not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Utente not found'
+ *       500:
+ *         description: Error retrieving utente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error retrieving utente'
+ *                 error:
+ *                   type: object
+ */
 router.get("/:id", utenteController.getUtenteById);
 
 // TO DO: Aggiungere rotte per creazione, aggiornamento e cancellazione utenti
