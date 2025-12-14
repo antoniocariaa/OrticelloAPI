@@ -23,6 +23,7 @@ async function verify( token ) {
 	return payload;
 }
 
+
 router.post('', async function(req, res) {
     var user = {};
 

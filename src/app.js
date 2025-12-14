@@ -15,7 +15,7 @@ var bandoRoutes = require("./routes/bandoRoutes");
 var meteoRoutes = require("./routes/meteoRoutes");
 var sensorRoutes = require("./routes/sensorRoutes");
 var authentication = require("./routes/authentication");
-var checkToken = require("./routes/checkToken");
+var checkToken = require("./model/checkToken");
 
 var app = express();
 const PORT = process.env.PORT || 8080
