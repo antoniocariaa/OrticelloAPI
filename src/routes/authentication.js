@@ -35,9 +35,18 @@ router.post('', async function(req, res) {
 		user = await Utente.findOne({ email: payload['email'] }).exec();
 		if ( ! user ) {
 			user = new Utente({
+                nome: payload['given_name'],
+                cognome: payload['family_name'],
+
+                // probably won't work
+                codicefiscale: 'NNNNNNNNNNNNNNNN',
 				email: payload['email'],
-				password: 'default-google-password-to-be-changed'
+				password: await bcrypt.hash('default-google-password-to-be-changed', 10),
+                indirizzo: 'Non specificato',
+                telefono: '+393000000000',
+                tipo: 'citt'
 			});
+
 			await user.save().exec();
 			console.log('Utente created after login with google');
 			
