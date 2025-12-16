@@ -26,7 +26,7 @@ const detectLanguage = (req, res, next) => {
     const primaryLang = acceptLanguage.split(',')[0].split('-')[0];
     
     // Verifica che sia una lingua supportata
-    const supportedLocales = ['it', 'en', 'de', 'fr', 'es'];
+    const supportedLocales = ['it', 'en', 'de'];
     if (supportedLocales.includes(primaryLang)) {
       locale = primaryLang;
     }
