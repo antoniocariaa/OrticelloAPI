@@ -2,6 +2,7 @@ require('dotenv').config();
 var express = require('express');
 var mongoose = require('mongoose');
 var cors = require('cors');
+var detectLanguage = require('./controllers/detectLanguage');
 
 var ortoRoutes = require("./routes/ortoRoutes");
 var lottoRoutes = require("./routes/lottoRoutes");
@@ -31,6 +32,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(detectLanguage);
+
 app.use('/api/v1/authentication', authentication);
 
 // Handling GET requests
@@ -59,6 +62,7 @@ app.use("/api/v1/sensor", checkToken);
 
 app.use("/api/v1/orti", ortoRoutes);
 app.use("/api/v1/lotti", lottoRoutes);
+
 //middleware di autenticazione separato per la creazione utenti (vedi utenteRoutes.js)
 app.use("/api/v1/utenti", utentiRoutes);
 app.use("/api/v1/associazioni", associazioneRoutes);

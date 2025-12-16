@@ -1,0 +1,74 @@
+{
+  "errors": {
+    "retrieving_ortos": "Error retrieving gardens",
+    "retrieving_orto": "Error retrieving garden",
+    "retrieving_utenti": "Error retrieving users",
+    "retrieving_utente": "Error retrieving user",
+    "retrieving_lotti": "Error retrieving plots",
+    "retrieving_lotto": "Error retrieving plot",
+
+    "creating_orto": "Error creating garden",
+    "creating_utente": "Error creating user",
+    "creating_lotto": "Error creating plot",
+    
+    "updating_orto": "Error updating garden",
+    "updating_utente": "Error updating user",
+    "updating_lotto": "Error updating plot",
+    "updating_password": "Error updating password",
+
+    "deleting_orto": "Error deleting garden",
+    "deleting_utente": "Error deleting user",
+    "deleting_lotto": "Error deleting plot",
+    
+    "database_error": "Database error",
+
+    "validation_error": "Validation error",
+    "authentication_error": "Authentication error",
+    "authorization_error": "Unauthorized"
+  },
+  "success": {
+    "orto_deleted": "Garden deleted successfully",
+    "utente_deleted": "User deleted successfully",
+    "lotto_deleted": "Plot deleted successfully",
+
+    "orto_created": "Garden created successfully",
+    "utente_created": "User created successfully",
+    "lotto_created": "Plot created successfully",
+
+    "orto_updated": "Garden updated successfully",
+    "utente_updated": "User updated successfully",
+    "lotto_updated": "Plot updated successfully",
+    "password_updated": "Password updated successfully"
+  },
+  "notFound": {
+    "orto": "Garden not found",
+    "utente": "User not found",
+    "lotto": "Plot not found",
+    "associazione": "Association not found",
+    "comune": "Municipality not found",
+    "avviso": "Notice not found",
+    "bando": "Announcement not found"
+  },
+  "validation": {
+    "email_exists": "User already exists with this email",
+    "invalid_email": "Invalid email",
+    "invalid_phone": "Invalid phone number",
+    "invalid_tax_id": "Invalid tax ID",
+    "required_field": "Required field",
+    "password_too_short": "Password too short (minimum 8 characters)",
+    "password_updated": "Password updated successfully",
+    "old_password_incorrect": "Old password incorrect"
+  },
+  "auth": {
+    "login_success": "Login successful",
+    "logout_success": "Logout successful",
+
+    "invalid_credentials": "Invalid credentials",
+
+    "token_expired": "Token expired",
+    "token_invalid": "Invalid token",
+
+    "no_token": "No token provided",
+    "unauthorized": "Unauthorized access"
+  }
+}

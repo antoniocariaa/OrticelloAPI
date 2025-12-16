@@ -1,0 +1,74 @@
+{
+  "errors": {
+    "retrieving_ortos": "Fehler beim Abrufen der Gärten",
+    "retrieving_orto": "Fehler beim Abrufen des Gartens",
+    "retrieving_utenti": "Fehler beim Abrufen der Benutzer",
+    "retrieving_utente": "Fehler beim Abrufen des Benutzers",
+    "retrieving_lotti": "Fehler beim Abrufen der Parzellen",
+    "retrieving_lotto": "Fehler beim Abrufen der Parzelle",
+
+    "creating_orto": "Fehler beim Erstellen des Gartens",
+    "creating_utente": "Fehler beim Erstellen des Benutzers",
+    "creating_lotto": "Fehler beim Erstellen der Parzelle",
+    
+    "updating_orto": "Fehler beim Aktualisieren des Gartens",
+    "updating_utente": "Fehler beim Aktualisieren des Benutzers",
+    "updating_lotto": "Fehler beim Aktualisieren der Parzelle",
+    "updating_password": "Fehler beim Aktualisieren des Passworts",
+
+    "deleting_orto": "Fehler beim Löschen des Gartens",
+    "deleting_utente": "Fehler beim Löschen des Benutzers",
+    "deleting_lotto": "Fehler beim Löschen der Parzelle",
+    
+    "database_error": "Datenbankfehler",
+
+    "validation_error": "Validierungsfehler",
+    "authentication_error": "Authentifizierungsfehler",
+    "authorization_error": "Nicht autorisiert"
+  },
+  "success": {
+    "orto_deleted": "Garten erfolgreich gelöscht",
+    "utente_deleted": "Benutzer erfolgreich gelöscht",
+    "lotto_deleted": "Parzelle erfolgreich gelöscht",
+
+    "orto_created": "Garten erfolgreich erstellt",
+    "utente_created": "Benutzer erfolgreich erstellt",
+    "lotto_created": "Parzelle erfolgreich erstellt",
+
+    "orto_updated": "Garten erfolgreich aktualisiert",
+    "utente_updated": "Benutzer erfolgreich aktualisiert",
+    "lotto_updated": "Parzelle erfolgreich aktualisiert",
+    "password_updated": "Passwort erfolgreich aktualisiert"
+  },
+  "notFound": {
+    "orto": "Garten nicht gefunden",
+    "utente": "Benutzer nicht gefunden",
+    "lotto": "Parzelle nicht gefunden",
+    "associazione": "Verband nicht gefunden",
+    "comune": "Gemeinde nicht gefunden",
+    "avviso": "Hinweis nicht gefunden",
+    "bando": "Ankündigung nicht gefunden"
+  },
+  "validation": {
+    "email_exists": "Benutzer mit dieser E-Mail existiert bereits",
+    "invalid_email": "Ungültige E-Mail",
+    "invalid_phone": "Ungültige Telefonnummer",
+    "invalid_tax_id": "Ungültige Steuernummer",
+    "required_field": "Pflichtfeld",
+    "password_too_short": "Passwort zu kurz (mindestens 8 Zeichen)",
+    "password_updated": "Passwort erfolgreich aktualisiert",
+    "old_password_incorrect": "Altes Passwort falsch"
+  },
+  "auth": {
+    "login_success": "Anmeldung erfolgreich",
+    "logout_success": "Abmeldung erfolgreich",
+
+    "invalid_credentials": "Ungültige Anmeldedaten",
+
+    "token_expired": "Token abgelaufen",
+    "token_invalid": "Ungültiges Token",
+
+    "no_token": "Kein Token bereitgestellt",
+    "unauthorized": "Unbefugter Zugriff"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "errors": {
+    "retrieving_ortos": "Errore nel recupero degli orti",
+    "retrieving_orto": "Errore nel recupero dell'orto",
+    "retrieving_utenti": "Errore nel recupero degli utenti",
+    "retrieving_utente": "Errore nel recupero dell'utente",
+    "retrieving_lotti": "Errore nel recupero dei lotti",
+    "retrieving_lotto": "Errore nel recupero del lotto",
+
+    "creating_orto": "Errore nella creazione dell'orto",
+    "creating_utente": "Errore nella creazione dell'utente",
+    "creating_lotto": "Errore nella creazione del lotto",
+    
+    "updating_orto": "Errore nell'aggiornamento dell'orto",
+    "updating_utente": "Errore nell'aggiornamento dell'utente",
+    "updating_lotto": "Errore nell'aggiornamento del lotto",
+    "updating_password": "Errore nell'aggiornamento della password",
+
+    "deleting_orto": "Errore nell'eliminazione dell'orto",
+    "deleting_utente": "Errore nell'eliminazione dell'utente",
+    "deleting_lotto": "Errore nell'eliminazione del lotto",
+    
+    "database_error": "Errore del database",
+
+    "validation_error": "Errore di validazione",
+    "authentication_error": "Errore di autenticazione",
+    "authorization_error": "Non autorizzato"
+  },
+  "success": {
+    "orto_deleted": "Orto eliminato con successo",
+    "utente_deleted": "Utente eliminato con successo",
+    "lotto_deleted": "Lotto eliminato con successo",
+
+    "orto_created": "Orto creato con successo",
+    "utente_created": "Utente creato con successo",
+    "lotto_created": "Lotto creato con successo",
+
+    "orto_updated": "Orto aggiornato con successo",
+    "utente_updated": "Utente aggiornato con successo",
+    "lotto_updated": "Lotto aggiornato con successo",
+    "password_updated": "Password aggiornata con successo"
+  },
+  "notFound": {
+    "orto": "Orto non trovato",
+    "utente": "Utente non trovato",
+    "lotto": "Lotto non trovato",
+    "associazione": "Associazione non trovata",
+    "comune": "Comune non trovato",
+    "avviso": "Avviso non trovato",
+    "bando": "Bando non trovato"
+  },
+  "validation": {
+    "email_exists": "Utente già esistente con questa email",
+    "invalid_email": "Email non valida",
+    "invalid_phone": "Numero di telefono non valido",
+    "invalid_tax_id": "Codice fiscale non valido",
+    "required_field": "Campo obbligatorio",
+    "password_too_short": "Password troppo corta (minimo 8 caratteri)",
+    "password_updated": "Password aggiornata con successo",
+    "old_password_incorrect": "Vecchia password non corretta"
+  },
+  "auth": {
+    "login_success": "Login effettuato con successo",
+    "logout_success": "Logout effettuato con successo",
+
+    "invalid_credentials": "Credenziali non valide",
+
+    "token_expired": "Token scaduto",
+    "token_invalid": "Token non valido",
+
+    "no_token": "Token non fornito",
+    "unauthorized": "Accesso non autorizzato"
+  }
+}
