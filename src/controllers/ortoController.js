@@ -5,7 +5,7 @@ exports.getAllOrtos = async (req, res) => {
         const ortos = await Orto.find();
         res.status(200).json(ortos);
     } catch (error) {
-        res.status(500).json({ message: 'Error retrieving ortos', error });
+        res.status(500).json({ message: req.t('errors.retrieving_ortos'), error });
     }   
 };
 
@@ -16,7 +16,7 @@ exports.createOrto = async (req, res) => {
         const savedOrto = await newOrto.save();
         res.status(201).json(savedOrto);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating orto', error });
+        res.status(500).json({ message: req.t('errors.creating_orto'), error });
     }  
 };
 
@@ -24,11 +24,11 @@ exports.getOrtoById = async (req, res) => {
     try {
         const orto = await Orto.findById(req.params.id);
         if (!orto) {
-            return res.status(404).json({ message: 'Orto not found' });
+            return res.status(404).json({ message: req.t('notFound.orto') });
         }
         res.status(200).json(orto);
     } catch (error) {
-        res.status(500).json({ message: 'Error retrieving orto', error });
+        res.status(500).json({ message: req.t('errors.retrieving_orto'), error });
     }   
 };
 
@@ -36,11 +36,11 @@ exports.updateOrto = async (req, res) => {
     try {
         const updatedOrto = await Orto.findByIdAndUpdate(req.params.id, req.body, { new: true });    
         if (!updatedOrto) {
-            return res.status(404).json({ message: 'Orto not found' });
+            return res.status(404).json({ message: req.t('notFound.orto') });
         }  
         res.status(200).json(updatedOrto);
     } catch (error) {
-        res.status(500).json({ message: 'Error updating orto', error });
+        res.status(500).json({ message: req.t('errors.updating_orto'), error });
     }
 };
 
@@ -52,10 +52,10 @@ exports.deleteOrto = async (req, res) => {
         
 
         if (!deletedOrto) {
-            return res.status(404).json({ message: 'Orto not found' });
+            return res.status(404).json({ message: req.t('notFound.orto') });
         }
-        res.status(200).json({ message: 'Orto deleted successfully' });
+        res.status(200).json({ message: req.t('success.orto_deleted') });
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting orto', error });
+        res.status(500).json({ message: req.t('errors.deleting_orto'), error });
     }               
 };

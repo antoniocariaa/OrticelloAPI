@@ -6,7 +6,7 @@ exports.getAllUtenti = async (req, res) => {
         const utenti = await Utente.find().select('-password'); 
         res.status(200).json(utenti);
     } catch (error) {
-        res.status(500).json({ message: 'Errore nel recupero degli utenti', error: error.message });
+        res.status(500).json({ message: req.t('errors.retrieving_utenti'), error: error.message });
     }
 };
 
@@ -15,11 +15,11 @@ exports.getUtenteById = async (req, res) => {
         const utente = await Utente.findById(req.params.id).select('-password');
         
         if (!utente) {
-            return res.status(404).json({ message: 'Utente non trovato' });
+            return res.status(404).json({ message: req.t('notFound.utente') });
         }
         res.status(200).json(utente);
     } catch (error) {
-        res.status(500).json({ message: 'Errore nel recupero dell\'utente', error: error.message });
+        res.status(500).json({ message: req.t('errors.retrieving_utente'), error: error.message });
     }
 };
 
@@ -29,7 +29,7 @@ exports.createUtente = async (req, res) => {
 
         const existingUtente = await Utente.findOne({ email });
         if (existingUtente) {
-            return res.status(409).json({ message: 'Utente già esistente con questa email' });
+            return res.status(409).json({ message: req.t('validation.email_exists') });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -61,7 +61,7 @@ exports.createUtente = async (req, res) => {
         delete utenteResponse.password;
 
         res.status(201).json({
-            message: 'Utente creato con successo',
+            message: req.t('success.utente_created'),
             utente: utenteResponse,
             self: `/api/v1/utenti/${savedUtente._id}`
         });
@@ -69,11 +69,11 @@ exports.createUtente = async (req, res) => {
     } catch (error) {
         if (error.name === 'ValidationError') {
             return res.status(400).json({ 
-                message: 'Errore di validazione', 
+                message: req.t('errors.validation_error'), 
                 errors: Object.values(error.errors).map(e => e.message)
             });
         }
-        res.status(500).json({ message: 'Errore nella creazione dell\'utente', error: error.message });
+        res.status(500).json({ message: req.t('errors.creating_utente'), error: error.message });
     }
 };
 
@@ -85,21 +85,21 @@ exports.updateUtente = async (req, res) => {
         const updatedUtente = await Utente.findByIdAndUpdate(utenteId, updateData, { new: true, runValidators: true }).select('-password');
         
         if(!updatedUtente){
-            return res.status(404).json({ message: 'Utente non trovato' });
+            return res.status(404).json({ message: req.t('notFound.utente') });
         }
         res.status(200).json({
-            message: 'Utente aggiornato con successo',
+            message: req.t('success.utente_updated'),
             utente: updatedUtente
         });
 
     } catch(error){
         if (error.name === 'ValidationError') {
             return res.status(400).json({ 
-                message: 'Errore di validazione', 
+                message: req.t('errors.validation_error'), 
                 errors: Object.values(error.errors).map(e => e.message)
             });
         }
-        res.status(500).json({ message: 'Errore nell\'aggiornamento dell\'utente', error: error.message });
+        res.status(500).json({ message: req.t('errors.updating_utente'), error: error.message });
     }
 };
 
@@ -109,18 +109,18 @@ exports.deleteUtente = async (req, res) => {
 
         const utente = await Utente.findById(utenteId);
         if(!utente){
-            return res.status(404).json({ message: 'Utente non trovato' });
+            return res.status(404).json({ message: req.t('notFound.utente') });
         }
 
         if (await bcrypt.compare(req.body.password, utente.password)) {
             await Utente.findByIdAndDelete(utenteId);
-            return res.status(200).json({ message: 'Utente cancellato con successo' });
+            return res.status(200).json({ message: req.t('success.utente_deleted') });
         }else{
-            return res.status(401).json({ message: 'Password errata. Cancellazione non autorizzata.' });
+            return res.status(401).json({ message: req.t('errors.authentication_error') });
         }
         
     } catch(error){
-        res.status(500).json({ message: 'Errore nella cancellazione dell\'utente', error: error.message });
+        res.status(500).json({ message: req.t('errors.deleting_utente'), error: error.message });
     }
 };
 
@@ -131,12 +131,12 @@ exports.updatePassword = async (req, res) => {
 
         const utente = await Utente.findById(utenteId);
         if(!utente){
-            return res.status(404).json({ message: 'Utente non trovato' });
+            return res.status(404).json({ message: req.t('notFound.utente') });
         }
 
         const isMatch = await bcrypt.compare(oldPassword, utente.password);
         if(!isMatch){
-            return res.status(401).json({ message: 'Password attuale errata' });
+            return res.status(401).json({ message: req.t('validation.old_password_incorrect') });
         }
 
         const hashedNewPassword = await bcrypt.hash(newPassword, 10);
@@ -144,8 +144,8 @@ exports.updatePassword = async (req, res) => {
         utente.password = hashedNewPassword;
         await utente.save();
 
-        res.status(200).json({ message: 'Password aggiornata con successo' });
+        res.status(200).json({ message: req.t('success.password_updated') });
     } catch(error){
-        res.status(500).json({ message: 'Errore nell\'aggiornamento della password', error: error.message });
+        res.status(500).json({ message: req.t('errors.updating_password'), error: error.message });
     }   
 }
