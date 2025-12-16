@@ -9,7 +9,9 @@ router.use(checkToken);
 
 router.get("/", utenteController.getAllUtenti);
 router.get("/:id", utenteController.getUtenteById);
+router.put("/:id", utenteController.updateUtente);
+router.delete("/:id", utenteController.deleteUtente);
 
-// TO DO: Aggiungere rotte per creazione, aggiornamento e cancellazione utenti
+router.put("/updatePassword/:id", utenteController.updatePassword);
 
 module.exports = router;
