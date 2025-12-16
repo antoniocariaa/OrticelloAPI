@@ -6,7 +6,7 @@ exports.getAllAssociazioni = async (req, res) => {
         res.status(200).json(associazioni);
     } catch (error) {
         res.status(500).json({ 
-            message: 'Errore nel recupero delle associazioni', 
+            message: req.t('errors.retrieving_associazioni'), 
             error: error.message 
         });
     }
@@ -17,13 +17,13 @@ exports.getAssociazioneById = async (req, res) => {
         const associazione = await Associazione.findById(req.params.id);
         
         if (!associazione) {
-            return res.status(404).json({ message: 'Associazione non trovata' });
+            return res.status(404).json({ message: req.t('notFound.associazione') });
         }
         
         res.status(200).json(associazione);
     } catch (error) {
         res.status(500).json({ 
-            message: 'Errore nel recupero dell\'associazione', 
+            message: req.t('errors.retrieving_associazione'), 
             error: error.message 
         });
     }
@@ -34,16 +34,16 @@ exports.createAssociazione = async (req, res) => {
         const nuovaAssociazione = new Associazione(req.body);
         const associazioneSalvata = await nuovaAssociazione.save();
         
-        res.status(201).json(associazioneSalvata);
+        res.status(201).json({ data: associazioneSalvata, message: req.t('success.associazione_created') });
     } catch (error) {
         if (error.name === 'ValidationError' || error.code === 11000) {
             return res.status(400).json({ 
-                message: 'Dati non validi o duplicati', 
+                message: req.t('validation.invalid_duplicate_data'), 
                 error: error.message 
             });
         }
         res.status(500).json({ 
-            message: 'Errore nella creazione dell\'associazione', 
+            message: req.t('errors.creating_associazione'), 
             error: error.message 
         });
     }
@@ -61,19 +61,19 @@ exports.updateAssociazione = async (req, res) => {
         );
 
         if (!associazioneAggiornata) {
-            return res.status(404).json({ message: 'Associazione non trovata' });
+            return res.status(404).json({ message: req.t('notFound.associazione') });
         }
 
-        res.status(200).json(associazioneAggiornata);
+        res.status(200).json({ data: associazioneAggiornata, message: req.t('success.associazione_updated') });
     } catch (error) {
         if (error.name === 'ValidationError') {
             return res.status(400).json({ 
-                message: 'Dati aggiornati non validi', 
+                message: req.t('validation.invalid_duplicate_data'), 
                 error: error.message 
             });
         }
         res.status(500).json({ 
-            message: 'Errore nell\'aggiornamento dell\'associazione', 
+            message: req.t('errors.updating_associazione'), 
             error: error.message 
         });
     }
@@ -84,13 +84,13 @@ exports.deleteAssociazione = async (req, res) => {
         const associazioneEliminata = await Associazione.findByIdAndDelete(req.params.id);
 
         if (!associazioneEliminata) {
-            return res.status(404).json({ message: 'Associazione non trovata' });
+            return res.status(404).json({ message: req.t('notFound.associazione') });
         }
 
-        res.status(200).json({ message: 'Associazione eliminata con successo' });
+        res.status(200).json({ message: req.t('success.associazione_deleted') });
     } catch (error) {
         res.status(500).json({ 
-            message: 'Errore durante l\'eliminazione', 
+            message: req.t('errors.deleting_associazione'), 
             error: error.message 
         });
     }

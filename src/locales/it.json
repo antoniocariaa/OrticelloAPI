@@ -6,20 +6,43 @@
     "retrieving_utente": "Errore nel recupero dell'utente",
     "retrieving_lotti": "Errore nel recupero dei lotti",
     "retrieving_lotto": "Errore nel recupero del lotto",
+    "retrieving_sensors": "Errore nel recupero dei sensori",
+    "retrieving_sensor": "Errore nel recupero del sensore",
+    "retrieving_meteo": "Errore nel recupero di dati meteo",
+    "retrieving_comuni": "Errore nel recupero dei comuni",
+    "retrieving_comune": "Errore nel recupero del comune",
+    "retrieving_bandi": "Errore nel recupero dei bandi",
+    "retrieving_bando": "Errore nel recupero del bando",
+    "retieving_avvisi": "Errore nel recupero degli avvisi",
+    "retrieving_avviso": "Errore nel recupero dell'avviso",
+    "retrieving_associazioni": "Errore nel recupero delle associazioni",
+    "retrieving_associazione": "Errore nel recupero dell'associaione",
 
     "creating_orto": "Errore nella creazione dell'orto",
     "creating_utente": "Errore nella creazione dell'utente",
     "creating_lotto": "Errore nella creazione del lotto",
+    "creating_comune": "Errore nella creazione del comune",
+    "creating_bando": "Errore nella creazione del bando",
+    "creating_avviso": "Errore nella creazione dell'avviso",
+    "creating_associazione": "Errore nella creazione dell'associazione",
     
     "updating_orto": "Errore nell'aggiornamento dell'orto",
     "updating_utente": "Errore nell'aggiornamento dell'utente",
     "updating_lotto": "Errore nell'aggiornamento del lotto",
     "updating_password": "Errore nell'aggiornamento della password",
+    "updating_comune": "Errore nell'aggiornamento del comune",
+    "updating_bando": "Errore nell'aggiornamento del Bando",
+    "updating_avviso": "Errore nell'aggiornamento dell'avviso",
+    "updating_associazione": "Errore nell'aggiornamento dell'associazione",
 
     "deleting_orto": "Errore nell'eliminazione dell'orto",
     "deleting_utente": "Errore nell'eliminazione dell'utente",
     "deleting_lotto": "Errore nell'eliminazione del lotto",
-    
+    "deleting_comune": "Errore nell'eliminazione del comune",
+    "deleting_bando": "Errore nell'eliminazione del bando",
+    "deleting_avviso": "Errore nell'eliminazione dell'avviso",
+    "deleting_associazione": "Errore nell'eliminazione dell'associazione",
+
     "database_error": "Errore del database",
 
     "validation_error": "Errore di validazione",
@@ -30,15 +53,25 @@
     "orto_deleted": "Orto eliminato con successo",
     "utente_deleted": "Utente eliminato con successo",
     "lotto_deleted": "Lotto eliminato con successo",
+    "comune_deleted": "Comune eliminato con successo",
+    "bando_deleted": "Bando eliminato con successo",
+    "avviso_deleted": "Avviso eliminato con successo",
+    "associazione_deleted": "Associazione eliminata con successo",
 
     "orto_created": "Orto creato con successo",
     "utente_created": "Utente creato con successo",
     "lotto_created": "Lotto creato con successo",
+    "comune_created": "Comune creato con successo",
+    "avviso_created": "Avviso creato con successo",
+    "associazione_created": "Associazione creata con successo",
 
     "orto_updated": "Orto aggiornato con successo",
     "utente_updated": "Utente aggiornato con successo",
     "lotto_updated": "Lotto aggiornato con successo",
-    "password_updated": "Password aggiornata con successo"
+    "password_updated": "Password aggiornata con successo",
+    "comune_updated": "comune aggiornato con successo",
+    "avviso_updated": "Avviso aggiornato con successo",
+    "associazione_updated": "Associazione aggiornata con successo"
   },
   "notFound": {
     "orto": "Orto non trovato",
@@ -47,7 +80,9 @@
     "associazione": "Associazione non trovata",
     "comune": "Comune non trovato",
     "avviso": "Avviso non trovato",
-    "bando": "Bando non trovato"
+    "bando": "Bando non trovato",
+    "sensor": "Sensore non trovato",
+    "meteo": "Rilevamento meteorologico non trovato"
   },
   "validation": {
     "email_exists": "Utente già esistente con questa email",
@@ -57,7 +92,8 @@
     "required_field": "Campo obbligatorio",
     "password_too_short": "Password troppo corta (minimo 8 caratteri)",
     "password_updated": "Password aggiornata con successo",
-    "old_password_incorrect": "Vecchia password non corretta"
+    "old_password_incorrect": "Vecchia password non corretta",
+    "invalid_duplicate_data": "Dati non validi o duplicati"
   },
   "auth": {
     "login_success": "Login effettuato con successo",
