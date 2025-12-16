@@ -2,7 +2,7 @@ var express = require('express');
 var Utente = require('../model/utente');
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcrypt');
-var OAuth2Client = require('google-auth-library');
+const { OAuth2Client } = require('google-auth-library');
 
 const router = express.Router();
 
