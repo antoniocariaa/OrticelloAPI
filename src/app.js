@@ -48,9 +48,9 @@ mongoose.connection.on('disconnected', () => {
 app.use(cors());
 
 app.use(express.json());
-app.listen(PORT, function() {
-	logger.info(`Server started successfully`, { port: PORT, env: process.env.NODE_ENV || 'development' });
-});
+app.use(express.urlencoded({ extended: true }));
+
+// Middleware di logging delle richieste (prima dei routes)
 app.use(requestLogger);
 
 app.use(detectLanguage);
@@ -64,10 +64,6 @@ app.get('/', async function(req, res){
   } catch(error){
     res.status(500).json({ message: 'Error', error });
   }
-});
-
-app.listen(PORT, function() {
-	console.log('Server running on port ', PORT);
 });
 
 app.use("/api/v1/orti", checkToken);
@@ -114,5 +110,36 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: 'Internal Server Error 500!' });
 });
 
+// Avvio del server (DEVE essere l'ultima operazione)
+const server = app.listen(PORT, function() {
+	logger.info(`Server started successfully`, { port: PORT, env: process.env.NODE_ENV || 'development' });
+});
+
+// Gestione errori del server
+server.on('error', (error) => {
+	if (error.code === 'EADDRINUSE') {
+		logger.error(`Port ${PORT} is already in use`, { port: PORT });
+		process.exit(1);
+	} else {
+		logger.error(`Server error: ${error.message}`, { error: error.code });
+		throw error;
+	}
+});
+
+process.on('SIGTERM', () => {
+	logger.info('SIGTERM received, closing server gracefully');
+	server.close(() => {
+		logger.info('Server closed');
+		process.exit(0);
+	});
+});
+
+process.on('SIGINT', () => {
+	logger.info('SIGINT received, closing server gracefully');
+	server.close(() => {
+		logger.info('Server closed');
+		process.exit(0);
+	});
+});
 
 
