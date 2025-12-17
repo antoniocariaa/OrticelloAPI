@@ -2,7 +2,10 @@ require('dotenv').config();
 var express = require('express');
 var mongoose = require('mongoose');
 var cors = require('cors');
-var detectLanguage = require('./controllers/detectLanguage');
+var detectLanguage = require('./util/detectLanguage');
+const logger = require('./config/logger');
+const requestLogger = require('./util/requestLogger');
+const errorLogger = require('./util/errorLogger');
 
 var ortoRoutes = require("./routes/ortoRoutes");
 var lottoRoutes = require("./routes/lottoRoutes");
@@ -25,12 +28,30 @@ const PORT = process.env.PORT || 8080
 mongoose.connect(process.env.MONGODB_URI, {
   serverSelectionTimeoutMS: 5000,
 	socketTimeoutMS: 45000
+})
+.then(() => {
+  logger.info('MongoDB connected successfully', { uri: process.env.MONGODB_URI?.split('@')[1] });
+})
+.catch((err) => {
+  logger.error('MongoDB connection failed', { error: err.message });
+});
+
+// Event listeners per MongoDB
+mongoose.connection.on('error', (err) => {
+  logger.error('MongoDB connection error', { error: err.message });
+});
+
+mongoose.connection.on('disconnected', () => {
+  logger.warn('MongoDB disconnected');
 });
 
 app.use(cors());
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.listen(PORT, function() {
+	logger.info(`Server started successfully`, { port: PORT, env: process.env.NODE_ENV || 'development' });
+});
+app.use(requestLogger);
 
 app.use(detectLanguage);
 
@@ -76,9 +97,17 @@ app.use("/api/v1/sensor", sensorRoutes);
 
 /* Default 404 handler */
 app.use((req, res) => {
+    logger.warn('404 - Route not found', { 
+      method: req.method, 
+      url: req.originalUrl,
+      ip: req.ip 
+    });
     res.status(404);
     res.json({ error: 'Page Not found Error 404' });
 });
+
+/* Middleware di logging errori */
+app.use(errorLogger);
 
 /* Default error handler */
 app.use((err, req, res, next) => {
