@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const utenteController = require("../controllers/utenteController");
-const checkToken = require("../model/checkToken");
+const checkToken = require("../util/checkToken");
 
 router.post("/", utenteController.createUtente);
 

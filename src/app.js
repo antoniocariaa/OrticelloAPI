@@ -19,7 +19,7 @@ var bandoRoutes = require("./routes/bandoRoutes");
 var meteoRoutes = require("./routes/meteoRoutes");
 var sensorRoutes = require("./routes/sensorRoutes");
 var authentication = require("./routes/authentication");
-var checkToken = require("./model/checkToken");
+var checkToken = require("./util/checkToken");
 
 var app = express();
 const PORT = process.env.PORT || 8080
@@ -111,7 +111,6 @@ app.use(errorLogger);
 
 /* Default error handler */
 app.use((err, req, res, next) => {
-    console.error(err.stack);
     res.status(500).json({ error: 'Internal Server Error 500!' });
 });
 
