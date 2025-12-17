@@ -56,7 +56,7 @@ router.post('', async function(req, res) {
             }
         } catch (error) {
             logger.auth('GOOGLE_LOGIN', 'unknown', false, { error: error.message });
-            return res.status(401).json({ message: 'Google authentication failed' });
+            return res.status(401).json({ message: req.t('auth.google_failed') });
         }
     }else{
         logger.debug('Email/password authentication attempt', { email: req.body.email });
@@ -64,13 +64,13 @@ router.post('', async function(req, res) {
         
         if(!user){
             logger.auth('LOGIN', req.body.email, false, { reason: 'User not found' });
-            return res.status(401).json({ message: 'Authentication failed. User not found.' });
+            return res.status(401).json({ message: req.t('auth.invalid_credentials') });
         }
 
         const isPasswordValid = await bcrypt.compare(req.body.password, user.password);
         if(!isPasswordValid){
             logger.auth('LOGIN', req.body.email, false, { reason: 'Wrong password', userId: user._id });
-            return res.status(401).json({ message: 'Authentication failed. Wrong password.' });
+            return res.status(401).json({ message: req.t('auth.invalid_credentials') });
         }
         
         logger.auth('LOGIN', user.email, true, { userId: user._id });
@@ -85,7 +85,7 @@ router.post('', async function(req, res) {
 
     res.json({
         success:true,
-        message: 'Token generated',
+        message: req.t('auth.login_success'),
         token: token,
         email: user.email,
         id: user._id,

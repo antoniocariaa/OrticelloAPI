@@ -98,6 +98,9 @@
   "auth": {
     "login_success": "Anmeldung erfolgreich",
     "logout_success": "Abmeldung erfolgreich",
+    "google_success": "Google-Anmeldung erfolgreich",
+
+    "google_failed": "Google-Anmeldung fehlgeschlagen",
 
     "invalid_credentials": "Ungültige Anmeldedaten",
 

@@ -98,6 +98,9 @@
   "auth": {
     "login_success": "Login effettuato con successo",
     "logout_success": "Logout effettuato con successo",
+    "google_success": "Login con google avvenuto con successo",
+
+    "google_failed": "Login con google fallito",
 
     "invalid_credentials": "Credenziali non valide",
 
