@@ -31,9 +31,23 @@ var utenteSchema = new Schema({
     required: true,
     validate: {
       validator: function(v) {
-        return validator.isTaxID(v);
+        // EU countries tax ID validation
+        const euLocales = [
+          'it-IT', // Italy
+          'de-DE', // Germany
+          'fr-FR', // France
+          'es-ES', // Spain
+          'at-AT', // Austria
+          'hr-HR', // Croatia
+          'lu-LU', // Luxembourg
+          'mt-MT', // Malta
+          'si-SI', // Slovenia
+        ];
+        
+        // Check if valid for any EU country
+        return euLocales.some(locale => validator.isTaxID(v, locale));
       },
-      message: '{VALUE} non è un codice fiscale valido'
+      message: '{VALUE} non è un codice fiscale valido per nessun paese dell\'UE'
     }
   },
   email: {

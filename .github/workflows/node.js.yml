@@ -1,0 +1,42 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    
+    env:
+      SUPER_SECRET: ${{ secrets.SUPER_SECRET }}
+      DB_URL: ${{ secrets.DB_URL }}
+      LOG_ENABLED: false
+    
+    environment: orticelloapi
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Create .env with Github Secrets and run script
+      run: |
+        touch .env
+        echo SUPER_SECRET=$SUPER_SECRET >> .env
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: npm ci
+    - run: npm run build --if-present
+    - run: npm test
