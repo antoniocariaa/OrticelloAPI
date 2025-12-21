@@ -17,7 +17,7 @@ jobs:
       DB_URL: ${{ secrets.DB_URL }}
       LOG_ENABLED: false
     
-    environment: orticelloapi
+    environment: production
 
     strategy:
       matrix:
