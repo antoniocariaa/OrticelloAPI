@@ -18,14 +18,12 @@ jobs:
       RENDER_TOKEN: ${{ secrets.RENDER_TOKEN }}
       RENDER_ID: ${{ secrets.RENDER_ID }}
       LOG_ENABLED: false
-      
     
     environment: orticelloapi
 
     strategy:
       matrix:
         node-version: [18.x]
-
 
     steps:
     - uses: actions/checkout@v3
