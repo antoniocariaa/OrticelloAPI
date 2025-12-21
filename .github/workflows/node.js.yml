@@ -41,16 +41,13 @@ jobs:
   deploy:
     name: Wait for Deploy
     runs-on: ubuntu-latest
-    env:
-      RENDER_TOKEN: ${{ secrets.RENDER_TOKEN }}
-      RENDER_ID: ${{ secrets.RENDER_ID }}
     needs: build
     steps:
       - name: Wait for Render Deployment
         uses: bounceapp/render-action@0.12.0
         with:
-          render-token: $RENDER_TOKEN
-          service-id: $RENDER_ID
+          render-token: ${{ secrets.RENDER_TOKEN }}
+          service-id: ${{ secrets.RENDER_ID }}
           retries: 20
           wait: 16000
           sleep: 30000
