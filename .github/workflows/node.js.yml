@@ -15,8 +15,6 @@ jobs:
     env:
       SUPER_SECRET: ${{ secrets.SUPER_SECRET }}
       DB_URL: ${{ secrets.DB_URL }}
-      RENDER_TOKEN: ${{ secrets.RENDER_TOKEN }}
-      RENDER_ID: ${{ secrets.RENDER_ID }}
       LOG_ENABLED: false
     
     environment: orticelloapi
@@ -43,6 +41,9 @@ jobs:
   deploy:
     name: Wait for Deploy
     runs-on: ubuntu-latest
+    env:
+      RENDER_TOKEN: ${{ secrets.RENDER_TOKEN }}
+      RENDER_ID: ${{ secrets.RENDER_ID }}
     needs: build
     steps:
       - name: Wait for Render Deployment
