@@ -1,4 +1,5 @@
 const bando = require('../model/news/bando');
+const logger = require('../config/logger');
 
 exports.getAllBandi = async (req, res) => {
     try {
@@ -6,7 +7,8 @@ exports.getAllBandi = async (req, res) => {
         res.status(200).json(bandi);
     }
     catch (error) {
-        res.status(500).json({ message: 'Error retrieving bandi', error });
+        logger.error('Error retrieving bandi', { error: error.message });
+        res.status(500).json({ message: req.t('errors.retrieving_bandi'), error });
     }
 };
 
@@ -14,9 +16,11 @@ exports.createBando = async (req, res) => {
     try {
         const newBando = new bando(req.body);
         const savedBando = await newBando.save();
-        res.status(201).json(savedBando);
+        logger.db('INSERT', 'Bando', true, { id: savedBando._id });
+        res.status(201).json({ data: savedBando, message: req.t('success.bando_created') });
     } catch (error) {
-        res.status(500).json({ message: 'Error creating bando', error });
+        logger.error('Error creating bando', { error: error.message, data: req.body });
+        res.status(500).json({ message: req.t('errors.creating_bando'), error });
     }
 };
 
@@ -24,11 +28,13 @@ exports.getBandoById = async (req, res) => {
     try {
         const bando = await bando.findById(req.params.id);
         if (!bando) {
-            return res.status(404).json({ message: 'Bando not found' });
+            logger.warn('Bando not found', { id: req.params.id });
+            return res.status(404).json({ message: req.t('notFound.bando') });
         }
-        res.status(200).json(bando);
+        res.status(200).json({ data: bando, message: req.t('success.bando_retrieved') });
     } catch (error) {
-        res.status(500).json({ message: 'Error retrieving bando', error });
+        logger.error('Error retrieving bando by ID', { error: error.message, id: req.params.id });
+        res.status(500).json({ message: req.t('errors.retrieving_bando'), error });
     }
 };
 
@@ -40,11 +46,14 @@ exports.updateBando = async (req, res) => {
             { new: true }
         );
         if (!updatedBando) {
-            return res.status(404).json({ message: 'Bando not found' });
+            logger.warn('Bando not found for update', { id: req.params.id });
+            return res.status(404).json({ message: req.t('notFound.bando') });
         }
-        res.status(200).json(updatedBando);
+        logger.db('UPDATE', 'Bando', true, { id: req.params.id });
+        res.status(200).json({ data: updatedBando, message: req.t('success.bando_updated') });
     } catch (error) {
-        res.status(500).json({ message: 'Error updating bando', error });
+        logger.error('Error updating bando', { error: error.message, id: req.params.id });
+        res.status(500).json({ message: req.t('errors.updating_bando'), error });
     }
 };
 
@@ -52,10 +61,13 @@ exports.deleteBando = async (req, res) => {
     try {
         const deletedBando = await bando.findByIdAndDelete(req.params.id);
         if (!deletedBando) {
-            return res.status(404).json({ message: 'Bando not found' });
+            logger.warn('Bando not found for deletion', { id: req.params.id });
+            return res.status(404).json({ message: req.t('notFound.bando') });
         }
-        res.status(200).json({ message: 'Bando deleted successfully' });
+        logger.db('DELETE', 'Bando', true, { id: req.params.id });
+        res.status(200).json({ message: req.t('success.bando_deleted') });
     } catch (error) {
-        res.status(500).json({ message: 'Error deleting bando', error });
+        logger.error('Error deleting bando', { error: error.message, id: req.params.id });
+        res.status(500).json({ message: req.t('errors.deleting_bando'), error });
     }
 };
