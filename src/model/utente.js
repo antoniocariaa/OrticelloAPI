@@ -105,14 +105,14 @@ var utenteSchema = new Schema({
     type: String,
     required: true
   },
-  telefono: {
+    telefono: {
     type: String,
     required: true,
-    validate:{
-        validator: function(v){
-            return validator.isMobilePhone(v);
-        },
-        message: '{VALUE} non è un numero di telefono valido'
+    validate: {
+      validator: function(v) {
+        return validator.isMobilePhone(v);
+      },
+      message: '{VALUE} non è un numero di telefono valido'
     }
   },
   tipo: {
@@ -124,25 +124,49 @@ var utenteSchema = new Schema({
   associazione: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Associazione',
-    required: function () {
+    required: function() {
       return this.tipo === 'asso';
+    },
+    validate: {
+      validator: function(v) {
+        // riferimento ad Associazione deve essere presente solo se tipo è 'asso'
+        if (this.tipo === 'asso') {
+          return v != null;
+        } else {
+          return v == null;
+        }
+      },
+      message: 'Il campo associazione deve essere presente solo per utenti di tipo "asso"'
     }
   },
   comune: {
+    // Riferimento al modello Comune
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Comune',
-    required: function () {
+    required: function() {
       return this.tipo === 'comu';
+    },
+    validate: {
+      validator: function(v) {
+        // Se tipo è 'comu', il campo deve essere presente
+        // Se tipo NON è 'comu', il campo deve essere null/undefined
+        if (this.tipo === 'comu') {
+          return v != null;
+        } else {
+          return v == null;
+        }
+      },
+      message: 'Il campo comune deve essere presente solo per utenti di tipo "comu"'
     }
   },
   admin: {
     type: Boolean,
-    required: function () {
+    required: function() {
       return this.tipo !== 'citt';
     },
     default: false
   }
-
 });
+
 
 module.exports = mongoose.model("Utente", utenteSchema, "utente");
