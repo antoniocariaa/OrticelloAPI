@@ -29,6 +29,7 @@ var utenteSchema = new Schema({
   codicefiscale: {
     type: String,
     required: true,
+    unique: true,
     validate: {
       validator: function(v) {
         // EU countries tax ID validation

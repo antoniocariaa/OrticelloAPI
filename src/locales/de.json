@@ -17,7 +17,10 @@
     "retrieving_avviso": "Fehler beim Abrufen des Hinweises",
     "retrieving_associazioni": "Fehler beim Abrufen der Verbände",
     "retrieving_associazione": "Fehler beim Abrufen des Verbandes",
-
+    "retrieving_affidamenti_lotto": "Fehler beim Abrufen der Parzellen-Zuweisungen",
+    "retrieving_affidamento_lotto": "Fehler beim Abrufen der Parzellen-Zuweisung",
+    "retrieving_affidamenti_orto": "Fehler beim Abrufen der Garten-Zuweisungen",
+    "retrieving_affidamento_orto": "Fehler beim Abrufen der Garten-Zuweisung",
     "creating_orto": "Fehler beim Erstellen des Gartens",
     "creating_utente": "Fehler beim Erstellen des Benutzers",
     "creating_lotto": "Fehler beim Erstellen der Parzelle",
@@ -25,7 +28,8 @@
     "creating_bando": "Fehler beim Erstellen der Ankündigung",
     "creating_avviso": "Fehler beim Erstellen des Hinweises",
     "creating_associazione": "Fehler beim Erstellen des Verbandes",
-    
+    "creating_affidamento_lotto": "Fehler beim Erstellen der Parzellen-Zuweisung",
+    "creating_affidamento_orto": "Fehler beim Erstellen der Garten-Zuweisung",
     "updating_orto": "Fehler beim Aktualisieren des Gartens",
     "updating_utente": "Fehler beim Aktualisieren des Benutzers",
     "updating_lotto": "Fehler beim Aktualisieren der Parzelle",
@@ -34,7 +38,8 @@
     "updating_bando": "Fehler beim Aktualisieren der Ankündigung",
     "updating_avviso": "Fehler beim Aktualisieren des Hinweises",
     "updating_associazione": "Fehler beim Aktualisieren des Verbandes",
-
+    "updating_affidamento_lotto": "Fehler beim Aktualisieren der Parzellen-Zuweisung",
+    "updating_affidamento_orto": "Fehler beim Aktualisieren der Garten-Zuweisung",
     "deleting_orto": "Fehler beim Löschen des Gartens",
     "deleting_utente": "Fehler beim Löschen des Benutzers",
     "deleting_lotto": "Fehler beim Löschen der Parzelle",
@@ -42,9 +47,11 @@
     "deleting_bando": "Fehler beim Löschen der Ankündigung",
     "deleting_avviso": "Fehler beim Löschen des Hinweises",
     "deleting_associazione": "Fehler beim Löschen des Verbandes",
-
+    "deleting_affidamento_lotto": "Fehler beim Löschen der Parzellen-Zuweisung",
+    "deleting_affidamento_orto": "Fehler beim Löschen der Garten-Zuweisung",
+    "adding_coltura": "Fehler beim Hinzufügen der Kulturpflanze",
+    "removing_coltura": "Fehler beim Entfernen der Kulturpflanze",
     "database_error": "Datenbankfehler",
-
     "validation_error": "Validierungsfehler",
     "authentication_error": "Authentifizierungsfehler",
     "authorization_error": "Nicht autorisiert"
@@ -57,21 +64,29 @@
     "bando_deleted": "Ankündigung erfolgreich gelöscht",
     "avviso_deleted": "Hinweis erfolgreich gelöscht",
     "associazione_deleted": "Verband erfolgreich gelöscht",
-
+    "affidamento_lotto_deleted": "Parzellen-Zuweisung erfolgreich gelöscht",
+    "affidamento_orto_deleted": "Garten-Zuweisung erfolgreich gelöscht",
     "orto_created": "Garten erfolgreich erstellt",
     "utente_created": "Benutzer erfolgreich erstellt",
     "lotto_created": "Parzelle erfolgreich erstellt",
     "comune_created": "Gemeinde erfolgreich erstellt",
+    "bando_created": "Ankündigung erfolgreich erstellt",
     "avviso_created": "Hinweis erfolgreich erstellt",
     "associazione_created": "Verband erfolgreich erstellt",
-
+    "affidamento_lotto_created": "Parzellen-Zuweisung erfolgreich erstellt",
+    "affidamento_orto_created": "Garten-Zuweisung erfolgreich erstellt",
     "orto_updated": "Garten erfolgreich aktualisiert",
     "utente_updated": "Benutzer erfolgreich aktualisiert",
     "lotto_updated": "Parzelle erfolgreich aktualisiert",
     "password_updated": "Passwort erfolgreich aktualisiert",
     "comune_updated": "Gemeinde erfolgreich aktualisiert",
+    "bando_updated": "Ankündigung erfolgreich aktualisiert",
     "avviso_updated": "Hinweis erfolgreich aktualisiert",
-    "associazione_updated": "Verband erfolgreich aktualisiert"
+    "associazione_updated": "Verband erfolgreich aktualisiert",
+    "affidamento_lotto_updated": "Parzellen-Zuweisung erfolgreich aktualisiert",
+    "affidamento_orto_updated": "Garten-Zuweisung erfolgreich aktualisiert",
+    "coltura_added": "Kulturpflanze erfolgreich hinzugefügt",
+    "coltura_removed": "Kulturpflanze erfolgreich entfernt"
   },
   "notFound": {
     "orto": "Garten nicht gefunden",
@@ -82,7 +97,10 @@
     "avviso": "Hinweis nicht gefunden",
     "bando": "Ankündigung nicht gefunden",
     "sensor": "Sensor nicht gefunden",
-    "meteo": "Wettermessung nicht gefunden"
+    "meteo": "Wettermessung nicht gefunden",
+    "affidamento_lotto": "Parzellen-Zuweisung nicht gefunden",
+    "affidamento_orto": "Garten-Zuweisung nicht gefunden",
+    "coltura": "Kulturpflanze nicht gefunden"
   },
   "validation": {
     "email_exists": "Benutzer mit dieser E-Mail existiert bereits",
@@ -93,20 +111,17 @@
     "password_too_short": "Passwort zu kurz (mindestens 8 Zeichen)",
     "password_updated": "Passwort erfolgreich aktualisiert",
     "old_password_incorrect": "Altes Passwort falsch",
-    "invalid_duplicate_data": "Ungültige oder doppelte Daten"
+    "invalid_duplicate_data": "Ungültige oder doppelte Daten",
+    "coltura_required": "Kulturpflanze ist erforderlich"
   },
   "auth": {
     "login_success": "Anmeldung erfolgreich",
     "logout_success": "Abmeldung erfolgreich",
     "google_success": "Google-Anmeldung erfolgreich",
-
     "google_failed": "Google-Anmeldung fehlgeschlagen",
-
     "invalid_credentials": "Ungültige Anmeldedaten",
-
     "token_expired": "Token abgelaufen",
     "token_invalid": "Ungültiges Token",
-
     "no_token": "Kein Token bereitgestellt",
     "unauthorized": "Unbefugter Zugriff"
   }
