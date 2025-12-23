@@ -6,6 +6,11 @@ var swaggerUi = require('swagger-ui-express');
 var { initializeSwagger } = require('./config/swagger');
 var swaggerUi = require('swagger-ui-express');
 var { initializeSwagger } = require('./config/swagger');
+var detectLanguage = require('./util/detectLanguage');
+
+const logger = require('./config/logger');
+const requestLogger = require('./util/requestLogger');
+const errorLogger = require('./util/errorLogger');
 
 var ortoRoutes = require("./routes/ortoRoutes");
 var lottoRoutes = require("./routes/lottoRoutes");
@@ -19,7 +24,7 @@ var bandoRoutes = require("./routes/bandoRoutes");
 var meteoRoutes = require("./routes/meteoRoutes");
 var sensorRoutes = require("./routes/sensorRoutes");
 var authentication = require("./routes/authentication");
-var checkToken = require("./model/checkToken");
+var checkToken = require("./util/checkToken");
 
 var app = express();
 const PORT = process.env.PORT || 8080
@@ -28,12 +33,32 @@ const PORT = process.env.PORT || 8080
 mongoose.connect(process.env.MONGODB_URI, {
   serverSelectionTimeoutMS: 5000,
 	socketTimeoutMS: 45000
+})
+.then(() => {
+  logger.info('MongoDB connected successfully', { uri: process.env.MONGODB_URI?.split('@')[1] });
+})
+.catch((err) => {
+  logger.error('MongoDB connection failed', { error: err.message });
+});
+
+// Event listeners per MongoDB
+mongoose.connection.on('error', (err) => {
+  logger.error('MongoDB connection error', { error: err.message });
+});
+
+mongoose.connection.on('disconnected', () => {
+  logger.warn('MongoDB disconnected');
 });
 
 app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Middleware di logging delle richieste (prima dei routes)
+app.use(requestLogger);
+
+app.use(detectLanguage);
 
 app.use('/api/v1/authentication', authentication);
 
@@ -44,10 +69,6 @@ app.get('/', async function(req, res){
   } catch(error){
     res.status(500).json({ message: 'Error', error });
   }
-});
-
-app.listen(PORT, function() {
-	console.log('Server running on port ', PORT);
 });
 
 app.use("/api/v1/orti", checkToken);
@@ -68,6 +89,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 }));
 app.use("/api/v1/orti", ortoRoutes);
 app.use("/api/v1/lotti", lottoRoutes);
+
 //middleware di autenticazione separato per la creazione utenti (vedi utenteRoutes.js)
 app.use("/api/v1/utenti", utentiRoutes);
 app.use("/api/v1/associazioni", associazioneRoutes);
@@ -81,15 +103,53 @@ app.use("/api/v1/sensor", sensorRoutes);
 
 /* Default 404 handler */
 app.use((req, res) => {
+    logger.warn('404 - Route not found', { 
+      method: req.method, 
+      url: req.originalUrl,
+      ip: req.ip 
+    });
     res.status(404);
     res.json({ error: 'Page Not found Error 404' });
 });
 
+/* Middleware di logging errori */
+app.use(errorLogger);
+
 /* Default error handler */
 app.use((err, req, res, next) => {
-    console.error(err.stack);
     res.status(500).json({ error: 'Internal Server Error 500!' });
 });
 
+// Avvio del server (DEVE essere l'ultima operazione)
+const server = app.listen(PORT, function() {
+	logger.info(`Server started successfully`, { port: PORT, env: process.env.NODE_ENV || 'development' });
+});
+
+// Gestione errori del server
+server.on('error', (error) => {
+	if (error.code === 'EADDRINUSE') {
+		logger.error(`Port ${PORT} is already in use`, { port: PORT });
+		process.exit(1);
+	} else {
+		logger.error(`Server error: ${error.message}`, { error: error.code });
+		throw error;
+	}
+});
+
+process.on('SIGTERM', () => {
+	logger.info('SIGTERM received, closing server gracefully');
+	server.close(() => {
+		logger.info('Server closed');
+		process.exit(0);
+	});
+});
+
+process.on('SIGINT', () => {
+	logger.info('SIGINT received, closing server gracefully');
+	server.close(() => {
+		logger.info('Server closed');
+		process.exit(0);
+	});
+});
 
 

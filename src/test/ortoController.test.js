@@ -14,7 +14,8 @@ describe('OrtoController', () => {
     // Mock degli oggetti request e response
     req = {
       body: {},
-      params: {}
+      params: {},
+      t: jest.fn((key) => key) // Mock della funzione di traduzione
     };
 
     res = {
@@ -60,7 +61,7 @@ describe('OrtoController', () => {
       expect(Orto.find).toHaveBeenCalledTimes(1);
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
-        message: 'Error retrieving ortos',
+        message: 'errors.retrieving_ortos',
         error: mockError
       });
     });
@@ -112,7 +113,7 @@ describe('OrtoController', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
-        message: 'Error creating orto',
+        message: 'errors.creating_orto',
         error: mockError
       });
     });
@@ -146,7 +147,7 @@ describe('OrtoController', () => {
 
       expect(Orto.findById).toHaveBeenCalledWith('507f1f77bcf86cd799439999');
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Orto not found' });
+      expect(res.json).toHaveBeenCalledWith({ message: 'notFound.orto' });
     });
 
     test('should return error 500 when database fails', async () => {
@@ -158,7 +159,7 @@ describe('OrtoController', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
-        message: 'Error retrieving orto',
+        message: 'errors.retrieving_orto',
         error: mockError
       });
     });
@@ -204,7 +205,7 @@ describe('OrtoController', () => {
         { new: true }
       );
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Orto not found' });
+      expect(res.json).toHaveBeenCalledWith({ message: 'notFound.orto' });
     });
 
     test('should return error 500 when update fails', async () => {
@@ -218,7 +219,7 @@ describe('OrtoController', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
-        message: 'Error updating orto',
+        message: 'errors.updating_orto',
         error: mockError
       });
     });
@@ -241,7 +242,7 @@ describe('OrtoController', () => {
 
       expect(Orto.findByIdAndDelete).toHaveBeenCalledWith('507f1f77bcf86cd799439011');
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Orto deleted successfully' });
+      expect(res.json).toHaveBeenCalledWith({ message: 'success.orto_deleted' });
     });
 
     test('should return 404 when orto to delete is not found', async () => {
@@ -252,7 +253,7 @@ describe('OrtoController', () => {
 
       expect(Orto.findByIdAndDelete).toHaveBeenCalledWith('507f1f77bcf86cd799439999');
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'Orto not found' });
+      expect(res.json).toHaveBeenCalledWith({ message: 'notFound.orto' });
     });
 
     test('should return error 500 when deletion fails', async () => {
@@ -265,7 +266,7 @@ describe('OrtoController', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
-        message: 'Error deleting orto',
+        message: 'errors.deleting_orto',
         error: mockError
       });
     });

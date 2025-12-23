@@ -1,0 +1,113 @@
+{
+  "errors": {
+    "retrieving_ortos": "Fehler beim Abrufen der Gärten",
+    "retrieving_orto": "Fehler beim Abrufen des Gartens",
+    "retrieving_utenti": "Fehler beim Abrufen der Benutzer",
+    "retrieving_utente": "Fehler beim Abrufen des Benutzers",
+    "retrieving_lotti": "Fehler beim Abrufen der Parzellen",
+    "retrieving_lotto": "Fehler beim Abrufen der Parzelle",
+    "retrieving_sensors": "Fehler beim Abrufen der Sensoren",
+    "retrieving_sensor": "Fehler beim Abrufen des Sensors",
+    "retrieving_meteo": "Fehler beim Abrufen der Wetterdaten",
+    "retrieving_comuni": "Fehler beim Abrufen der Gemeinden",
+    "retrieving_comune": "Fehler beim Abrufen der Gemeinde",
+    "retrieving_bandi": "Fehler beim Abrufen der Ankündigungen",
+    "retrieving_bando": "Fehler beim Abrufen der Ankündigung",
+    "retieving_avvisi": "Fehler beim Abrufen der Hinweise",
+    "retrieving_avviso": "Fehler beim Abrufen des Hinweises",
+    "retrieving_associazioni": "Fehler beim Abrufen der Verbände",
+    "retrieving_associazione": "Fehler beim Abrufen des Verbandes",
+
+    "creating_orto": "Fehler beim Erstellen des Gartens",
+    "creating_utente": "Fehler beim Erstellen des Benutzers",
+    "creating_lotto": "Fehler beim Erstellen der Parzelle",
+    "creating_comune": "Fehler beim Erstellen der Gemeinde",
+    "creating_bando": "Fehler beim Erstellen der Ankündigung",
+    "creating_avviso": "Fehler beim Erstellen des Hinweises",
+    "creating_associazione": "Fehler beim Erstellen des Verbandes",
+    
+    "updating_orto": "Fehler beim Aktualisieren des Gartens",
+    "updating_utente": "Fehler beim Aktualisieren des Benutzers",
+    "updating_lotto": "Fehler beim Aktualisieren der Parzelle",
+    "updating_password": "Fehler beim Aktualisieren des Passworts",
+    "updating_comune": "Fehler beim Aktualisieren der Gemeinde",
+    "updating_bando": "Fehler beim Aktualisieren der Ankündigung",
+    "updating_avviso": "Fehler beim Aktualisieren des Hinweises",
+    "updating_associazione": "Fehler beim Aktualisieren des Verbandes",
+
+    "deleting_orto": "Fehler beim Löschen des Gartens",
+    "deleting_utente": "Fehler beim Löschen des Benutzers",
+    "deleting_lotto": "Fehler beim Löschen der Parzelle",
+    "deleting_comune": "Fehler beim Löschen der Gemeinde",
+    "deleting_bando": "Fehler beim Löschen der Ankündigung",
+    "deleting_avviso": "Fehler beim Löschen des Hinweises",
+    "deleting_associazione": "Fehler beim Löschen des Verbandes",
+
+    "database_error": "Datenbankfehler",
+
+    "validation_error": "Validierungsfehler",
+    "authentication_error": "Authentifizierungsfehler",
+    "authorization_error": "Nicht autorisiert"
+  },
+  "success": {
+    "orto_deleted": "Garten erfolgreich gelöscht",
+    "utente_deleted": "Benutzer erfolgreich gelöscht",
+    "lotto_deleted": "Parzelle erfolgreich gelöscht",
+    "comune_deleted": "Gemeinde erfolgreich gelöscht",
+    "bando_deleted": "Ankündigung erfolgreich gelöscht",
+    "avviso_deleted": "Hinweis erfolgreich gelöscht",
+    "associazione_deleted": "Verband erfolgreich gelöscht",
+
+    "orto_created": "Garten erfolgreich erstellt",
+    "utente_created": "Benutzer erfolgreich erstellt",
+    "lotto_created": "Parzelle erfolgreich erstellt",
+    "comune_created": "Gemeinde erfolgreich erstellt",
+    "avviso_created": "Hinweis erfolgreich erstellt",
+    "associazione_created": "Verband erfolgreich erstellt",
+
+    "orto_updated": "Garten erfolgreich aktualisiert",
+    "utente_updated": "Benutzer erfolgreich aktualisiert",
+    "lotto_updated": "Parzelle erfolgreich aktualisiert",
+    "password_updated": "Passwort erfolgreich aktualisiert",
+    "comune_updated": "Gemeinde erfolgreich aktualisiert",
+    "avviso_updated": "Hinweis erfolgreich aktualisiert",
+    "associazione_updated": "Verband erfolgreich aktualisiert"
+  },
+  "notFound": {
+    "orto": "Garten nicht gefunden",
+    "utente": "Benutzer nicht gefunden",
+    "lotto": "Parzelle nicht gefunden",
+    "associazione": "Verband nicht gefunden",
+    "comune": "Gemeinde nicht gefunden",
+    "avviso": "Hinweis nicht gefunden",
+    "bando": "Ankündigung nicht gefunden",
+    "sensor": "Sensor nicht gefunden",
+    "meteo": "Wettermessung nicht gefunden"
+  },
+  "validation": {
+    "email_exists": "Benutzer mit dieser E-Mail existiert bereits",
+    "invalid_email": "Ungültige E-Mail",
+    "invalid_phone": "Ungültige Telefonnummer",
+    "invalid_tax_id": "Ungültige Steuernummer",
+    "required_field": "Pflichtfeld",
+    "password_too_short": "Passwort zu kurz (mindestens 8 Zeichen)",
+    "password_updated": "Passwort erfolgreich aktualisiert",
+    "old_password_incorrect": "Altes Passwort falsch",
+    "invalid_duplicate_data": "Ungültige oder doppelte Daten"
+  },
+  "auth": {
+    "login_success": "Anmeldung erfolgreich",
+    "logout_success": "Abmeldung erfolgreich",
+    "google_success": "Google-Anmeldung erfolgreich",
+
+    "google_failed": "Google-Anmeldung fehlgeschlagen",
+
+    "invalid_credentials": "Ungültige Anmeldedaten",
+
+    "token_expired": "Token abgelaufen",
+    "token_invalid": "Ungültiges Token",
+
+    "no_token": "Kein Token bereitgestellt",
+    "unauthorized": "Unbefugter Zugriff"
+  }
+}
