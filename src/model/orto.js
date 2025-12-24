@@ -24,12 +24,12 @@ var ortoSchema = new Schema({
   geometry: {
     type: {
       type: String,
-      enum: ['Polygon'],
+      enum: ['Point'],
       required: true,
-      default: 'Polygon'
+      default: 'Point'
     },
     coordinates: {
-      type: [[[Number]]], // Array of linear rings
+      type: [Number], // [longitude, latitude]
       required: true
     }
   },
