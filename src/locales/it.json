@@ -123,6 +123,8 @@
     "token_expired": "Token scaduto",
     "token_invalid": "Token non valido",
     "no_token": "Token non fornito",
-    "unauthorized": "Accesso non autorizzato"
+    "unauthorized": "Accesso non autorizzato",
+    "unauthorized_role": "Accesso proibito. Il tuo ruolo non permette questa operazione.",
+    "unauthorized_admin": "Accesso proibito. Sono richiesti privilegi di amministratore."
   }
 }

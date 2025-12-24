@@ -123,6 +123,8 @@
     "token_expired": "Token expired",
     "token_invalid": "Invalid token",
     "no_token": "No token provided",
-    "unauthorized": "Unauthorized access"
+    "unauthorized": "Unauthorized access",
+    "unauthorized_role": "Forbidden access. Your role does not permit this operation.",
+    "unauthorized_admin": "Forbidden access. Administrator privileges are required."
   }
 }

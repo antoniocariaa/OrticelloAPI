@@ -143,7 +143,7 @@ router.post('', async function(req, res) {
         }
     }else{
         logger.debug('Email/password authentication attempt', { email: req.body.email });
-        user = await Utente.findOne({ email: req.body.email }).select('email password').exec();
+        user = await Utente.findOne({ email: req.body.email }).select('email password tipo admin').exec();
         
         if(!user){
             logger.auth('LOGIN', req.body.email, false, { reason: 'User not found' });
@@ -159,7 +159,12 @@ router.post('', async function(req, res) {
         logger.auth('LOGIN', user.email, true, { userId: user._id });
     }
 
-    var payload = {email: user.email, id: user._id};
+    var payload = {
+        email: user.email, 
+        id: user._id, 
+        tipo: user.tipo, 
+        admin: user.admin
+    };
     var options = {expiresIn: 86400}
 
     var token = jwt.sign(payload, process.env.SUPER_SECRET, options);

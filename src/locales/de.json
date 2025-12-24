@@ -123,6 +123,8 @@
     "token_expired": "Token abgelaufen",
     "token_invalid": "Ungültiges Token",
     "no_token": "Kein Token bereitgestellt",
-    "unauthorized": "Unbefugter Zugriff"
+    "unauthorized": "Unbefugter Zugriff",
+    "unauthorized_role": "Zugriff verweigert. Ihre Rolle erlaubt diesen Vorgang nicht.",
+    "unauthorized_admin": "Zugriff verweigert. Administratorrechte sind erforderlich."
   }
 }
