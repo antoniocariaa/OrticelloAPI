@@ -4,7 +4,7 @@ const affidaLottoController = require("../controllers/affidaLottoController");
 
 /**
  * @swagger
- * /api/v1/affida-lotti:
+ * /api/v1/affidaLotti:
  *   get:
  *     summary: Get list of lotto assignments
  *     description: Retrieve a list of all lotto assignments (affidaLotti). Returns an array showing which users have been assigned to which lotti, including assignment dates and optional colture information.
@@ -36,7 +36,7 @@ router.get("/", affidaLottoController.getAllAffidaLotti);
 
 /**
  * @swagger
- * /api/v1/affida-lotti:
+ * /api/v1/affidaLotti:
  *   post:
  *     summary: Create a new lotto assignment
  *     description: Create a new assignment of a lotto to a user with start and end dates, and optionally a list of crops
@@ -82,7 +82,7 @@ router.post("/", affidaLottoController.createAffidaLotto);
 
 /**
  * @swagger
- * /api/v1/affida-lotti/{id}:
+ * /api/v1/affidaLotti/{id}:
  *   get:
  *     summary: Get lotto assignment by ID
  *     description: Retrieve a single lotto assignment by its unique identifier
@@ -129,7 +129,7 @@ router.get("/:id", affidaLottoController.getAffidaLottoById);
 
 /**
  * @swagger
- * /api/v1/affida-lotti/{id}:
+ * /api/v1/affidaLotti/{id}:
  *   put:
  *     summary: Update lotto assignment by ID
  *     description: Update an existing lotto assignment with new information (dates, colture, etc.)
@@ -192,7 +192,7 @@ router.put("/:id", affidaLottoController.updateAffidaLotto);
 
 /**
  * @swagger
- * /api/v1/affida-lotti/{id}:
+ * /api/v1/affidaLotti/{id}:
  *   delete:
  *     summary: Delete lotto assignment by ID
  *     description: Remove an existing lotto assignment from the system
@@ -244,7 +244,7 @@ router.delete("/:id", affidaLottoController.deleteAffidaLotto);
 // --- NUOVE ROTTE ---
 /**
  * @swagger
- * /api/v1/affida-lotti/{id}/colture:
+ * /api/v1/affidaLotti/{id}/colture:
  *   post:
  *     summary: Add a crop to lotto assignment
  *     description: Add a new crop (coltura) to the list of crops for a specific lotto assignment
@@ -308,11 +308,11 @@ router.delete("/:id", affidaLottoController.deleteAffidaLotto);
  *                 error:
  *                   type: object
  */
-router.post("/api/v1/affida-lotti/:id/colture", affidaLottoController.addColtura);
+router.post("/api/v1/affidaLotti/:id/colture", affidaLottoController.addColtura);
 
 /**
  * @swagger
- * /api/v1/affida-lotti/{id}/colture/{coltura}:
+ * /api/v1/affidaLotti/{id}/colture/{coltura}:
  *   delete:
  *     summary: Remove a crop from lotto assignment
  *     description: Remove a specific crop (coltura) from the list of crops for a lotto assignment
@@ -361,6 +361,6 @@ router.post("/api/v1/affida-lotti/:id/colture", affidaLottoController.addColtura
  *                 error:
  *                   type: object
  */
-router.delete("/api/v1/affida-lotti/:id/colture/:coltura", affidaLottoController.removeColtura);
+router.delete("/api/v1/affidaLotti/:id/colture/:coltura", affidaLottoController.removeColtura);
 
 module.exports = router;
