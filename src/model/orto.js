@@ -7,9 +7,9 @@ var Schema = mongoose.Schema;
  * @typedef {Object} Orto
  * @property {string} nome - Required name of the garden.
  * @property {string} indirizzo - Required address of the garden.
- * @property {Object} coordinate - Required geographic coordinates.
- * @property {number} coordinate.lat - Latitude in decimal degrees.
- * @property {number} coordinate.lng - Longitude in decimal degrees.
+ * @property {Object} geometry - GeoJSON geometry representing the garden area (Polygon).
+ * @property {string} geometry.type - Must be "Polygon".
+ * @property {number[][][]} geometry.coordinates - Array of linear rings (first is outer boundary, rest are holes).
  * @property {import('mongoose').Types.ObjectId[]} lotti - Array of ObjectId references to Lotto documents (ref: "Lotto").
  */
 var ortoSchema = new Schema({
@@ -21,13 +21,15 @@ var ortoSchema = new Schema({
     type: String,
     required: true
   },
-  coordinate: {
-    lat: {
-      type: Number,
-      required: true
+  geometry: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      required: true,
+      default: 'Point'
     },
-    lng: {
-      type: Number,
+    coordinates: {
+      type: [Number], // [longitude, latitude]
       required: true
     }
   },
@@ -39,5 +41,8 @@ var ortoSchema = new Schema({
   ]
 
 });
+
+// Create a 2dsphere index for geospatial queries
+ortoSchema.index({ geometry: '2dsphere' });
 
 module.exports = mongoose.model("Orto", ortoSchema);

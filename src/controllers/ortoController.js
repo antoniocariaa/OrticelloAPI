@@ -19,7 +19,7 @@ exports.createOrto = async (req, res) => {
         logger.debug('Creating new orto', { data: req.body });
         const savedOrto = await newOrto.save();
         logger.db('INSERT', 'Orto', true, { id: savedOrto._id, nome: savedOrto.nome });
-        res.status(201).json(savedOrto);
+        res.status(201).json({ message: req.t('success.orto_created'), data: savedOrto });
     } catch (error) {
         logger.db('INSERT', 'Orto', false, { error: error.message, data: req.body });
         res.status(500).json({ message: req.t('errors.creating_orto'), error });
@@ -51,7 +51,7 @@ exports.updateOrto = async (req, res) => {
             return res.status(404).json({ message: req.t('notFound.orto') });
         }  
         logger.db('UPDATE', 'Orto', true, { id: req.params.id, nome: updatedOrto.nome });
-        res.status(200).json(updatedOrto);
+        res.status(200).json({ message: req.t('success.orto_updated'), data: updatedOrto });
     } catch (error) {
         logger.db('UPDATE', 'Orto', false, { error: error.message, id: req.params.id });
         res.status(500).json({ message: req.t('errors.updating_orto'), error });

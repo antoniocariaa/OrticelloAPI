@@ -17,7 +17,10 @@
     "retrieving_avviso": "Errore nel recupero dell'avviso",
     "retrieving_associazioni": "Errore nel recupero delle associazioni",
     "retrieving_associazione": "Errore nel recupero dell'associaione",
-
+    "retrieving_affidamenti_lotto": "Errore nel recupero degli affidamenti dei lotti",
+    "retrieving_affidamento_lotto": "Errore nel recupero dell'affidamento del lotto",
+    "retrieving_affidamenti_orto": "Errore nel recupero degli affidamenti degli orti",
+    "retrieving_affidamento_orto": "Errore nel recupero dell'affidamento dell'orto",
     "creating_orto": "Errore nella creazione dell'orto",
     "creating_utente": "Errore nella creazione dell'utente",
     "creating_lotto": "Errore nella creazione del lotto",
@@ -25,7 +28,8 @@
     "creating_bando": "Errore nella creazione del bando",
     "creating_avviso": "Errore nella creazione dell'avviso",
     "creating_associazione": "Errore nella creazione dell'associazione",
-    
+    "creating_affidamento_lotto": "Errore nella creazione dell'affidamento del lotto",
+    "creating_affidamento_orto": "Errore nella creazione dell'affidamento dell'orto",
     "updating_orto": "Errore nell'aggiornamento dell'orto",
     "updating_utente": "Errore nell'aggiornamento dell'utente",
     "updating_lotto": "Errore nell'aggiornamento del lotto",
@@ -34,7 +38,8 @@
     "updating_bando": "Errore nell'aggiornamento del Bando",
     "updating_avviso": "Errore nell'aggiornamento dell'avviso",
     "updating_associazione": "Errore nell'aggiornamento dell'associazione",
-
+    "updating_affidamento_lotto": "Errore nell'aggiornamento dell'affidamento del lotto",
+    "updating_affidamento_orto": "Errore nell'aggiornamento dell'affidamento dell'orto",
     "deleting_orto": "Errore nell'eliminazione dell'orto",
     "deleting_utente": "Errore nell'eliminazione dell'utente",
     "deleting_lotto": "Errore nell'eliminazione del lotto",
@@ -42,9 +47,11 @@
     "deleting_bando": "Errore nell'eliminazione del bando",
     "deleting_avviso": "Errore nell'eliminazione dell'avviso",
     "deleting_associazione": "Errore nell'eliminazione dell'associazione",
-
+    "deleting_affidamento_lotto": "Errore nell'eliminazione dell'affidamento del lotto",
+    "deleting_affidamento_orto": "Errore nell'eliminazione dell'affidamento dell'orto",
+    "adding_coltura": "Errore nell'aggiunta della coltura",
+    "removing_coltura": "Errore nella rimozione della coltura",
     "database_error": "Errore del database",
-
     "validation_error": "Errore di validazione",
     "authentication_error": "Errore di autenticazione",
     "authorization_error": "Non autorizzato"
@@ -57,21 +64,29 @@
     "bando_deleted": "Bando eliminato con successo",
     "avviso_deleted": "Avviso eliminato con successo",
     "associazione_deleted": "Associazione eliminata con successo",
-
+    "affidamento_lotto_deleted": "Affidamento del lotto eliminato con successo",
+    "affidamento_orto_deleted": "Affidamento dell'orto eliminato con successo",
     "orto_created": "Orto creato con successo",
     "utente_created": "Utente creato con successo",
     "lotto_created": "Lotto creato con successo",
     "comune_created": "Comune creato con successo",
+    "bando_created": "Bando creato con successo",
     "avviso_created": "Avviso creato con successo",
     "associazione_created": "Associazione creata con successo",
-
+    "affidamento_lotto_created": "Affidamento del lotto creato con successo",
+    "affidamento_orto_created": "Affidamento dell'orto creato con successo",
     "orto_updated": "Orto aggiornato con successo",
     "utente_updated": "Utente aggiornato con successo",
     "lotto_updated": "Lotto aggiornato con successo",
     "password_updated": "Password aggiornata con successo",
     "comune_updated": "comune aggiornato con successo",
+    "bando_updated": "Bando aggiornato con successo",
     "avviso_updated": "Avviso aggiornato con successo",
-    "associazione_updated": "Associazione aggiornata con successo"
+    "associazione_updated": "Associazione aggiornata con successo",
+    "affidamento_lotto_updated": "Affidamento del lotto aggiornato con successo",
+    "affidamento_orto_updated": "Affidamento dell'orto aggiornato con successo",
+    "coltura_added": "Coltura aggiunta con successo",
+    "coltura_removed": "Coltura rimossa con successo"
   },
   "notFound": {
     "orto": "Orto non trovato",
@@ -82,7 +97,10 @@
     "avviso": "Avviso non trovato",
     "bando": "Bando non trovato",
     "sensor": "Sensore non trovato",
-    "meteo": "Rilevamento meteorologico non trovato"
+    "meteo": "Rilevamento meteorologico non trovato",
+    "affidamento_lotto": "Affidamento del lotto non trovato",
+    "affidamento_orto": "Affidamento dell'orto non trovato",
+    "coltura": "Coltura non trovata"
   },
   "validation": {
     "email_exists": "Utente già esistente con questa email",
@@ -93,20 +111,17 @@
     "password_too_short": "Password troppo corta (minimo 8 caratteri)",
     "password_updated": "Password aggiornata con successo",
     "old_password_incorrect": "Vecchia password non corretta",
-    "invalid_duplicate_data": "Dati non validi o duplicati"
+    "invalid_duplicate_data": "Dati non validi o duplicati",
+    "coltura_required": "La coltura è obbligatoria"
   },
   "auth": {
     "login_success": "Login effettuato con successo",
     "logout_success": "Logout effettuato con successo",
     "google_success": "Login con google avvenuto con successo",
-
     "google_failed": "Login con google fallito",
-
     "invalid_credentials": "Credenziali non valide",
-
     "token_expired": "Token scaduto",
     "token_invalid": "Token non valido",
-
     "no_token": "Token non fornito",
     "unauthorized": "Accesso non autorizzato"
   }
