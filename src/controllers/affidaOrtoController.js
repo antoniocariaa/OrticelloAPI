@@ -14,6 +14,25 @@ exports.getAllAffidaOrti = async (req, res) => {
     }
 };
 
+exports.getActiveAffidaOrti = async (req, res) => {
+    try {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const affidamenti = await AffidaOrto.find({
+            data_inizio: { $lte: today },
+            data_fine: { $gte: today }
+        })
+            .populate("orto")
+            .populate("associazione");
+
+        res.status(200).json(affidamenti);
+    } catch (error) {
+        logger.error('Error retrieving active affidamenti', { error: error.message });
+        res.status(500).json({ message: 'Error retrieving active affidamenti', error });
+    }
+};
+
 exports.createAffidaOrto = async (req, res) => {
     try {
         const newAffidamento = new AffidaOrto(req.body);

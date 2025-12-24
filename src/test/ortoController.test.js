@@ -94,7 +94,7 @@ describe('OrtoController', () => {
       expect(Orto).toHaveBeenCalledWith(mockOrtoData);
       expect(saveMock).toHaveBeenCalledTimes(1);
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith(mockSavedOrto);
+      expect(res.json).toHaveBeenCalledWith({ message: 'success.orto_created', data: mockSavedOrto });
     });
 
     test('should return error 500 when creation fails', async () => {
@@ -188,7 +188,7 @@ describe('OrtoController', () => {
         { new: true }
       );
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockUpdatedOrto);
+      expect(res.json).toHaveBeenCalledWith({ message: 'success.orto_updated', data: mockUpdatedOrto });
     });
 
     test('should return 404 when orto to update is not found', async () => {
