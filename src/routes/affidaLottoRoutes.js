@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const affidaLottoController = require("../controllers/affidaLottoController");
+const checkToken = require('../util/checkToken');
+const checkRole = require('../util/checkRole');
 
 /**
  * @swagger
