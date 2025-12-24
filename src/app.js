@@ -2,7 +2,12 @@ require('dotenv').config();
 var express = require('express');
 var mongoose = require('mongoose');
 var cors = require('cors');
+var swaggerUi = require('swagger-ui-express');
+var { initializeSwagger } = require('./config/swagger');
+var swaggerUi = require('swagger-ui-express');
+var { initializeSwagger } = require('./config/swagger');
 var detectLanguage = require('./util/detectLanguage');
+
 const logger = require('./config/logger');
 const requestLogger = require('./util/requestLogger');
 const errorLogger = require('./util/errorLogger');
@@ -76,7 +81,12 @@ app.use("/api/v1/avvisi", checkToken);
 app.use("/api/v1/bandi", checkToken);
 app.use("/api/v1/meteo", checkToken);
 app.use("/api/v1/sensor", checkToken);
+const swaggerSpec = initializeSwagger();
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "Orticello API Documentation"
+}));
 app.use("/api/v1/orti", ortoRoutes);
 app.use("/api/v1/lotti", lottoRoutes);
 

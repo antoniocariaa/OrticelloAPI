@@ -25,6 +25,89 @@ async function verify( token ) {
 	return payload;
 }
 
+/**
+ * @swagger
+ * /api/v1/authentication:
+ *   post:
+ *     summary: Authenticate user and generate JWT token
+ *     description: Authenticate a user with email and password or Google token. Returns a JWT token valid for 24 hours.
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: User's email address (required if not using googleToken)
+ *                 example: paolo.rossi@rossi.it
+ *               password:
+ *                 type: string
+ *                 description: User's password (required if not using googleToken)
+ *                 example: 12345678
+ *               googleToken:
+ *                 type: string
+ *                 description: Google authentication token (alternative to email/password)
+ *           examples:
+ *             emailPassword:
+ *               summary: Login with email and password
+ *               value:
+ *                 email: paolo.rossi@rossi.it
+ *                 password: 12345678
+ *             googleAuth:
+ *               summary: Login with Google token
+ *               value:
+ *                 googleToken: eyJhbGciOiJSUzI1NiIsImtpZCI6...
+ *     responses:
+ *       200:
+ *         description: Authentication successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Token generated
+ *                 token:
+ *                   type: string
+ *                   description: JWT token (expires in 24 hours)
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 email:
+ *                   type: string
+ *                   example: paolo.rossi@rossi.it
+ *                 id:
+ *                   type: string
+ *                   description: User's MongoDB ObjectId
+ *                   example: 693bfed09c0ff8cb58ab35fe
+ *                 self:
+ *                   type: string
+ *                   description: Link to user resource
+ *                   example: /api/v1/utenti/693bfed09c0ff8cb58ab35fe
+ *       401:
+ *         description: Authentication failed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *             examples:
+ *               userNotFound:
+ *                 value:
+ *                   message: Authentication failed. User not found.
+ *               wrongPassword:
+ *                 value:
+ *                   message: Authentication failed. Wrong password.
+ */
 
 router.post('', async function(req, res) {
     var user = {};
