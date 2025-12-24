@@ -24,7 +24,6 @@ var bandoRoutes = require("./routes/bandoRoutes");
 var meteoRoutes = require("./routes/meteoRoutes");
 var sensorRoutes = require("./routes/sensorRoutes");
 var authentication = require("./routes/authentication");
-var richiestaLottoRoutes = require("./routes/richiestaLottoRoutes");
 var checkToken = require("./util/checkToken");
 
 var app = express();
@@ -82,7 +81,6 @@ app.use("/api/v1/avvisi", checkToken);
 app.use("/api/v1/bandi", checkToken);
 app.use("/api/v1/meteo", checkToken);
 app.use("/api/v1/sensor", checkToken);
-app.use("/api/v1/richiestaLotto", checkToken);
 const swaggerSpec = initializeSwagger();
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
@@ -102,7 +100,6 @@ app.use("/api/v1/avvisi", avvisoRoutes);
 app.use("/api/v1/bandi", bandoRoutes);
 app.use("/api/v1/meteo", meteoRoutes);
 app.use("/api/v1/sensor", sensorRoutes);
-app.use("/api/v1/richiestaLotto", richiestaLottoRoutes);
 /* Default 404 handler */
 app.use((req, res) => {
 	logger.warn('404 - Route not found', {

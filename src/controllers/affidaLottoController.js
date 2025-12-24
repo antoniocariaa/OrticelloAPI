@@ -15,7 +15,7 @@ exports.getAllAffidaLotti = async (req, res) => {
 
 exports.createAffidaLotto = async (req, res) => {
     try {
-        const newAffidamento = new AffidaLotto(req.body);
+        const newAffidamento = new AffidaLotto(req.body, data_richiesta = Date.now());
         const saved = await newAffidamento.save();
 
         logger.db('INSERT', 'AffidaLotto', true, { id: saved._id });
