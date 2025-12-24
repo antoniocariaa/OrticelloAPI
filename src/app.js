@@ -24,6 +24,7 @@ var bandoRoutes = require("./routes/bandoRoutes");
 var meteoRoutes = require("./routes/meteoRoutes");
 var sensorRoutes = require("./routes/sensorRoutes");
 var authentication = require("./routes/authentication");
+var richiestaLottoRoutes = require("./routes/richiestaLottoRoutes");
 var checkToken = require("./util/checkToken");
 
 var app = express();
@@ -31,23 +32,23 @@ const PORT = process.env.PORT || 8080
 
 
 mongoose.connect(process.env.MONGODB_URI, {
-  serverSelectionTimeoutMS: 5000,
+	serverSelectionTimeoutMS: 5000,
 	socketTimeoutMS: 45000
 })
-.then(() => {
-  logger.info('MongoDB connected successfully', { uri: process.env.MONGODB_URI?.split('@')[1] });
-})
-.catch((err) => {
-  logger.error('MongoDB connection failed', { error: err.message });
-});
+	.then(() => {
+		logger.info('MongoDB connected successfully', { uri: process.env.MONGODB_URI?.split('@')[1] });
+	})
+	.catch((err) => {
+		logger.error('MongoDB connection failed', { error: err.message });
+	});
 
 // Event listeners per MongoDB
 mongoose.connection.on('error', (err) => {
-  logger.error('MongoDB connection error', { error: err.message });
+	logger.error('MongoDB connection error', { error: err.message });
 });
 
 mongoose.connection.on('disconnected', () => {
-  logger.warn('MongoDB disconnected');
+	logger.warn('MongoDB disconnected');
 });
 
 app.use(cors());
@@ -63,12 +64,12 @@ app.use(detectLanguage);
 app.use('/api/v1/authentication', authentication);
 
 // Handling GET requests
-app.get('/', async function(req, res){
-	try{
-    res.status(200).json("Orticello API is running");
-  } catch(error){
-    res.status(500).json({ message: 'Error', error });
-  }
+app.get('/', async function (req, res) {
+	try {
+		res.status(200).json("Orticello API is running");
+	} catch (error) {
+		res.status(500).json({ message: 'Error', error });
+	}
 });
 
 app.use("/api/v1/orti", checkToken);
@@ -81,11 +82,12 @@ app.use("/api/v1/avvisi", checkToken);
 app.use("/api/v1/bandi", checkToken);
 app.use("/api/v1/meteo", checkToken);
 app.use("/api/v1/sensor", checkToken);
+app.use("/api/v1/richiestaLotto", checkToken);
 const swaggerSpec = initializeSwagger();
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: "Orticello API Documentation"
+	customCss: '.swagger-ui .topbar { display: none }',
+	customSiteTitle: "Orticello API Documentation"
 }));
 app.use("/api/v1/orti", ortoRoutes);
 app.use("/api/v1/lotti", lottoRoutes);
@@ -100,16 +102,16 @@ app.use("/api/v1/avvisi", avvisoRoutes);
 app.use("/api/v1/bandi", bandoRoutes);
 app.use("/api/v1/meteo", meteoRoutes);
 app.use("/api/v1/sensor", sensorRoutes);
-
+app.use("/api/v1/richiestaLotto", richiestaLottoRoutes);
 /* Default 404 handler */
 app.use((req, res) => {
-    logger.warn('404 - Route not found', { 
-      method: req.method, 
-      url: req.originalUrl,
-      ip: req.ip 
-    });
-    res.status(404);
-    res.json({ error: 'Page Not found Error 404' });
+	logger.warn('404 - Route not found', {
+		method: req.method,
+		url: req.originalUrl,
+		ip: req.ip
+	});
+	res.status(404);
+	res.json({ error: 'Page Not found Error 404' });
 });
 
 /* Middleware di logging errori */
@@ -117,11 +119,11 @@ app.use(errorLogger);
 
 /* Default error handler */
 app.use((err, req, res, next) => {
-    res.status(500).json({ error: 'Internal Server Error 500!' });
+	res.status(500).json({ error: 'Internal Server Error 500!' });
 });
 
 // Avvio del server (DEVE essere l'ultima operazione)
-const server = app.listen(PORT, function() {
+const server = app.listen(PORT, function () {
 	logger.info(`Server started successfully`, { port: PORT, env: process.env.NODE_ENV || 'development' });
 });
 
