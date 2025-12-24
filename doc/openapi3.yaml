@@ -9,6 +9,8 @@ servers:
   - url: https://orticelloapi.onrender.com
     description: Production server
 tags:
+  - name: Authentication
+    description: User authentication endpoints
   - name: Orti
     description: Garden management endpoints
   - name: Lotti
@@ -483,7 +485,7 @@ components:
           description: Sensor payload (TODO - structure to be defined)
           example: "Soil moisture: 45%, Temperature: 18°C"
 paths:
-  /api/v1/affida-lotti:
+  /api/v1/affidaLotti:
     get:
       summary: Get list of lotto assignments
       description: Retrieve a list of all lotto assignments (affidaLotti). Returns an
@@ -553,7 +555,7 @@ paths:
                     example: Error creating affida lotto
                   error:
                     type: object
-  /api/v1/affida-lotti/{id}:
+  /api/v1/affidaLotti/{id}:
     get:
       summary: Get lotto assignment by ID
       description: Retrieve a single lotto assignment by its unique identifier
@@ -698,7 +700,7 @@ paths:
                     example: Error deleting affida lotto
                   error:
                     type: object
-  /api/v1/affida-lotti/{id}/colture:
+  /api/v1/affidaLotti/{id}/colture:
     post:
       summary: Add a crop to lotto assignment
       description: Add a new crop (coltura) to the list of crops for a specific lotto
@@ -762,7 +764,7 @@ paths:
                     example: Error adding coltura
                   error:
                     type: object
-  /api/v1/affida-lotti/{id}/colture/{coltura}:
+  /api/v1/affidaLotti/{id}/colture/{coltura}:
     delete:
       summary: Remove a crop from lotto assignment
       description: Remove a specific crop (coltura) from the list of crops for a lotto
@@ -811,7 +813,7 @@ paths:
                     example: Error removing coltura
                   error:
                     type: object
-  /api/v1/affida-orti:
+  /api/v1/affidaOrti:
     get:
       summary: Get list of orto assignments
       description: Retrieve a list of all orto assignments (affidaOrti). Returns an
@@ -881,7 +883,7 @@ paths:
                     example: Error creating affida orto
                   error:
                     type: object
-  /api/v1/affida-orti/{id}:
+  /api/v1/affidaOrti/{id}:
     get:
       summary: Get orto assignment by ID
       description: Retrieve a single orto assignment by its unique identifier
@@ -1024,6 +1026,35 @@ paths:
                   message:
                     type: string
                     example: Error deleting affida orto
+                  error:
+                    type: object
+  /api/v1/affidaOrti/active:
+    get:
+      summary: Get list of active orto assignments
+      description: Retrieve a list of orto assignments that are currently active
+        (where today's date falls within the assignment date range). Returns an
+        array showing which associazioni are currently assigned to which orti.
+      tags:
+        - AffidaOrti
+      responses:
+        "200":
+          description: Successfully retrieved list of active affida orti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AffidaOrto"
+        "500":
+          description: Error retrieving active affida orti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving active affida orti
                   error:
                     type: object
   /api/v1/associazioni:
@@ -1242,6 +1273,87 @@ paths:
                     example: Errore durante l'eliminazione
                   error:
                     type: string
+  /api/v1/authentication:
+    post:
+      summary: Authenticate user and generate JWT token
+      description: Authenticate a user with email and password or Google token.
+        Returns a JWT token valid for 24 hours.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address (required if not using googleToken)
+                  example: paolo.rossi@rossi.it
+                password:
+                  type: string
+                  description: User's password (required if not using googleToken)
+                  example: 12345678
+                googleToken:
+                  type: string
+                  description: Google authentication token (alternative to email/password)
+            examples:
+              emailPassword:
+                summary: Login with email and password
+                value:
+                  email: paolo.rossi@rossi.it
+                  password: 12345678
+              googleAuth:
+                summary: Login with Google token
+                value:
+                  googleToken: eyJhbGciOiJSUzI1NiIsImtpZCI6...
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Token generated
+                  token:
+                    type: string
+                    description: JWT token (expires in 24 hours)
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  email:
+                    type: string
+                    example: paolo.rossi@rossi.it
+                  id:
+                    type: string
+                    description: User's MongoDB ObjectId
+                    example: 693bfed09c0ff8cb58ab35fe
+                  self:
+                    type: string
+                    description: Link to user resource
+                    example: /api/v1/utenti/693bfed09c0ff8cb58ab35fe
+        "401":
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                userNotFound:
+                  value:
+                    message: Authentication failed. User not found.
+                wrongPassword:
+                  value:
+                    message: Authentication failed. Wrong password.
   /api/v1/avvisi:
     get:
       summary: Get list of notices
@@ -1460,11 +1572,19 @@ paths:
   /api/v1/bandi:
     get:
       summary: Get list of announcements
-      description: Retrieve a list of all announcements (bandi). Returns an array of
-        bando objects with details including titolo, data_inizio, data_fine,
-        messaggio, and optional link.
+      description: Retrieve a list of all announcements. Use query param 'active=true'
+        to filter only current ones.
+      security:
+        - bearerAuth: []
       tags:
         - Bandi
+      parameters:
+        - in: query
+          name: active
+          schema:
+            type: boolean
+          description: Se impostato a true, restituisce solo i bandi non scaduti (ordinati
+            per scadenza).
       responses:
         "200":
           description: Successfully retrieved list of bandi
@@ -1476,20 +1596,11 @@ paths:
                   $ref: "#/components/schemas/Bando"
         "500":
           description: Error retrieving bandi
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Error retrieving bandi
-                  error:
-                    type: object
     post:
       summary: Create a new announcement
-      description: Create a new bando with the provided information including title,
-        start and end dates, message, and optional link
+      description: Create a new bando. Only accessible by Comune.
+      security:
+        - bearerAuth: []
       tags:
         - Bandi
       requestBody:
@@ -1507,30 +1618,14 @@ paths:
                 $ref: "#/components/schemas/Bando"
         "400":
           description: Invalid input data
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Invalid input data
         "500":
           description: Error creating bando
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Error creating bando
-                  error:
-                    type: object
   /api/v1/bandi/{id}:
     get:
       summary: Get announcement by ID
-      description: Retrieve a single bando by its unique identifier
+      description: Retrieve a single bando by ID.
+      security:
+        - bearerAuth: []
       tags:
         - Bandi
       parameters:
@@ -1539,7 +1634,6 @@ paths:
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the bando
       responses:
         "200":
           description: Successfully retrieved bando
@@ -1549,29 +1643,13 @@ paths:
                 $ref: "#/components/schemas/Bando"
         "404":
           description: Bando not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Bando not found
         "500":
           description: Error retrieving bando
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Error retrieving bando
-                  error:
-                    type: object
     put:
       summary: Update announcement by ID
-      description: Update an existing bando with new information
+      description: Update an existing bando. Only accessible by Comune.
+      security:
+        - bearerAuth: []
       tags:
         - Bandi
       parameters:
@@ -1580,7 +1658,6 @@ paths:
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the bando
       requestBody:
         required: true
         content:
@@ -1594,41 +1671,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Bando"
-        "400":
-          description: Invalid input data
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Invalid input data
         "404":
           description: Bando not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Bando not found
         "500":
           description: Error updating bando
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Error updating bando
-                  error:
-                    type: object
     delete:
       summary: Delete announcement by ID
-      description: Remove an existing bando from the system
+      description: Remove an existing bando. Only accessible by Comune.
+      security:
+        - bearerAuth: []
       tags:
         - Bandi
       parameters:
@@ -1637,40 +1688,13 @@ paths:
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the bando
       responses:
         "200":
           description: Bando deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Bando deleted successfully
         "404":
           description: Bando not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Bando not found
         "500":
           description: Error deleting bando
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Error deleting bando
-                  error:
-                    type: object
   /api/v1/comune:
     get:
       summary: Get list of comuni
@@ -2414,6 +2438,159 @@ paths:
                   error:
                     type: object
   /api/v1/utenti:
+    post:
+      summary: Create a new user
+      description: Register a new user in the system. Password is hashed before
+        storage. No authentication required for this endpoint.
+      tags:
+        - Utenti
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nome
+                - cognome
+                - codicefiscale
+                - email
+                - password
+                - indirizzo
+                - telefono
+              properties:
+                nome:
+                  type: string
+                  description: User's first name
+                  example: Paolo
+                cognome:
+                  type: string
+                  description: User's last name
+                  example: Rossi
+                codicefiscale:
+                  type: string
+                  description: Tax ID (validated for EU countries)
+                  example: RSSMRA80A01H501U
+                email:
+                  type: string
+                  format: email
+                  description: User's email (must be unique)
+                  example: paolo.rossi@rossi.it
+                password:
+                  type: string
+                  description: User's password (will be hashed)
+                  example: securePassword123
+                indirizzo:
+                  type: string
+                  description: User's address
+                  example: Via Roma 10, Trento
+                telefono:
+                  type: string
+                  description: Mobile phone number (validated)
+                  example: 393331234567
+                tipo:
+                  type: string
+                  enum:
+                    - citt
+                    - asso
+                    - comu
+                  description: User type (citt=citizen, asso=association, comu=municipality)
+                  default: citt
+                  example: citt
+                associazione:
+                  type: string
+                  description: Associazione ObjectId (required if tipo=asso)
+                  example: 507f1f77bcf86cd799439014
+                comune:
+                  type: string
+                  description: Comune ObjectId (required if tipo=comu)
+                  example: 507f1f77bcf86cd799439015
+                admin:
+                  type: boolean
+                  description: Admin flag (required if tipo != citt)
+                  default: false
+                  example: false
+            examples:
+              citizen:
+                summary: Create a citizen user
+                value:
+                  nome: Paolo
+                  cognome: Rossi
+                  codicefiscale: RSSMRA80A01H501U
+                  email: paolo.rossi@rossi.it
+                  password: securePassword123
+                  indirizzo: Via Roma 10, Trento
+                  telefono: 393331234567
+                  tipo: citt
+              association:
+                summary: Create an association user
+                value:
+                  nome: Mario
+                  cognome: Verdi
+                  codicefiscale: VRDMRA75B15H501T
+                  email: mario.verdi@ortitrento.it
+                  password: securePassword123
+                  indirizzo: Via delle Associazioni 45, Trento
+                  telefono: 393331234568
+                  tipo: asso
+                  associazione: 507f1f77bcf86cd799439014
+                  admin: true
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Utente creato con successo
+                  utente:
+                    $ref: "#/components/schemas/Utente"
+                  self:
+                    type: string
+                    description: Link to created user resource
+                    example: /api/v1/utenti/693bfed09c0ff8cb58ab35fe
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore di validazione
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - PLRS12345678lmnn non è un codice fiscale valido per
+                        nessun paese dell'UE
+        "409":
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Utente già esistente con questa email
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore nella creazione dell'utente
+                  error:
+                    type: string
     get:
       summary: Get list of users
       description: Retrieve a list of all users (utenti). Returns an array of utente
