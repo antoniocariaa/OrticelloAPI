@@ -1,0 +1,2486 @@
+openapi: 3.0.4
+info:
+  title: Orticello API
+  version: 1.0.0
+  description: API for managing community gardens (orti urbani) in Trento
+servers:
+  - url: http://localhost:8080
+    description: Development server
+  - url: https://orticelloapi.onrender.com
+    description: Production server
+tags:
+  - name: Orti
+    description: Garden management endpoints
+  - name: Lotti
+    description: Plot management endpoints
+  - name: Utenti
+    description: User management endpoints
+  - name: Associazioni
+    description: Association management endpoints
+  - name: Comune
+    description: Municipality management endpoints
+  - name: AffidaLotti
+    description: Plot assignment endpoints
+  - name: AffidaOrti
+    description: Garden assignment endpoints
+  - name: Avvisi
+    description: Notice management endpoints
+  - name: Bandi
+    description: Competition announcement endpoints
+  - name: Meteo
+    description: Weather data endpoints
+  - name: Sensor
+    description: Sensor data endpoints
+components:
+  schemas:
+    Orto:
+      type: object
+      required:
+        - nome
+        - indirizzo
+        - comune
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: 507f1f77bcf86cd799439011
+        nome:
+          type: string
+          description: Name of the garden
+          example: Orto San Bartolomeo
+        indirizzo:
+          type: string
+          description: Address of the garden
+          example: Via San Bartolomeo 15, Trento
+        comune:
+          type: string
+          description: Reference to Comune ObjectId
+          example: 507f1f77bcf86cd799439015
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp of creation (generated automatically)
+          readOnly: true
+          example: 2025-12-11T10:30:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp of last update (generated automatically)
+          readOnly: true
+          example: 2025-12-11T10:30:00.000Z
+    Lotto:
+      type: object
+      required:
+        - dimensione
+        - sensori
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: 507f1f77bcf86cd799439012
+        dimensione:
+          type: number
+          description: Size of the plot in square meters
+          example: 50
+        sensori:
+          type: boolean
+          description: Whether the plot is equipped with sensors
+          example: true
+    Associazione:
+      type: object
+      required:
+        - nome
+        - indirizzo
+        - telefono
+        - email
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: 507f1f77bcf86cd799439014
+        nome:
+          type: string
+          description: Name of the association
+          example: Associazione Orti Urbani Trento
+        indirizzo:
+          type: string
+          description: Address of the association
+          example: Via delle Associazioni 45, Trento
+        telefono:
+          type: string
+          description: Phone number (mobile format validated)
+          example: "+393331234567"
+        email:
+          type: string
+          format: email
+          description: Email address (unique, validated)
+          example: info@ortiurbanitrento.it
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp of creation (generated automatically)
+          readOnly: true
+          example: 2025-12-11T10:30:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp of last update (generated automatically)
+          readOnly: true
+          example: 2025-12-11T10:30:00.000Z
+    Comune:
+      type: object
+      required:
+        - nome
+        - indirizzo
+        - telefono
+        - email
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: 507f1f77bcf86cd799439015
+        nome:
+          type: string
+          description: Name of the municipality
+          example: Comune di Trento
+        indirizzo:
+          type: string
+          description: Address of the municipality
+          example: Piazza Duomo 1, Trento
+        telefono:
+          type: string
+          description: Phone number of the municipality
+          example: "+390461884111"
+        email:
+          type: string
+          format: email
+          description: Email address (unique, validated)
+          example: info@comune.trento.it
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp of creation (generated automatically)
+          readOnly: true
+          example: 2025-12-11T10:30:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp of last update (generated automatically)
+          readOnly: true
+          example: 2025-12-11T10:30:00.000Z
+    Utente:
+      type: object
+      required:
+        - nome
+        - cognome
+        - codicefiscale
+        - email
+        - indirizzo
+        - telefono
+        - tipo
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: 507f1f77bcf86cd799439016
+        nome:
+          type: string
+          description: First name of the user
+          example: Mario
+        cognome:
+          type: string
+          description: Last name of the user
+          example: Rossi
+        codicefiscale:
+          type: string
+          description: Italian tax ID (validated)
+          example: RSSMRA80A01H501U
+        email:
+          type: string
+          format: email
+          description: Email address (unique, validated)
+          example: mario.rossi@example.com
+        password:
+          type: string
+          description: Password (hashed in future implementation)
+          writeOnly: true
+          example: securePassword123
+        indirizzo:
+          type: string
+          description: User address
+          example: Via Roma 10, Trento
+        telefono:
+          type: string
+          description: Mobile phone number (validated)
+          example: "+393331234567"
+        tipo:
+          type: string
+          enum:
+            - citt
+            - asso
+            - comu
+          description: User type (citt=citizen, asso=association, comu=municipality)
+          default: citt
+          example: citt
+        associazione:
+          type: string
+          description: Reference to Associazione (required if tipo=asso)
+          example: 507f1f77bcf86cd799439014
+        comune:
+          type: string
+          description: Reference to Comune (required if tipo=comu)
+          example: 507f1f77bcf86cd799439015
+        admin:
+          type: boolean
+          description: Admin flag (required if tipo != citt)
+          default: false
+          example: false
+    AffidaLotto:
+      type: object
+      required:
+        - lotto
+        - utente
+        - data_inizio
+        - data_fine
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: 507f1f77bcf86cd799439017
+        lotto:
+          type: string
+          description: Reference to Lotto ObjectId
+          example: 507f1f77bcf86cd799439012
+        utente:
+          type: string
+          description: Reference to Utente ObjectId
+          example: 507f1f77bcf86cd799439016
+        data_inizio:
+          type: string
+          format: date
+          description: Assignment start date
+          example: 2025-01-01
+        data_fine:
+          type: string
+          format: date
+          description: Assignment end date
+          example: 2025-12-31
+        colture:
+          type: array
+          items:
+            type: string
+          description: List of crops planted by the user
+          example:
+            - Pomodori
+            - Zucchine
+            - Insalata
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp of creation (generated automatically)
+          readOnly: true
+          example: 2025-12-11T10:30:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp of last update (generated automatically)
+          readOnly: true
+          example: 2025-12-11T10:30:00.000Z
+    AffidaOrto:
+      type: object
+      required:
+        - orto
+        - associazione
+        - data_inizio
+        - data_fine
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: 507f1f77bcf86cd799439018
+        orto:
+          type: string
+          description: Reference to Orto ObjectId
+          example: 507f1f77bcf86cd799439011
+        associazione:
+          type: string
+          description: Reference to Associazione ObjectId
+          example: 507f1f77bcf86cd799439014
+        data_inizio:
+          type: string
+          format: date
+          description: Assignment start date
+          example: 2025-01-01
+        data_fine:
+          type: string
+          format: date
+          description: Assignment end date
+          example: 2025-12-31
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp of creation (generated automatically)
+          readOnly: true
+          example: 2025-12-11T10:30:00.000Z
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp of last update (generated automatically)
+          readOnly: true
+          example: 2025-12-11T10:30:00.000Z
+    Avviso:
+      type: object
+      required:
+        - titolo
+        - tipo
+        - data
+        - messaggio
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: 507f1f77bcf86cd799439019
+        titolo:
+          type: string
+          description: Notice title
+          example: Chiusura per manutenzione
+        tipo:
+          type: string
+          enum:
+            - asso
+            - comu
+          description: Notice type (asso=association, comu=municipality)
+          default: asso
+          example: comu
+        comune:
+          type: string
+          description: Reference to Comune (required if tipo=comu)
+          example: 507f1f77bcf86cd799439015
+        associazione:
+          type: string
+          description: Reference to Associazione (required if tipo=asso)
+          example: 507f1f77bcf86cd799439014
+        data:
+          type: string
+          format: date
+          description: Notice date
+          example: 2025-12-15
+        target:
+          type: string
+          enum:
+            - asso
+            - all
+          description: Target audience (required if tipo=comu)
+          default: all
+          example: all
+        messaggio:
+          type: string
+          description: Notice message content
+          example: Gli orti rimarranno chiusi per manutenzione dal 20 al 25 dicembre
+        categoria:
+          type: string
+          description: Optional category
+          example: manutenzione
+    Bando:
+      type: object
+      required:
+        - titolo
+        - data_inizio
+        - data_fine
+        - messaggio
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: 507f1f77bcf86cd799439020
+        titolo:
+          type: string
+          description: Competition announcement title
+          example: Bando per assegnazione lotti 2026
+        data_inizio:
+          type: string
+          format: date
+          description: Application period start date
+          example: 2026-01-01
+        data_fine:
+          type: string
+          format: date
+          description: Application period end date
+          example: 2026-01-31
+        messaggio:
+          type: string
+          description: Competition announcement message
+          example: Sono aperti i bandi per l'assegnazione dei lotti per l'anno 2026
+        link:
+          type: string
+          description: Optional link to full announcement
+          example: https://www.comune.trento.it/bandi/orti-2026
+    Meteo:
+      type: object
+      required:
+        - coordinate
+        - timestamp
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: 507f1f77bcf86cd799439021
+        coordinate:
+          type: object
+          required:
+            - lat
+            - lng
+          properties:
+            lat:
+              type: number
+              description: Latitude in decimal degrees (WGS84)
+              example: 46.0664
+            lng:
+              type: number
+              description: Longitude in decimal degrees (WGS84)
+              example: 11.1257
+        timestamp:
+          type: string
+          format: date-time
+          description: Observation timestamp
+          example: 2025-12-11T14:30:00.000Z
+        rilev:
+          type: string
+          description: Meteorological reading or notes (TODO - structure to be defined)
+          example: "Temperature: 15°C, Humidity: 65%"
+    Sensor:
+      type: object
+      required:
+        - lotto
+        - timestamp
+      properties:
+        _id:
+          type: string
+          description: MongoDB ObjectId (generated automatically)
+          readOnly: true
+          example: 507f1f77bcf86cd799439022
+        lotto:
+          type: string
+          description: Reference to Lotto ObjectId
+          example: 507f1f77bcf86cd799439012
+        timestamp:
+          type: string
+          format: date-time
+          description: Reading timestamp
+          example: 2025-12-11T14:30:00.000Z
+        rilev:
+          type: string
+          description: Sensor payload (TODO - structure to be defined)
+          example: "Soil moisture: 45%, Temperature: 18°C"
+paths:
+  /api/v1/affida-lotti:
+    get:
+      summary: Get list of lotto assignments
+      description: Retrieve a list of all lotto assignments (affidaLotti). Returns an
+        array showing which users have been assigned to which lotti, including
+        assignment dates and optional colture information.
+      tags:
+        - AffidaLotti
+      responses:
+        "200":
+          description: Successfully retrieved list of affida lotti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AffidaLotto"
+        "500":
+          description: Error retrieving affida lotti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving affida lotti
+                  error:
+                    type: object
+    post:
+      summary: Create a new lotto assignment
+      description: Create a new assignment of a lotto to a user with start and end
+        dates, and optionally a list of crops
+      tags:
+        - AffidaLotti
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AffidaLotto"
+      responses:
+        "201":
+          description: AffidaLotto created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AffidaLotto"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+        "500":
+          description: Error creating affida lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error creating affida lotto
+                  error:
+                    type: object
+  /api/v1/affida-lotti/{id}:
+    get:
+      summary: Get lotto assignment by ID
+      description: Retrieve a single lotto assignment by its unique identifier
+      tags:
+        - AffidaLotti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the affida lotto
+      responses:
+        "200":
+          description: Successfully retrieved affida lotto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AffidaLotto"
+        "404":
+          description: AffidaLotto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: AffidaLotto not found
+        "500":
+          description: Error retrieving affida lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving affida lotto
+                  error:
+                    type: object
+    put:
+      summary: Update lotto assignment by ID
+      description: Update an existing lotto assignment with new information (dates,
+        colture, etc.)
+      tags:
+        - AffidaLotti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the affida lotto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AffidaLotto"
+      responses:
+        "200":
+          description: AffidaLotto updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AffidaLotto"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+        "404":
+          description: AffidaLotto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: AffidaLotto not found
+        "500":
+          description: Error updating affida lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error updating affida lotto
+                  error:
+                    type: object
+    delete:
+      summary: Delete lotto assignment by ID
+      description: Remove an existing lotto assignment from the system
+      tags:
+        - AffidaLotti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the affida lotto
+      responses:
+        "200":
+          description: AffidaLotto deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: AffidaLotto deleted successfully
+        "404":
+          description: AffidaLotto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: AffidaLotto not found
+        "500":
+          description: Error deleting affida lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error deleting affida lotto
+                  error:
+                    type: object
+  /api/v1/affida-lotti/{id}/colture:
+    post:
+      summary: Add a crop to lotto assignment
+      description: Add a new crop (coltura) to the list of crops for a specific lotto
+        assignment
+      tags:
+        - AffidaLotti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the affida lotto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                coltura:
+                  type: string
+                  description: Name of the crop to add
+                  example: Pomodori
+      responses:
+        "200":
+          description: Coltura added successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AffidaLotto"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Coltura name is required
+        "404":
+          description: AffidaLotto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: AffidaLotto not found
+        "500":
+          description: Error adding coltura
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error adding coltura
+                  error:
+                    type: object
+  /api/v1/affida-lotti/{id}/colture/{coltura}:
+    delete:
+      summary: Remove a crop from lotto assignment
+      description: Remove a specific crop (coltura) from the list of crops for a lotto
+        assignment
+      tags:
+        - AffidaLotti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the affida lotto
+        - in: path
+          name: coltura
+          required: true
+          schema:
+            type: string
+          description: Name of the crop to remove
+      responses:
+        "200":
+          description: Coltura removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AffidaLotto"
+        "404":
+          description: AffidaLotto not found or coltura not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: AffidaLotto not found or coltura not found
+        "500":
+          description: Error removing coltura
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error removing coltura
+                  error:
+                    type: object
+  /api/v1/affida-orti:
+    get:
+      summary: Get list of orto assignments
+      description: Retrieve a list of all orto assignments (affidaOrti). Returns an
+        array showing which associazioni have been assigned to which orti,
+        including assignment start and end dates.
+      tags:
+        - AffidaOrti
+      responses:
+        "200":
+          description: Successfully retrieved list of affida orti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AffidaOrto"
+        "500":
+          description: Error retrieving affida orti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving affida orti
+                  error:
+                    type: object
+    post:
+      summary: Create a new orto assignment
+      description: Create a new assignment of an orto to an associazione with start
+        and end dates
+      tags:
+        - AffidaOrti
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AffidaOrto"
+      responses:
+        "201":
+          description: AffidaOrto created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AffidaOrto"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+        "500":
+          description: Error creating affida orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error creating affida orto
+                  error:
+                    type: object
+  /api/v1/affida-orti/{id}:
+    get:
+      summary: Get orto assignment by ID
+      description: Retrieve a single orto assignment by its unique identifier
+      tags:
+        - AffidaOrti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the affida orto
+      responses:
+        "200":
+          description: Successfully retrieved affida orto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AffidaOrto"
+        "404":
+          description: AffidaOrto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: AffidaOrto not found
+        "500":
+          description: Error retrieving affida orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving affida orto
+                  error:
+                    type: object
+    put:
+      summary: Update orto assignment by ID
+      description: Update an existing orto assignment with new information (dates,
+        orto, associazione)
+      tags:
+        - AffidaOrti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the affida orto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AffidaOrto"
+      responses:
+        "200":
+          description: AffidaOrto updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AffidaOrto"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+        "404":
+          description: AffidaOrto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: AffidaOrto not found
+        "500":
+          description: Error updating affida orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error updating affida orto
+                  error:
+                    type: object
+    delete:
+      summary: Delete orto assignment by ID
+      description: Remove an existing orto assignment from the system
+      tags:
+        - AffidaOrti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the affida orto
+      responses:
+        "200":
+          description: AffidaOrto deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: AffidaOrto deleted successfully
+        "404":
+          description: AffidaOrto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: AffidaOrto not found
+        "500":
+          description: Error deleting affida orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error deleting affida orto
+                  error:
+                    type: object
+  /api/v1/associazioni:
+    get:
+      summary: Get list of associazioni
+      description: Retrieve a list of all associazioni (associations). Returns an
+        array of associazione objects with their details.
+      tags:
+        - Associazioni
+      responses:
+        "200":
+          description: Successfully retrieved list of associazioni
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Associazione"
+        "500":
+          description: Error retrieving associazioni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore nel recupero delle associazioni
+                  error:
+                    type: string
+    post:
+      summary: Create a new associazione
+      description: Create a new association with the provided information
+      tags:
+        - Associazioni
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Associazione"
+      responses:
+        "201":
+          description: Associazione created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Associazione"
+        "400":
+          description: Invalid data or duplicate entry
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Dati non validi o duplicati
+                  error:
+                    type: string
+        "500":
+          description: Error creating associazione
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore nella creazione dell'associazione
+                  error:
+                    type: string
+  /api/v1/associazioni/{id}:
+    get:
+      summary: Get associazione by ID
+      description: Retrieve a single association by its unique identifier
+      tags:
+        - Associazioni
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the associazione
+      responses:
+        "200":
+          description: Successfully retrieved associazione
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Associazione"
+        "404":
+          description: Associazione not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Associazione non trovata
+        "500":
+          description: Error retrieving associazione
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore nel recupero dell'associazione
+                  error:
+                    type: string
+    put:
+      summary: Update associazione by ID
+      description: Update an existing association with new information
+      tags:
+        - Associazioni
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the associazione
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Associazione"
+      responses:
+        "200":
+          description: Associazione updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Associazione"
+        "400":
+          description: Invalid update data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Dati aggiornati non validi
+                  error:
+                    type: string
+        "404":
+          description: Associazione not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Associazione non trovata
+        "500":
+          description: Error updating associazione
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore nell'aggiornamento dell'associazione
+                  error:
+                    type: string
+    delete:
+      summary: Delete associazione by ID
+      description: Delete an association by its unique identifier
+      tags:
+        - Associazioni
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the associazione
+      responses:
+        "200":
+          description: Associazione deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Associazione eliminata con successo
+        "404":
+          description: Associazione not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Associazione non trovata
+        "500":
+          description: Error deleting associazione
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore durante l'eliminazione
+                  error:
+                    type: string
+  /api/v1/avvisi:
+    get:
+      summary: Get list of notices
+      description: Retrieve a list of all notices (avvisi). Returns an array of avviso
+        objects with details including titolo, tipo (asso/comu), data,
+        messaggio, and references to comune or associazione.
+      tags:
+        - Avvisi
+      responses:
+        "200":
+          description: Successfully retrieved list of avvisi
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Avviso"
+        "500":
+          description: Error retrieving avvisi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving avvisi
+                  error:
+                    type: object
+    post:
+      summary: Create a new notice
+      description: Create a new avviso with the provided information. The notice can
+        be created by an associazione or comune, with different required fields
+        based on the tipo.
+      tags:
+        - Avvisi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Avviso"
+      responses:
+        "201":
+          description: Avviso created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Avviso"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+        "500":
+          description: Error creating avviso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error creating avviso
+                  error:
+                    type: object
+  /api/v1/avvisi/{id}:
+    get:
+      summary: Get notice by ID
+      description: Retrieve a single avviso by its unique identifier
+      tags:
+        - Avvisi
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the avviso
+      responses:
+        "200":
+          description: Successfully retrieved avviso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Avviso"
+        "404":
+          description: Avviso not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Avviso not found
+        "500":
+          description: Error retrieving avviso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving avviso
+                  error:
+                    type: object
+    put:
+      summary: Update notice by ID
+      description: Update an existing avviso with new information
+      tags:
+        - Avvisi
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the avviso
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Avviso"
+      responses:
+        "200":
+          description: Avviso updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Avviso"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+        "404":
+          description: Avviso not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Avviso not found
+        "500":
+          description: Error updating avviso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error updating avviso
+                  error:
+                    type: object
+    delete:
+      summary: Delete notice by ID
+      description: Remove an existing avviso from the system
+      tags:
+        - Avvisi
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the avviso
+      responses:
+        "200":
+          description: Avviso deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Avviso deleted successfully
+        "404":
+          description: Avviso not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Avviso not found
+        "500":
+          description: Error deleting avviso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error deleting avviso
+                  error:
+                    type: object
+  /api/v1/bandi:
+    get:
+      summary: Get list of announcements
+      description: Retrieve a list of all announcements (bandi). Returns an array of
+        bando objects with details including titolo, data_inizio, data_fine,
+        messaggio, and optional link.
+      tags:
+        - Bandi
+      responses:
+        "200":
+          description: Successfully retrieved list of bandi
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bando"
+        "500":
+          description: Error retrieving bandi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving bandi
+                  error:
+                    type: object
+    post:
+      summary: Create a new announcement
+      description: Create a new bando with the provided information including title,
+        start and end dates, message, and optional link
+      tags:
+        - Bandi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Bando"
+      responses:
+        "201":
+          description: Bando created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bando"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+        "500":
+          description: Error creating bando
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error creating bando
+                  error:
+                    type: object
+  /api/v1/bandi/{id}:
+    get:
+      summary: Get announcement by ID
+      description: Retrieve a single bando by its unique identifier
+      tags:
+        - Bandi
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the bando
+      responses:
+        "200":
+          description: Successfully retrieved bando
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bando"
+        "404":
+          description: Bando not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bando not found
+        "500":
+          description: Error retrieving bando
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving bando
+                  error:
+                    type: object
+    put:
+      summary: Update announcement by ID
+      description: Update an existing bando with new information
+      tags:
+        - Bandi
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the bando
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Bando"
+      responses:
+        "200":
+          description: Bando updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Bando"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+        "404":
+          description: Bando not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bando not found
+        "500":
+          description: Error updating bando
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error updating bando
+                  error:
+                    type: object
+    delete:
+      summary: Delete announcement by ID
+      description: Remove an existing bando from the system
+      tags:
+        - Bandi
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the bando
+      responses:
+        "200":
+          description: Bando deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bando deleted successfully
+        "404":
+          description: Bando not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Bando not found
+        "500":
+          description: Error deleting bando
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error deleting bando
+                  error:
+                    type: object
+  /api/v1/comune:
+    get:
+      summary: Get list of comuni
+      description: Retrieve a list of all comuni (municipalities). Returns an array of
+        comune objects with their details.
+      tags:
+        - Comune
+      responses:
+        "200":
+          description: Successfully retrieved list of comuni
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comune"
+        "500":
+          description: Error retrieving comuni
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore nel recupero dei comuni
+                  error:
+                    type: string
+    post:
+      summary: Create a new comune
+      description: Create a new municipality with the provided information
+      tags:
+        - Comune
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Comune"
+      responses:
+        "201":
+          description: Comune created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comune"
+        "400":
+          description: Invalid data or duplicate entry
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Dati non validi o duplicati
+                  error:
+                    type: string
+        "500":
+          description: Error creating comune
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore nella creazione del comune
+                  error:
+                    type: string
+  /api/v1/comune/{id}:
+    get:
+      summary: Get comune by ID
+      description: Retrieve a single municipality by its unique identifier
+      tags:
+        - Comune
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the comune
+      responses:
+        "200":
+          description: Successfully retrieved comune
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comune"
+        "404":
+          description: Comune not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Comune non trovato
+        "500":
+          description: Error retrieving comune
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore nel recupero del comune
+                  error:
+                    type: string
+    put:
+      summary: Update comune by ID
+      description: Update an existing municipality with new information
+      tags:
+        - Comune
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the comune
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Comune"
+      responses:
+        "200":
+          description: Comune updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comune"
+        "400":
+          description: Invalid update data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Dati aggiornati non validi
+                  error:
+                    type: string
+        "404":
+          description: Comune not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Comune non trovato
+        "500":
+          description: Error updating comune
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore nell'aggiornamento del comune
+                  error:
+                    type: string
+    delete:
+      summary: Delete comune by ID
+      description: Delete a municipality by its unique identifier
+      tags:
+        - Comune
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the comune
+      responses:
+        "200":
+          description: Comune deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Comune eliminato con successo
+        "404":
+          description: Comune not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Comune non trovato
+        "500":
+          description: Error deleting comune
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore durante l'eliminazione
+                  error:
+                    type: string
+  /api/v1/lotti:
+    get:
+      summary: Get list of lotti
+      description: Retrieve a list of all lotti (plots). Returns an array of lotto
+        objects with their details.
+      tags:
+        - Lotti
+      responses:
+        "200":
+          description: Successfully retrieved list of lotti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lotto"
+        "500":
+          description: Error retrieving lotti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving lotti
+                  error:
+                    type: object
+    post:
+      summary: Create a new lotto
+      description: Create a new plot with the provided information
+      tags:
+        - Lotti
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Lotto"
+      responses:
+        "201":
+          description: Lotto created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lotto"
+        "500":
+          description: Error creating lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error creating lotto
+                  error:
+                    type: object
+  /api/v1/lotti/{id}:
+    get:
+      summary: Get lotto by ID
+      description: Retrieve a single plot by its unique identifier
+      tags:
+        - Lotti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the lotto
+      responses:
+        "200":
+          description: Successfully retrieved lotto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lotto"
+        "404":
+          description: Lotto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Lotto not found
+        "500":
+          description: Error retrieving lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving lotto
+                  error:
+                    type: object
+    put:
+      summary: Update lotto by ID
+      description: Update an existing plot with new information
+      tags:
+        - Lotti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the lotto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Lotto"
+      responses:
+        "200":
+          description: Lotto updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lotto"
+        "404":
+          description: Lotto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Lotto not found
+        "500":
+          description: Error updating lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error updating lotto
+                  error:
+                    type: object
+    delete:
+      summary: Delete lotto by ID
+      description: Delete a plot by its unique identifier
+      tags:
+        - Lotti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the lotto
+      responses:
+        "200":
+          description: Lotto deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Lotto deleted successfully
+        "404":
+          description: Lotto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Lotto not found
+        "500":
+          description: Error deleting lotto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error deleting lotto
+                  error:
+                    type: object
+  /api/v1/meteo:
+    get:
+      summary: Get list of meteorological observations
+      description: Retrieve a list of all meteorological observations (meteo). Returns
+        an array of meteo objects with details including geographic coordinates,
+        timestamp, and reading data.
+      tags:
+        - Meteo
+      responses:
+        "200":
+          description: Successfully retrieved list of meteo observations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Meteo"
+        "500":
+          description: Error retrieving meteo observations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving meteo observations
+                  error:
+                    type: object
+  /api/v1/meteo/{id}:
+    get:
+      summary: Get meteorological observation by ID
+      description: Retrieve a single meteorological observation by its unique identifier
+      tags:
+        - Meteo
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the meteo observation
+      responses:
+        "200":
+          description: Successfully retrieved meteo observation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Meteo"
+        "404":
+          description: Meteo observation not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Meteo observation not found
+        "500":
+          description: Error retrieving meteo observation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving meteo observation
+                  error:
+                    type: object
+  /api/v1/orti:
+    get:
+      summary: Get list of green gardens
+      description: Retrieve a list of all green gardens (orti). Returns an array of
+        orto objects with their details.
+      tags:
+        - Orti
+      responses:
+        "200":
+          description: Successfully retrieved list of orti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Orto"
+        "500":
+          description: Error retrieving orti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving ortos
+                  error:
+                    type: object
+    post:
+      summary: Create a new orto
+      description: Create a new green garden with the provided information
+      tags:
+        - Orti
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Orto"
+      responses:
+        "201":
+          description: Orto created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Orto"
+        "500":
+          description: Error creating orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error creating orto
+                  error:
+                    type: object
+  /api/v1/orti/{id}:
+    get:
+      summary: Get orto by ID
+      description: Retrieve a single green garden by its unique identifier
+      tags:
+        - Orti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the orto
+      responses:
+        "200":
+          description: Successfully retrieved orto
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Orto"
+        "404":
+          description: Orto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Orto not found
+        "500":
+          description: Error retrieving orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving orto
+                  error:
+                    type: object
+    put:
+      summary: Update orto by ID
+      description: Update an existing green garden with new information
+      tags:
+        - Orti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the orto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Orto"
+      responses:
+        "200":
+          description: Orto updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Orto"
+        "404":
+          description: Orto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Orto not found
+        "500":
+          description: Error updating orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error updating orto
+                  error:
+                    type: object
+    delete:
+      summary: Delete orto by ID
+      description: Delete a green garden by its unique identifier
+      tags:
+        - Orti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the orto
+      responses:
+        "200":
+          description: Orto deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Orto deleted successfully
+        "404":
+          description: Orto not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Orto not found
+        "500":
+          description: Error deleting orto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error deleting orto
+                  error:
+                    type: object
+  /api/v1/sensor:
+    get:
+      summary: Get list of sensor readings
+      description: Retrieve a list of all sensor readings. Returns an array of sensor
+        objects with details including lotto reference, timestamp, and reading
+        data.
+      tags:
+        - Sensor
+      responses:
+        "200":
+          description: Successfully retrieved list of sensor readings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Sensor"
+        "500":
+          description: Error retrieving sensor readings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving sensor readings
+                  error:
+                    type: object
+  /api/v1/sensor/{id}:
+    get:
+      summary: Get sensor reading by ID
+      description: Retrieve a single sensor reading by its unique identifier
+      tags:
+        - Sensor
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the sensor reading
+      responses:
+        "200":
+          description: Successfully retrieved sensor reading
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Sensor"
+        "404":
+          description: Sensor reading not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Sensor reading not found
+        "500":
+          description: Error retrieving sensor reading
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving sensor reading
+                  error:
+                    type: object
+  /api/v1/utenti:
+    get:
+      summary: Get list of users
+      description: Retrieve a list of all users (utenti). Returns an array of utente
+        objects with their details including nome, cognome, email, tipo, and
+        references to associazione or comune if applicable.
+      tags:
+        - Utenti
+      responses:
+        "200":
+          description: Successfully retrieved list of utenti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Utente"
+        "500":
+          description: Error retrieving utenti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving utenti
+                  error:
+                    type: object
+  /api/v1/utenti/{id}:
+    get:
+      summary: Get utente by ID
+      description: Retrieve a single user by its unique identifier
+      tags:
+        - Utenti
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the utente
+      responses:
+        "200":
+          description: Successfully retrieved utente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Utente"
+        "404":
+          description: Utente not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Utente not found
+        "500":
+          description: Error retrieving utente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving utente
+                  error:
+                    type: object

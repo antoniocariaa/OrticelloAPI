@@ -9,7 +9,7 @@ exports.getAllAffidaLotti = async (req, res) => {
         res.status(200).json(affidamenti);
     } catch (error) {
         logger.error('Error retrieving affidamenti', { error: error.message });
-        res.status(500).json({ message: 'Error retrieving affidamenti', error});
+        res.status(500).json({ message: req.t('errors.retrieving_affidamenti_lotto'), error});
     }
 };
 
@@ -19,10 +19,10 @@ exports.createAffidaLotto = async (req, res) => {
         const saved = await newAffidamento.save();
 
         logger.db('INSERT', 'AffidaLotto', true, { id: saved._id });
-        res.status(201).json(saved);
+        res.status(201).json({ message: req.t('success.affidamento_lotto_created'), data: saved });
     } catch (error) {
         logger.error('Error creating affidamento', { error: error.message, data: req.body });
-        res.status(500).json({ message: 'Error creating affidamento', error });
+        res.status(500).json({ message: req.t('errors.creating_affidamento_lotto'), error });
     }
 };
 
@@ -33,13 +33,13 @@ exports.getAffidaLottoById = async (req, res) => {
             .populate("utente");
         if (!affidamento) {
             logger.warn('Affidamento not found', { id: req.params.id });
-            return res.status(404).json({ message: 'Affidamento not found' });
+            return res.status(404).json({ message: req.t('notFound.affidamento_lotto') });
         }
         logger.db('SELECT', 'AffidaLotto', true, { id: req.params.id });
         res.status(200).json(affidamento);
     } catch (error) {
         logger.error('Error retrieving affidamento', { error: error.message, id: req.params.id });
-        res.status(500).json({ message: 'Error retrieving affidamento', error });
+        res.status(500).json({ message: req.t('errors.retrieving_affidamento_lotto'), error });
     }
 };
 
@@ -52,13 +52,13 @@ exports.updateAffidaLotto = async (req, res) => {
         );
         if (!updated) {
             logger.warn('Affidamento not found for update', { id: req.params.id });
-            return res.status(404).json({ message: 'Affidamento not found' });
+            return res.status(404).json({ message: req.t('notFound.affidamento_lotto') });
         }
         logger.db('UPDATE', 'AffidaLotto', true, { id: req.params.id });
-        res.status(200).json(updated);
+        res.status(200).json({ message: req.t('success.affidamento_lotto_updated'), data: updated });
     } catch (error) {
         logger.error('Error updating affidamento', { error: error.message, id: req.params.id });
-        res.status(500).json({ message: 'Error updating affidamento', error });
+        res.status(500).json({ message: req.t('errors.updating_affidamento_lotto'), error });
     }
 };
 
@@ -67,13 +67,13 @@ exports.deleteAffidaLotto = async (req, res) => {
         const deleted = await AffidaLotto.findByIdAndDelete(req.params.id);
         if (!deleted) {
             logger.warn('Affidamento not found for deletion', { id: req.params.id });
-            return res.status(404).json({ message: 'Affidamento not found' });
+            return res.status(404).json({ message: req.t('notFound.affidamento_lotto') });
         }
         logger.db('DELETE', 'AffidaLotto', true, { id: req.params.id });
-        res.status(200).json({ message: 'Affidamento deleted successfully' });
+        res.status(200).json({ message: req.t('success.affidamento_lotto_deleted') });
     } catch (error) {
         logger.error('Error deleting affidamento', { error: error.message, id: req.params.id });
-        res.status(500).json({ message: 'Error deleting affidamento', error });
+        res.status(500).json({ message: req.t('errors.deleting_affidamento_lotto'), error });
     }
 };
 
@@ -82,14 +82,14 @@ exports.addColtura = async (req, res) => {
 
     if (!coltura) {
         logger.warn('coltura is required to add', { id: req.params.id });
-        return res.status(400).json({ message: "coltura is required" });
+        return res.status(400).json({ message: req.t('validation.coltura_required') });
     }
 
     try {
         const affida = await AffidaLotto.findById(req.params.id);
         if (!affida) {
             logger.warn('Affidamento not found', { id: req.params.id });
-            return res.status(404).json({ message: "Affidamento not found" });
+            return res.status(404).json({ message: req.t('notFound.affidamento_lotto') });
         }
 
         affida.colture.push(coltura);
@@ -97,13 +97,13 @@ exports.addColtura = async (req, res) => {
 
         logger.db('UPDATE', 'AffidaLotto', true, { id: req.params.id, colturaAdded: coltura });
         res.status(200).json({
-            message: "coltura added successfully",
+            message: req.t('success.coltura_added'),
             colture: affida.colture
         });
 
     } catch (error) {
         logger.error('Error adding coltura', { error: error.message, id: req.params.id });
-        res.status(500).json({ message: "Error adding coltura", error });
+        res.status(500).json({ message: req.t('errors.adding_coltura'), error });
     }
 };
 
@@ -114,13 +114,13 @@ exports.removeColtura = async (req, res) => {
         const affida = await AffidaLotto.findById(req.params.id);
         if (!affida) {
             logger.warn('Affidamento not found', { id: req.params.id });
-            return res.status(404).json({ message: "Affidamento not found" });
+            return res.status(404).json({ message: req.t('notFound.affidamento_lotto') });
         }
 
-        const index = affida.culture.indexOf(colturaToRemove);
+        const index = affida.colture.indexOf(colturaToRemove);
         if (index === -1) {
             logger.warn('coltura not found in affidamento', { id: req.params.id, coltura: colturaToRemove });
-            return res.status(404).json({ message: "coltura not found" });
+            return res.status(404).json({ message: req.t('notFound.coltura') });
         }
 
         affida.colture.splice(index, 1);
@@ -128,13 +128,12 @@ exports.removeColtura = async (req, res) => {
 
         logger.db('UPDATE', 'AffidaLotto', true, { id: req.params.id, colturaRemoved: colturaToRemove });
         res.status(200).json({
-            message: "coltura removed successfully",
+            message: req.t('success.coltura_removed'),
             colture: affida.colture
         });
 
     } catch (error) {
         logger.error('Error removing coltura', { error: error.message, id: req.params.id });
-        res.status(500).json({ message: "Error removing coltura", error });
+        res.status(500).json({ message: req.t('errors.removing_coltura'), error });
     }
 };
-

@@ -17,7 +17,10 @@
     "retrieving_avviso": "Error retrieving notice",
     "retrieving_associazioni": "Error retrieving associations",
     "retrieving_associazione": "Error retrieving association",
-
+    "retrieving_affidamenti_lotto": "Error retrieving plot assignments",
+    "retrieving_affidamento_lotto": "Error retrieving plot assignment",
+    "retrieving_affidamenti_orto": "Error retrieving garden assignments",
+    "retrieving_affidamento_orto": "Error retrieving garden assignment",
     "creating_orto": "Error creating garden",
     "creating_utente": "Error creating user",
     "creating_lotto": "Error creating plot",
@@ -25,7 +28,8 @@
     "creating_bando": "Error creating announcement",
     "creating_avviso": "Error creating notice",
     "creating_associazione": "Error creating association",
-    
+    "creating_affidamento_lotto": "Error creating plot assignment",
+    "creating_affidamento_orto": "Error creating garden assignment",
     "updating_orto": "Error updating garden",
     "updating_utente": "Error updating user",
     "updating_lotto": "Error updating plot",
@@ -34,7 +38,8 @@
     "updating_bando": "Error updating announcement",
     "updating_avviso": "Error updating notice",
     "updating_associazione": "Error updating association",
-
+    "updating_affidamento_lotto": "Error updating plot assignment",
+    "updating_affidamento_orto": "Error updating garden assignment",
     "deleting_orto": "Error deleting garden",
     "deleting_utente": "Error deleting user",
     "deleting_lotto": "Error deleting plot",
@@ -42,9 +47,11 @@
     "deleting_bando": "Error deleting announcement",
     "deleting_avviso": "Error deleting notice",
     "deleting_associazione": "Error deleting association",
-
+    "deleting_affidamento_lotto": "Error deleting plot assignment",
+    "deleting_affidamento_orto": "Error deleting garden assignment",
+    "adding_coltura": "Error adding crop",
+    "removing_coltura": "Error removing crop",
     "database_error": "Database error",
-
     "validation_error": "Validation error",
     "authentication_error": "Authentication error",
     "authorization_error": "Unauthorized"
@@ -57,21 +64,29 @@
     "bando_deleted": "Announcement deleted successfully",
     "avviso_deleted": "Notice deleted successfully",
     "associazione_deleted": "Association deleted successfully",
-
+    "affidamento_lotto_deleted": "Plot assignment deleted successfully",
+    "affidamento_orto_deleted": "Garden assignment deleted successfully",
     "orto_created": "Garden created successfully",
     "utente_created": "User created successfully",
     "lotto_created": "Plot created successfully",
     "comune_created": "Municipality created successfully",
+    "bando_created": "Announcement created successfully",
     "avviso_created": "Notice created successfully",
     "associazione_created": "Association created successfully",
-
+    "affidamento_lotto_created": "Plot assignment created successfully",
+    "affidamento_orto_created": "Garden assignment created successfully",
     "orto_updated": "Garden updated successfully",
     "utente_updated": "User updated successfully",
     "lotto_updated": "Plot updated successfully",
     "password_updated": "Password updated successfully",
     "comune_updated": "Municipality updated successfully",
+    "bando_updated": "Announcement updated successfully",
     "avviso_updated": "Notice updated successfully",
-    "associazione_updated": "Association updated successfully"
+    "associazione_updated": "Association updated successfully",
+    "affidamento_lotto_updated": "Plot assignment updated successfully",
+    "affidamento_orto_updated": "Garden assignment updated successfully",
+    "coltura_added": "Crop added successfully",
+    "coltura_removed": "Crop removed successfully"
   },
   "notFound": {
     "orto": "Garden not found",
@@ -82,7 +97,10 @@
     "avviso": "Notice not found",
     "bando": "Announcement not found",
     "sensor": "Sensor not found",
-    "meteo": "Weather reading not found"
+    "meteo": "Weather reading not found",
+    "affidamento_lotto": "Plot assignment not found",
+    "affidamento_orto": "Garden assignment not found",
+    "coltura": "Crop not found"
   },
   "validation": {
     "email_exists": "User already exists with this email",
@@ -93,20 +111,17 @@
     "password_too_short": "Password too short (minimum 8 characters)",
     "password_updated": "Password updated successfully",
     "old_password_incorrect": "Old password incorrect",
-    "invalid_duplicate_data": "Invalid or duplicate data"
+    "invalid_duplicate_data": "Invalid or duplicate data",
+    "coltura_required": "Crop is required"
   },
   "auth": {
     "login_success": "Login successful",
     "logout_success": "Logout successful",
     "google_success": "Google login successful",
-
     "google_failed": "Google login failed",
-
     "invalid_credentials": "Invalid credentials",
-
     "token_expired": "Token expired",
     "token_invalid": "Invalid token",
-
     "no_token": "No token provided",
     "unauthorized": "Unauthorized access"
   }

@@ -31,7 +31,7 @@ exports.getBandoById = async (req, res) => {
             logger.warn('Bando not found', { id: req.params.id });
             return res.status(404).json({ message: req.t('notFound.bando') });
         }
-        res.status(200).json({ data: bando, message: req.t('success.bando_retrieved') });
+        res.status(200).json(bando);
     } catch (error) {
         logger.error('Error retrieving bando by ID', { error: error.message, id: req.params.id });
         res.status(500).json({ message: req.t('errors.retrieving_bando'), error });
