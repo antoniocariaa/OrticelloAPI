@@ -37,6 +37,31 @@ router.get('/', checkToken, checkRole(['comu', 'asso']), bandoController.getAllB
 
 /**
  * @swagger
+ * /api/v1/bandi/attivi:
+ *   get:
+ *     summary: Get active announcements
+ *     description: Retrieve only bandi that have already started and not yet ended (data_inizio <= now <= data_fine). Results are sorted by end date.
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Bandi
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved list of active bandi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Bando'
+ *       500:
+ *         description: Error retrieving active bandi
+ */
+// GET: Bandi attivi (già iniziati e non ancora terminati)
+router.get('/attivi', checkToken, checkRole(['comu', 'asso']), bandoController.getBandiAttivi);
+
+/**
+ * @swagger
  * /api/v1/bandi:
  *   post:
  *     summary: Create a new announcement

@@ -135,7 +135,7 @@ Ali Raja Faizan, Caria Antonio, Pedron Federico
 | `getAllBandi` | GET | `All` | ✅ DONE | **RF26**: List of bandi visible to all (or logged users) |
 | `getBandoById` | GET | `All` | ✅ DONE | **RF26.2**: Bando details for application |
 | `updateBando` | PUT | `comu` | ✅ DONE | Correction of errors in bando |
-| `getActiveBandi` | GET | `All` | ❌ TODO | **RF26**: Only active bandi (deadline not passed) |
+| `getActiveBandi` | GET | `Comu, Asso` | ✅ DONE | **RF26**: Only active bandi (deadline not passed) |
 
 **Priority Tasks:**
 - [ ] Implement `getActiveBandi` to filter bandi with future deadlines

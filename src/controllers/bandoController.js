@@ -23,6 +23,29 @@ exports.getAllBandi = async (req, res) => {
     }
 };
 
+exports.getBandiAttivi = async (req, res) => {
+    try {
+        const now = new Date();
+        
+        // Filtra i bandi che sono già iniziati e non ancora terminati
+        const query = {
+            data_inizio: { $lte: now },  // Già iniziati
+            data_fine: { $gte: now }     // Non ancora terminati
+        };
+
+        logger.debug('Fetching active bandi', { currentDate: now });
+
+        // Ordinamento per data di scadenza (i più urgenti prima)
+        const bandiAttivi = await bando.find(query).sort({ data_fine: 1 });
+        
+        res.status(200).json(bandiAttivi);
+    }
+    catch (error) {
+        logger.error('Error retrieving active bandi', { error: error.message });
+        res.status(500).json({ message: req.t('errors.retrieving_bandi'), error });
+    }
+};
+
 exports.createBando = async (req, res) => {
     try {
         // Validazione logica base: La fine non può essere prima dell'inizio
