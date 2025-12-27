@@ -38,6 +38,38 @@ router.get("/", affidaLottoController.getAllAffidaLotti);
 
 /**
  * @swagger
+ * /api/v1/affidaLotti/attivi:
+ *   get:
+ *     summary: Get active lotto assignments
+ *     description: Retrieve only lotto assignments that have already started and not yet ended (data_inizio <= now <= data_fine). Results include populated lotto and utente data and are sorted by end date.
+ *     tags:
+ *       - AffidaLotti
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved list of active affida lotti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/AffidaLotto'
+ *       500:
+ *         description: Error retrieving active affida lotti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error retrieving active affida lotti'
+ *                 error:
+ *                   type: object
+ */
+router.get("/attivi", affidaLottoController.getAffidaLottiAttivi);
+
+/**
+ * @swagger
  * /api/v1/affidaLotti:
  *   post:
  *     summary: Create a new lotto assignment
