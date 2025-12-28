@@ -1,30 +1,30 @@
+const request = require('supertest');
+const mongoose = require('mongoose');
+const app = require('../app');
 const Orto = require('../model/orto');
-const ortoController = require('../controllers/ortoController');
 
 // Mock del model Orto
 jest.mock('../model/orto');
 
-describe('OrtoController', () => {
-  let req, res;
+// Mock JWT middleware per bypassare autenticazione nei test
+jest.mock('../util/checkToken', () => (req, res, next) => {
+  req.user = { id: 'testUserId', email: 'test@test.com' };
+  next();
+});
 
+describe('OrtoController', () => {
   beforeEach(() => {
     // Reset dei mock prima di ogni test
     jest.clearAllMocks();
-
-    // Mock degli oggetti request e response
-    req = {
-      body: {},
-      params: {},
-      t: jest.fn((key) => key) // Mock della funzione di traduzione
-    };
-
-    res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn().mockReturnThis()
-    };
   });
 
-  describe('getAllOrtos', () => {
+  afterAll(async () => {
+    // Close mongoose connection to prevent open handles
+    await mongoose.connection.close();
+  });
+
+
+  describe('GET /api/v1/orti', () => {
     test('should return all ortos with status 200', async () => {
       const mockOrtos = [
         {
@@ -45,29 +45,28 @@ describe('OrtoController', () => {
 
       Orto.find.mockResolvedValue(mockOrtos);
 
-      await ortoController.getAllOrtos(req, res);
+      const response = await request(app)
+        .get('/api/v1/orti')
+        .expect(200);
 
       expect(Orto.find).toHaveBeenCalledTimes(1);
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockOrtos);
+      expect(response.body).toEqual(mockOrtos);
     });
 
     test('should return error 500 when database fails', async () => {
       const mockError = new Error('Database connection failed');
       Orto.find.mockRejectedValue(mockError);
 
-      await ortoController.getAllOrtos(req, res);
+      const response = await request(app)
+        .get('/api/v1/orti')
+        .expect(500);
 
       expect(Orto.find).toHaveBeenCalledTimes(1);
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        message: 'errors.retrieving_ortos',
-        error: mockError
-      });
+      expect(response.body.message).toBe('Errore nel recupero degli orti');
     });
   });
 
-  describe('createOrto', () => {
+  describe('POST /api/v1/orti', () => {
     test('should create a new orto and return it with status 201', async () => {
       const mockOrtoData = {
         nome: 'Orto Nuovo',
@@ -81,45 +80,42 @@ describe('OrtoController', () => {
         ...mockOrtoData
       };
 
-      req.body = mockOrtoData;
-
-      // Mock del costruttore e del metodo save
       const saveMock = jest.fn().mockResolvedValue(mockSavedOrto);
       Orto.mockImplementation(() => ({
         save: saveMock
       }));
 
-      await ortoController.createOrto(req, res);
+      const response = await request(app)
+        .post('/api/v1/orti')
+        .send(mockOrtoData)
+        .expect(201);
 
       expect(Orto).toHaveBeenCalledWith(mockOrtoData);
       expect(saveMock).toHaveBeenCalledTimes(1);
-      expect(res.status).toHaveBeenCalledWith(201);
-      expect(res.json).toHaveBeenCalledWith({ message: 'success.orto_created', data: mockSavedOrto });
+      expect(response.body.message).toBe('Orto creato con successo');
+      expect(response.body.data).toMatchObject(mockSavedOrto);
     });
 
     test('should return error 500 when creation fails', async () => {
       const mockError = new Error('Validation failed');
-      req.body = {
-        nome: 'Orto Incompleto'
-        // Missing required fields
+      const mockOrtoData = {
+        nome: 'Orto Test'
       };
 
-      const saveMock = jest.fn().mockRejectedValue(mockError);
       Orto.mockImplementation(() => ({
-        save: saveMock
+        save: jest.fn().mockRejectedValue(mockError)
       }));
 
-      await ortoController.createOrto(req, res);
+      const response = await request(app)
+        .post('/api/v1/orti')
+        .send(mockOrtoData)
+        .expect(500);
 
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        message: 'errors.creating_orto',
-        error: mockError
-      });
+      expect(response.body.message).toBe('Errore nella creazione dell\'orto');
     });
   });
 
-  describe('getOrtoById', () => {
+  describe('GET /api/v1/orti/:id', () => {
     test('should return orto by id with status 200', async () => {
       const mockOrto = {
         _id: '507f1f77bcf86cd799439011',
@@ -129,43 +125,39 @@ describe('OrtoController', () => {
         lotti: []
       };
 
-      req.params.id = '507f1f77bcf86cd799439011';
       Orto.findById.mockResolvedValue(mockOrto);
 
-      await ortoController.getOrtoById(req, res);
+      const response = await request(app)
+        .get('/api/v1/orti/507f1f77bcf86cd799439011')
+        .expect(200);
 
       expect(Orto.findById).toHaveBeenCalledWith('507f1f77bcf86cd799439011');
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(mockOrto);
+      expect(response.body).toEqual(mockOrto);
     });
 
     test('should return 404 when orto is not found', async () => {
-      req.params.id = '507f1f77bcf86cd799439999';
       Orto.findById.mockResolvedValue(null);
 
-      await ortoController.getOrtoById(req, res);
+      const response = await request(app)
+        .get('/api/v1/orti/507f1f77bcf86cd799439999')
+        .expect(404);
 
-      expect(Orto.findById).toHaveBeenCalledWith('507f1f77bcf86cd799439999');
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'notFound.orto' });
+      expect(response.body.message).toBe('Orto non trovato');
     });
 
     test('should return error 500 when database fails', async () => {
       const mockError = new Error('Database error');
-      req.params.id = '507f1f77bcf86cd799439011';
       Orto.findById.mockRejectedValue(mockError);
 
-      await ortoController.getOrtoById(req, res);
+      const response = await request(app)
+        .get('/api/v1/orti/507f1f77bcf86cd799439011')
+        .expect(500);
 
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        message: 'errors.retrieving_orto',
-        error: mockError
-      });
+      expect(response.body.message).toBe('Errore nel recupero dell\'orto');
     });
   });
 
-  describe('updateOrto', () => {
+  describe('PUT /api/v1/orti/:id', () => {
     test('should update orto and return it with status 200', async () => {
       const mockUpdatedOrto = {
         _id: '507f1f77bcf86cd799439011',
@@ -175,57 +167,47 @@ describe('OrtoController', () => {
         lotti: []
       };
 
-      req.params.id = '507f1f77bcf86cd799439011';
-      req.body = { nome: 'Orto San Bartolomeo Aggiornato' };
-
       Orto.findByIdAndUpdate.mockResolvedValue(mockUpdatedOrto);
 
-      await ortoController.updateOrto(req, res);
+      const response = await request(app)
+        .put('/api/v1/orti/507f1f77bcf86cd799439011')
+        .send({ nome: 'Orto San Bartolomeo Aggiornato' })
+        .expect(200);
 
       expect(Orto.findByIdAndUpdate).toHaveBeenCalledWith(
         '507f1f77bcf86cd799439011',
         { nome: 'Orto San Bartolomeo Aggiornato' },
         { new: true }
       );
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: 'success.orto_updated', data: mockUpdatedOrto });
+      expect(response.body.message).toBe('Orto aggiornato con successo');
+      expect(response.body.data).toEqual(mockUpdatedOrto);
     });
 
     test('should return 404 when orto to update is not found', async () => {
-      req.params.id = '507f1f77bcf86cd799439999';
-      req.body = { nome: 'Orto Non Esistente' };
-
       Orto.findByIdAndUpdate.mockResolvedValue(null);
 
-      await ortoController.updateOrto(req, res);
+      const response = await request(app)
+        .put('/api/v1/orti/507f1f77bcf86cd799439999')
+        .send({ nome: 'Orto Non Esistente' })
+        .expect(404);
 
-      expect(Orto.findByIdAndUpdate).toHaveBeenCalledWith(
-        '507f1f77bcf86cd799439999',
-        { nome: 'Orto Non Esistente' },
-        { new: true }
-      );
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'notFound.orto' });
+      expect(response.body.message).toBe('Orto non trovato');
     });
 
     test('should return error 500 when update fails', async () => {
       const mockError = new Error('Update failed');
-      req.params.id = '507f1f77bcf86cd799439011';
-      req.body = { nome: 'Nuovo Nome' };
-
       Orto.findByIdAndUpdate.mockRejectedValue(mockError);
 
-      await ortoController.updateOrto(req, res);
+      const response = await request(app)
+        .put('/api/v1/orti/507f1f77bcf86cd799439011')
+        .send({ nome: 'Nuovo Nome' })
+        .expect(500);
 
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        message: 'errors.updating_orto',
-        error: mockError
-      });
+      expect(response.body.message).toBe('Errore nell\'aggiornamento dell\'orto');
     });
   });
 
-  describe('deleteOrto', () => {
+  describe('DELETE /api/v1/orti/:id', () => {
     test('should delete orto and return success message with status 200', async () => {
       const mockDeletedOrto = {
         _id: '507f1f77bcf86cd799439011',
@@ -235,40 +217,35 @@ describe('OrtoController', () => {
         lotti: []
       };
 
-      req.params.id = '507f1f77bcf86cd799439011';
       Orto.findByIdAndDelete.mockResolvedValue(mockDeletedOrto);
 
-      await ortoController.deleteOrto(req, res);
+      const response = await request(app)
+        .delete('/api/v1/orti/507f1f77bcf86cd799439011')
+        .expect(200);
 
       expect(Orto.findByIdAndDelete).toHaveBeenCalledWith('507f1f77bcf86cd799439011');
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ message: 'success.orto_deleted' });
+      expect(response.body.message).toBe('Orto eliminato con successo');
     });
 
     test('should return 404 when orto to delete is not found', async () => {
-      req.params.id = '507f1f77bcf86cd799439999';
       Orto.findByIdAndDelete.mockResolvedValue(null);
 
-      await ortoController.deleteOrto(req, res);
+      const response = await request(app)
+        .delete('/api/v1/orti/507f1f77bcf86cd799439999')
+        .expect(404);
 
-      expect(Orto.findByIdAndDelete).toHaveBeenCalledWith('507f1f77bcf86cd799439999');
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ message: 'notFound.orto' });
+      expect(response.body.message).toBe('Orto non trovato');
     });
 
     test('should return error 500 when deletion fails', async () => {
       const mockError = new Error('Deletion failed');
-      req.params.id = '507f1f77bcf86cd799439011';
-
       Orto.findByIdAndDelete.mockRejectedValue(mockError);
 
-      await ortoController.deleteOrto(req, res);
+      const response = await request(app)
+        .delete('/api/v1/orti/507f1f77bcf86cd799439011')
+        .expect(500);
 
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        message: 'errors.deleting_orto',
-        error: mockError
-      });
+      expect(response.body.message).toBe('Errore nell\'eliminazione dell\'orto');
     });
   });
 });
