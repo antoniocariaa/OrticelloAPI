@@ -1,13 +1,13 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../app');
-const AffidaOrto = require('../model/affidaOrto');
+const app = require('../../app');
+const AffidaOrto = require('../../model/affidaOrto');
 
 // Mock del model AffidaOrto
-jest.mock('../model/affidaOrto');
+jest.mock('../../model/affidaOrto');
 
 // Mock del middleware di autenticazione
-jest.mock('../util/checkToken', () => (_req, _res, next) => {
+jest.mock('../../util/checkToken', () => (_req, _res, next) => {
   next();
 });
 

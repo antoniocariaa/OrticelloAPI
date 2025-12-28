@@ -1,13 +1,13 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../app');
-const sensor = require('../model/climate/sensor');
+const app = require('../../app');
+const sensor = require('../../model/climate/sensor');
 
 // Mock del model sensor
-jest.mock('../model/climate/sensor');
+jest.mock('../../model/climate/sensor');
 
 // Mock JWT middleware per bypassare autenticazione nei test
-jest.mock('../util/checkToken', () => (req, res, next) => {
+jest.mock('../../util/checkToken', () => (req, res, next) => {
   req.user = { id: 'testUserId', email: 'test@test.com' };
   next();
 });

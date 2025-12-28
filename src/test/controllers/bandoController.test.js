@@ -1,19 +1,19 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../app');
-const bando = require('../model/news/bando');
+const app = require('../../app');
+const bando = require('../../model/news/bando');
 
 // Mock del model bando
-jest.mock('../model/news/bando');
+jest.mock('../../model/news/bando');
 
 // Mock JWT middleware per bypassare autenticazione nei test
-jest.mock('../util/checkToken', () => (req, res, next) => {
+jest.mock('../../util/checkToken', () => (req, res, next) => {
   req.user = { id: 'testUserId', email: 'test@test.com' };
   next();
 });
 
 // Mock checkRole middleware
-jest.mock('../util/checkRole', () => (roles) => (req, res, next) => {
+jest.mock('../../util/checkRole', () => (roles) => (req, res, next) => {
   next();
 });
 

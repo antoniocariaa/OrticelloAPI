@@ -1,13 +1,13 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../app');
-const Lotto = require('../model/lotto');
+const app = require('../../app');
+const Lotto = require('../../model/lotto');
 
 // Mock del model Lotto
-jest.mock('../model/lotto');
+jest.mock('../../model/lotto');
 
 // Mock del middleware di autenticazione
-jest.mock('../util/checkToken', () => (req, res, next) => {
+jest.mock('../../util/checkToken', () => (req, res, next) => {
   next();
 });
 
