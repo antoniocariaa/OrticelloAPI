@@ -21,6 +21,7 @@
     "retrieving_affidamento_lotto": "Fehler beim Abrufen der Parzellen-Zuweisung",
     "retrieving_affidamenti_orto": "Fehler beim Abrufen der Garten-Zuweisungen",
     "retrieving_affidamento_orto": "Fehler beim Abrufen der Garten-Zuweisung",
+    "retrieving_active_affidamenti_orto": "Fehler beim Abrufen der aktiven Garten-Zuweisungen",
     "creating_orto": "Fehler beim Erstellen des Gartens",
     "creating_utente": "Fehler beim Erstellen des Benutzers",
     "creating_lotto": "Fehler beim Erstellen der Parzelle",

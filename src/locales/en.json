@@ -21,6 +21,7 @@
     "retrieving_affidamento_lotto": "Error retrieving plot assignment",
     "retrieving_affidamenti_orto": "Error retrieving garden assignments",
     "retrieving_affidamento_orto": "Error retrieving garden assignment",
+    "retrieving_active_affidamenti_orto": "Error retrieving active garden assignments",
     "creating_orto": "Error creating garden",
     "creating_utente": "Error creating user",
     "creating_lotto": "Error creating plot",

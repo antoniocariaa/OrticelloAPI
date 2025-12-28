@@ -29,7 +29,7 @@ exports.getActiveAffidaOrti = async (req, res) => {
         res.status(200).json(affidamenti);
     } catch (error) {
         logger.error('Error retrieving active affidamenti', { error: error.message });
-        res.status(500).json({ message: 'Error retrieving active affidamenti', error });
+        res.status(500).json({ message: req.t('errors.retrieving_active_affidamenti_orto'), error });
     }
 };
 
