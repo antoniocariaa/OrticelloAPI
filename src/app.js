@@ -119,36 +119,41 @@ app.use((err, req, res, next) => {
 	res.status(500).json({ error: 'Internal Server Error 500!' });
 });
 
-// Avvio del server (DEVE essere l'ultima operazione)
-const server = app.listen(PORT, function () {
-	logger.info(`Server started successfully`, { port: PORT, env: process.env.NODE_ENV || 'development' });
-});
+// Export app for testing
+module.exports = app;
 
-// Gestione errori del server
-server.on('error', (error) => {
-	if (error.code === 'EADDRINUSE') {
-		logger.error(`Port ${PORT} is already in use`, { port: PORT });
-		process.exit(1);
-	} else {
-		logger.error(`Server error: ${error.message}`, { error: error.code });
-		throw error;
-	}
-});
-
-process.on('SIGTERM', () => {
-	logger.info('SIGTERM received, closing server gracefully');
-	server.close(() => {
-		logger.info('Server closed');
-		process.exit(0);
+// Avvio del server solo se non siamo in ambiente di test
+if (require.main === module) {
+	const server = app.listen(PORT, function () {
+		logger.info(`Server started successfully`, { port: PORT, env: process.env.NODE_ENV || 'development' });
 	});
-});
 
-process.on('SIGINT', () => {
-	logger.info('SIGINT received, closing server gracefully');
-	server.close(() => {
-		logger.info('Server closed');
-		process.exit(0);
+	// Gestione errori del server
+	server.on('error', (error) => {
+		if (error.code === 'EADDRINUSE') {
+			logger.error(`Port ${PORT} is already in use`, { port: PORT });
+			process.exit(1);
+		} else {
+			logger.error(`Server error: ${error.message}`, { error: error.code });
+			throw error;
+		}
 	});
-});
+
+	process.on('SIGTERM', () => {
+		logger.info('SIGTERM received, closing server gracefully');
+		server.close(() => {
+			logger.info('Server closed');
+			process.exit(0);
+		});
+	});
+
+	process.on('SIGINT', () => {
+		logger.info('SIGINT received, closing server gracefully');
+		server.close(() => {
+			logger.info('Server closed');
+			process.exit(0);
+		});
+	});
+}
 
 
