@@ -36,6 +36,38 @@ router.get("/", affidaOrtoController.getAllAffidaOrti);
 
 /**
  * @swagger
+ * /api/v1/affidaOrti/active:
+ *   get:
+ *     summary: Get list of active orto assignments
+ *     description: Retrieve a list of orto assignments that are currently active (where today's date falls within the assignment date range). Returns an array showing which associazioni are currently assigned to which orti.
+ *     tags:
+ *       - AffidaOrti
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved list of active affida orti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/AffidaOrto'
+ *       500:
+ *         description: Error retrieving active affida orti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error retrieving active affida orti'
+ *                 error:
+ *                   type: object
+ */
+router.get("/active", affidaOrtoController.getActiveAffidaOrti);
+
+/**
+ * @swagger
  * /api/v1/affidaOrti/{id}:
  *   get:
  *     summary: Get orto assignment by ID
@@ -80,38 +112,6 @@ router.get("/", affidaOrtoController.getAllAffidaOrti);
  *                   type: object
  */
 router.get("/:id", affidaOrtoController.getAffidaOrtoById);
-
-/**
- * @swagger
- * /api/v1/affidaOrti/active:
- *   get:
- *     summary: Get list of active orto assignments
- *     description: Retrieve a list of orto assignments that are currently active (where today's date falls within the assignment date range). Returns an array showing which associazioni are currently assigned to which orti.
- *     tags:
- *       - AffidaOrti
- *     responses:
- *       200:
- *         description: Successfully retrieved list of active affida orti
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/AffidaOrto'
- *       500:
- *         description: Error retrieving active affida orti
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Error retrieving active affida orti'
- *                 error:
- *                   type: object
- */
-router.get("/active", affidaOrtoController.getActiveAffidaOrti);
 
 /**
  * @swagger

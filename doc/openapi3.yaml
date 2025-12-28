@@ -555,6 +555,35 @@ paths:
                     example: Error creating affida lotto
                   error:
                     type: object
+  /api/v1/affidaLotti/attivi:
+    get:
+      summary: Get active lotto assignments
+      description: Retrieve only lotto assignments that have already started and not
+        yet ended (data_inizio <= now <= data_fine). Results include populated
+        lotto and utente data and are sorted by end date.
+      tags:
+        - AffidaLotti
+      responses:
+        "200":
+          description: Successfully retrieved list of active affida lotti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AffidaLotto"
+        "500":
+          description: Error retrieving active affida lotti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving active affida lotti
+                  error:
+                    type: object
   /api/v1/affidaLotti/{id}:
     get:
       summary: Get lotto assignment by ID
@@ -883,6 +912,35 @@ paths:
                     example: Error creating affida orto
                   error:
                     type: object
+  /api/v1/affidaOrti/active:
+    get:
+      summary: Get list of active orto assignments
+      description: Retrieve a list of orto assignments that are currently active
+        (where today's date falls within the assignment date range). Returns an
+        array showing which associazioni are currently assigned to which orti.
+      tags:
+        - AffidaOrti
+      responses:
+        "200":
+          description: Successfully retrieved list of active affida orti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AffidaOrto"
+        "500":
+          description: Error retrieving active affida orti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving active affida orti
+                  error:
+                    type: object
   /api/v1/affidaOrti/{id}:
     get:
       summary: Get orto assignment by ID
@@ -1026,35 +1084,6 @@ paths:
                   message:
                     type: string
                     example: Error deleting affida orto
-                  error:
-                    type: object
-  /api/v1/affidaOrti/active:
-    get:
-      summary: Get list of active orto assignments
-      description: Retrieve a list of orto assignments that are currently active
-        (where today's date falls within the assignment date range). Returns an
-        array showing which associazioni are currently assigned to which orti.
-      tags:
-        - AffidaOrti
-      responses:
-        "200":
-          description: Successfully retrieved list of active affida orti
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/AffidaOrto"
-        "500":
-          description: Error retrieving active affida orti
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Error retrieving active affida orti
                   error:
                     type: object
   /api/v1/associazioni:
@@ -1620,6 +1649,26 @@ paths:
           description: Invalid input data
         "500":
           description: Error creating bando
+  /api/v1/bandi/attivi:
+    get:
+      summary: Get active announcements
+      description: Retrieve only bandi that have already started and not yet ended
+        (data_inizio <= now <= data_fine). Results are sorted by end date.
+      security:
+        - bearerAuth: []
+      tags:
+        - Bandi
+      responses:
+        "200":
+          description: Successfully retrieved list of active bandi
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bando"
+        "500":
+          description: Error retrieving active bandi
   /api/v1/bandi/{id}:
     get:
       summary: Get announcement by ID
