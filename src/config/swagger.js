@@ -2,6 +2,7 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const logger = require('./logger');
 
 /**
  * Swagger JSDoc configuration options
@@ -576,7 +577,7 @@ function saveOpenAPISpec(swaggerSpec) {
       const previousHash = fs.readFileSync(hashFilePath, 'utf8');
       if (previousHash === currentHash) {
         shouldRegenerate = false;
-        console.log('✓ OpenAPI specification is up to date');
+        logger.info('✓ OpenAPI specification is up to date');
       }
     }
     
@@ -592,10 +593,10 @@ function saveOpenAPISpec(swaggerSpec) {
       
       fs.writeFileSync(openapiPath, yamlContent, 'utf8');
       fs.writeFileSync(hashFilePath, currentHash, 'utf8');
-      console.log('✓ OpenAPI specification regenerated at doc/openapi3.yaml');
+      logger.info('✓ OpenAPI specification regenerated and saved to doc/openapi3.yaml');
     }
   } catch (error) {
-    console.error('Warning: Could not save OpenAPI spec to file:', error.message);
+    logger.error('Could not save OpenAPI spec to file', { error: error.message });
   }
 }
 
