@@ -1,9 +1,9 @@
-const avviso = require('../model/news/avviso');
+const Avviso = require('../model/news/avviso');
 const logger = require('../config/logger');
 
 exports.getAllAvvisi = async (req, res) => {
     try {
-        const avvisi = await avviso.find();
+        const avvisi = await Avviso.find();
         res.status(200).json(avvisi);
     }
     catch (error) {
@@ -14,7 +14,7 @@ exports.getAllAvvisi = async (req, res) => {
 
 exports.createAvviso = async (req, res) => {
     try {
-        const newAvviso = new avviso(req.body);
+        const newAvviso = new Avviso(req.body);
         const savedAvviso = await newAvviso.save();
         logger.db('INSERT', 'Avviso', true, { id: savedAvviso._id });
         res.status(201).json({ data: savedAvviso, message: req.t('success.avviso_created') });
@@ -26,7 +26,7 @@ exports.createAvviso = async (req, res) => {
 
 exports.getAvvisoById = async (req, res) => {
     try {
-        const avviso = await avviso.findById(req.params.id);
+        const avviso = await Avviso.findById(req.params.id);
         if (!avviso) {
             logger.warn('Avviso not found', { id: req.params.id });
             return res.status(404).json({ message: req.t('notFound.avviso') });
@@ -40,7 +40,7 @@ exports.getAvvisoById = async (req, res) => {
 
 exports.updateAvviso = async (req, res) => {
     try {
-        const updatedAvviso = await avviso.findByIdAndUpdate(
+        const updatedAvviso = await Avviso.findByIdAndUpdate(
             req.params.id,
             req.body,
             { new: true }
@@ -58,7 +58,7 @@ exports.updateAvviso = async (req, res) => {
 
 exports.deleteAvviso = async (req, res) => {
     try {
-        const deletedAvviso = await avviso.findByIdAndDelete(req.params.id);
+        const deletedAvviso = await Avviso.findByIdAndDelete(req.params.id);
         if (!deletedAvviso) {
             logger.warn('Avviso not found for deletion', { id: req.params.id });
             return res.status(404).json({ message: req.t('notFound.avviso') });
