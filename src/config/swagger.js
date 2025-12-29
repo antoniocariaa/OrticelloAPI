@@ -40,6 +40,13 @@ const swaggerOptions = {
       { name: 'Sensor', description: 'Sensor data endpoints' }
     ],
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT'
+        }
+      },
       schemas: {
         Orto: {
           type: 'object',
