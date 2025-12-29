@@ -52,6 +52,9 @@
     "deleting_associazione": "Error deleting association",
     "deleting_affidamento_lotto": "Error deleting plot assignment",
     "deleting_affidamento_orto": "Error deleting garden assignment",
+    "adding_member": "Error adding member",
+    "removing_member": "Error removing member",
+    "retrieving_members": "Error retrieving members",
     "adding_coltura": "Error adding crop",
     "removing_coltura": "Error removing crop",
     "database_error": "Database error",
@@ -88,6 +91,8 @@
     "associazione_updated": "Association updated successfully",
     "affidamento_lotto_updated": "Plot assignment updated successfully",
     "affidamento_orto_updated": "Garden assignment updated successfully",
+    "member_added": "Member added successfully",
+    "member_removed": "Member removed successfully",
     "coltura_added": "Crop added successfully",
     "coltura_removed": "Crop removed successfully"
   },
@@ -115,6 +120,8 @@
     "password_updated": "Password updated successfully",
     "old_password_incorrect": "Old password incorrect",
     "invalid_duplicate_data": "Invalid or duplicate data",
+    "member_already_exists": "Member already exists in the association",
+    "member_not_found": "Member not found in this association",
     "coltura_required": "Crop is required"
   },
   "auth": {

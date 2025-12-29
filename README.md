@@ -192,9 +192,9 @@ Ali Raja Faizan, Caria Antonio, Pedron Federico
 ### 6. associazioneController.js 👥 (Association Member Management)
 | Method | Verb | Role | Status | Description / Requirements |
 |--------|------|------|--------|---------------------------|
-| `addMembro` | POST | `asso (Admin)` | ❌ TODO | **RF22**: Association Admin adds collaborator |
-| `removeMembro` | DELETE | `asso (Admin)` | ❌ TODO | **RF22**: Association Admin removes collaborator |
-| `getMembri` | GET | `asso (Admin)` | ❌ TODO | List of association staff |
+| `addMembro` | POST | `asso (Admin)` | ✅ DONE | **RF22**: Association Admin adds collaborator |
+| `removeMembro` | DELETE | `asso (Admin)` | ✅ DONE | **RF22**: Association Admin removes collaborator |
+| `getMembri` | GET | `asso` | ✅ DONE | List of association staff |
 | `createAssociazione` | POST | `comu` | ✅ DONE | Create new association |
 | `getAllAssociazioni` | GET | `All` | ✅ DONE | List all associations |
 | `getAssociazioneById` | GET | `All` | ✅ DONE | Association details |
@@ -202,11 +202,11 @@ Ali Raja Faizan, Caria Antonio, Pedron Federico
 | `deleteAssociazione` | DELETE | `comu` | ✅ DONE | Remove association |
 
 **Priority Tasks:**
-- [ ] Implement `addMembro` to add association collaborators
-- [ ] Implement `removeMembro` to remove collaborators
-- [ ] Implement `getMembri` to list association members
+- [x] Implement `addMembro` to add association collaborators
+- [x] Implement `removeMembro` to remove collaborators
+- [x] Implement `getMembri` to list association members
 - [ ] Create member relationship model (utente-associazione)
-- [ ] Add admin-only access control for member management
+- [x] Add admin-only access control for member management
 
 ### 7. utenteController.js 👤 (User Profile Management)
 | Method | Verb | Role | Status | Description / Requirements |
