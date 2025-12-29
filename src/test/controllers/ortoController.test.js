@@ -248,4 +248,228 @@ describe('OrtoController', () => {
       expect(response.body.message).toBe('Errore nell\'eliminazione dell\'orto');
     });
   });
+
+  describe('GET /api/v1/orti/search', () => {
+    test('should search ortos by geographic location with status 200', async () => {
+      const mockSearchResults = [
+        {
+          _id: '507f1f77bcf86cd799439011',
+          nome: 'Orto Vicino',
+          indirizzo: 'Via Vicina 1, Trento',
+          geometry: {
+            type: 'Point',
+            coordinates: [11.1200, 46.0700]
+          },
+          lotti: ['507f1f77bcf86cd799439021'],
+          distance: 1500.5,
+          lottiCount: 1,
+          matchingLottiCount: 1
+        }
+      ];
+
+      Orto.aggregate = jest.fn().mockResolvedValue(mockSearchResults);
+
+      const response = await request(app)
+        .get('/api/v1/orti/search')
+        .query({ longitude: 11.1257, latitude: 46.0664, radius: 5000 })
+        .expect(200);
+
+      expect(Orto.aggregate).toHaveBeenCalledTimes(1);
+      expect(response.body.count).toBe(1);
+      expect(response.body.data).toEqual(mockSearchResults);
+      expect(response.body.filters.longitude).toBe('11.1257');
+      expect(response.body.filters.latitude).toBe('46.0664');
+      expect(response.body.filters.radius).toBe('5000');
+    });
+
+    test('should search ortos by plot size with status 200', async () => {
+      const mockSearchResults = [
+        {
+          _id: '507f1f77bcf86cd799439011',
+          nome: 'Orto Grande',
+          indirizzo: 'Via Grande 1, Trento',
+          geometry: {
+            type: 'Point',
+            coordinates: [11.1200, 46.0700]
+          },
+          lotti: ['507f1f77bcf86cd799439021'],
+          lottiCount: 2,
+          matchingLottiCount: 1
+        }
+      ];
+
+      Orto.aggregate = jest.fn().mockResolvedValue(mockSearchResults);
+
+      const response = await request(app)
+        .get('/api/v1/orti/search')
+        .query({ minSize: 50, maxSize: 200 })
+        .expect(200);
+
+      expect(Orto.aggregate).toHaveBeenCalledTimes(1);
+      expect(response.body.count).toBe(1);
+      expect(response.body.data).toEqual(mockSearchResults);
+      expect(response.body.filters.minSize).toBe('50');
+      expect(response.body.filters.maxSize).toBe('200');
+    });
+
+    test('should search ortos with sensors with status 200', async () => {
+      const mockSearchResults = [
+        {
+          _id: '507f1f77bcf86cd799439011',
+          nome: 'Orto Tecnologico',
+          indirizzo: 'Via Tecnologia 1, Trento',
+          geometry: {
+            type: 'Point',
+            coordinates: [11.1200, 46.0700]
+          },
+          lotti: ['507f1f77bcf86cd799439021'],
+          lottiCount: 3,
+          matchingLottiCount: 2
+        }
+      ];
+
+      Orto.aggregate = jest.fn().mockResolvedValue(mockSearchResults);
+
+      const response = await request(app)
+        .get('/api/v1/orti/search')
+        .query({ hasSensors: true })
+        .expect(200);
+
+      expect(Orto.aggregate).toHaveBeenCalledTimes(1);
+      expect(response.body.count).toBe(1);
+      expect(response.body.data).toEqual(mockSearchResults);
+      expect(response.body.filters.hasSensors).toBe('true');
+    });
+
+    test('should search ortos with combined filters with status 200', async () => {
+      const mockSearchResults = [
+        {
+          _id: '507f1f77bcf86cd799439011',
+          nome: 'Orto Perfetto',
+          indirizzo: 'Via Perfetta 1, Trento',
+          geometry: {
+            type: 'Point',
+            coordinates: [11.1200, 46.0700]
+          },
+          lotti: ['507f1f77bcf86cd799439021'],
+          distance: 2000.0,
+          lottiCount: 2,
+          matchingLottiCount: 1
+        }
+      ];
+
+      Orto.aggregate = jest.fn().mockResolvedValue(mockSearchResults);
+
+      const response = await request(app)
+        .get('/api/v1/orti/search')
+        .query({
+          longitude: 11.1257,
+          latitude: 46.0664,
+          radius: 5000,
+          minSize: 50,
+          maxSize: 200,
+          hasSensors: true
+        })
+        .expect(200);
+
+      expect(Orto.aggregate).toHaveBeenCalledTimes(1);
+      expect(response.body.count).toBe(1);
+      expect(response.body.data).toEqual(mockSearchResults);
+      expect(response.body.filters.longitude).toBe('11.1257');
+      expect(response.body.filters.minSize).toBe('50');
+      expect(response.body.filters.hasSensors).toBe('true');
+    });
+
+    test('should return empty array when no ortos match filters', async () => {
+      Orto.aggregate = jest.fn().mockResolvedValue([]);
+
+      const response = await request(app)
+        .get('/api/v1/orti/search')
+        .query({ longitude: 11.1257, latitude: 46.0664, radius: 100 })
+        .expect(200);
+
+      expect(Orto.aggregate).toHaveBeenCalledTimes(1);
+      expect(response.body.count).toBe(0);
+      expect(response.body.data).toEqual([]);
+    });
+
+    test('should return 400 when coordinates are invalid', async () => {
+      const response = await request(app)
+        .get('/api/v1/orti/search')
+        .query({ longitude: 'invalid', latitude: 46.0664, radius: 5000 })
+        .expect(400);
+
+      expect(response.body.message).toBe('Coordinate non valide');
+    });
+
+    test('should return 400 when latitude is missing with longitude', async () => {
+      const response = await request(app)
+        .get('/api/v1/orti/search')
+        .query({ longitude: 11.1257, radius: 5000 })
+        .expect(400);
+
+      expect(response.body.message).toBe('Coordinate non valide');
+    });
+
+    test('should return 400 when radius is invalid', async () => {
+      const response = await request(app)
+        .get('/api/v1/orti/search')
+        .query({ longitude: 11.1257, latitude: 46.0664, radius: 'invalid' })
+        .expect(400);
+
+      expect(response.body.message).toBe('Coordinate non valide');
+    });
+
+    test('should search without filters and return all ortos', async () => {
+      const mockSearchResults = [
+        {
+          _id: '507f1f77bcf86cd799439011',
+          nome: 'Orto 1',
+          indirizzo: 'Via 1, Trento',
+          geometry: {
+            type: 'Point',
+            coordinates: [11.1200, 46.0700]
+          },
+          lotti: [],
+          lottiCount: 0,
+          matchingLottiCount: 0
+        },
+        {
+          _id: '507f1f77bcf86cd799439012',
+          nome: 'Orto 2',
+          indirizzo: 'Via 2, Trento',
+          geometry: {
+            type: 'Point',
+            coordinates: [11.1300, 46.0800]
+          },
+          lotti: [],
+          lottiCount: 0,
+          matchingLottiCount: 0
+        }
+      ];
+
+      Orto.aggregate = jest.fn().mockResolvedValue(mockSearchResults);
+
+      const response = await request(app)
+        .get('/api/v1/orti/search')
+        .expect(200);
+
+      expect(Orto.aggregate).toHaveBeenCalledTimes(1);
+      expect(response.body.count).toBe(2);
+      expect(response.body.data).toEqual(mockSearchResults);
+    });
+
+    test('should return error 500 when database fails during search', async () => {
+      const mockError = new Error('Aggregation pipeline failed');
+      Orto.aggregate = jest.fn().mockRejectedValue(mockError);
+
+      const response = await request(app)
+        .get('/api/v1/orti/search')
+        .query({ longitude: 11.1257, latitude: 46.0664, radius: 5000 })
+        .expect(500);
+
+      expect(Orto.aggregate).toHaveBeenCalledTimes(1);
+      expect(response.body.message).toBe('Errore nella ricerca degli orti');
+    });
+  });
 });
