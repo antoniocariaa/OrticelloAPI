@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ debug: false });
 var express = require('express');
 var mongoose = require('mongoose');
 var cors = require('cors');

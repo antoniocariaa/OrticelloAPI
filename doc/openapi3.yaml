@@ -2253,7 +2253,10 @@ paths:
                     type: object
     post:
       summary: Create a new orto
-      description: Create a new green garden with the provided information
+      description: Create a new green garden with the provided information. Only
+        accessible by municipality users.
+      security:
+        - bearerAuth: []
       tags:
         - Orti
       requestBody:
@@ -2269,6 +2272,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Orto"
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only municipality users can create orti
         "500":
           description: Error creating orto
           content:
@@ -2447,7 +2454,10 @@ paths:
                     type: object
     put:
       summary: Update orto by ID
-      description: Update an existing green garden with new information
+      description: Update an existing green garden with new information. Only
+        accessible by municipality users.
+      security:
+        - bearerAuth: []
       tags:
         - Orti
       parameters:
@@ -2470,6 +2480,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Orto"
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only municipality users can update orti
         "404":
           description: Orto not found
           content:
@@ -2494,7 +2508,10 @@ paths:
                     type: object
     delete:
       summary: Delete orto by ID
-      description: Delete a green garden by its unique identifier
+      description: Delete a green garden by its unique identifier. Only accessible by
+        municipality users.
+      security:
+        - bearerAuth: []
       tags:
         - Orti
       parameters:
@@ -2515,6 +2532,10 @@ paths:
                   message:
                     type: string
                     example: Orto deleted successfully
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only municipality users can delete orti
         "404":
           description: Orto not found
           content:

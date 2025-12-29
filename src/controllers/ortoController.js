@@ -96,7 +96,20 @@ exports.searchOrtos = async (req, res) => {
         let pipeline = [];
 
         // 1. Geospatial filter (if coordinates and radius are provided)
-        if (longitude && latitude && radius) {
+        // Check if any geographic parameter is provided
+        const hasLongitude = longitude !== undefined;
+        const hasLatitude = latitude !== undefined;
+        const hasRadius = radius !== undefined;
+        const hasAnyGeoParam = hasLongitude || hasLatitude || hasRadius;
+
+        // If any geographic parameter is provided, all three must be provided
+        if (hasAnyGeoParam) {
+            if (!hasLongitude || !hasLatitude || !hasRadius) {
+                return res.status(400).json({ 
+                    message: req.t('errors.invalid_coordinates') 
+                });
+            }
+
             const long = parseFloat(longitude);
             const lat = parseFloat(latitude);
             const rad = parseFloat(radius);
