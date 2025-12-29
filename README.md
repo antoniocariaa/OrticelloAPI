@@ -109,9 +109,6 @@ Ali Raja Faizan, Caria Antonio, Pedron Federico
 ### 1. affidaLottoController.js 📦 (Plot Assignment & Requests)
 | Method | Verb | Role | Status | Description / Requirements |
 |--------|------|------|--------|---------------------------|
-| `richiediLotto` | POST | `citt` | ❌ TODO | **RF6.3**: Citizen creates a request (status: pending) |
-| `getRichiestePendenti` | GET | `asso` | ❌ TODO | **RF25**: Association views list of pending requests |
-| `gestisciRichiesta` | PUT | `asso` | ❌ TODO | **RF25**: Association approves or rejects request |
 | `addColtura` | POST | `citt` | ✅ DONE | **RF7**: Citizen adds what they're cultivating |
 | `removeColtura` | DELETE | `citt` | ✅ DONE | **RF7**: Citizen removes a crop |
 | `getAllAffidaLotti` | GET | `asso, comu` | ✅ DONE | **RF100**: Assignment history |
@@ -171,12 +168,12 @@ Ali Raja Faizan, Caria Antonio, Pedron Federico
 | `getAllOrtos` | GET | `All` | ✅ DONE | **RF2**: Map/List of city gardens |
 | `getOrtoById` | GET | `All` | ✅ DONE | Single garden details |
 | `deleteOrto` | DELETE | `comu` | ✅ DONE | Remove garden (with integrity check) |
-| `getOrtosFiltrati` | GET | `All` | ❌ TODO | **RF2.2**: Gardens filtered by zone, availability, sensors, size |
+| `getOrtosFiltrati` | GET | `All` | ✅ DONE | **RF2.2**: Gardens filtered by zone, availability, sensors, size |
 
 **Priority Tasks:**
-- [ ] Implement `getOrtosFiltrati` with multiple filter criteria
+- [x] Implement `getOrtosFiltrati` with multiple filter criteria
 - [ ] Add geospatial query support for location-based filtering
-- [ ] Add role-based access control middleware to protected endpoints
+- [x] Add role-based access control middleware to protected endpoints
 
 ### 5. affidaOrtoController.js 🤝 (Garden-Association Assignment)
 | Method | Verb | Role | Status | Description / Requirements |

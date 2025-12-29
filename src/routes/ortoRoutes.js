@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const ortoController = require("../controllers/ortoController");
+const checkToken = require('../util/checkToken');
+const checkRole = require('../util/checkRole');
 
 /**
  * @swagger
@@ -165,7 +167,9 @@ router.get("/search", ortoController.searchOrtos);
  * /api/v1/orti:
  *   post:
  *     summary: Create a new orto
- *     description: Create a new green garden with the provided information
+ *     description: Create a new green garden with the provided information. Only accessible by municipality users.
+ *     security:
+ *       - bearerAuth: []
  *     tags:
  *       - Orti
  *     requestBody:
@@ -181,6 +185,10 @@ router.get("/search", ortoController.searchOrtos);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Orto'
+ *       401:
+ *         description: Unauthorized - No token provided
+ *       403:
+ *         description: Forbidden - Only municipality users can create orti
  *       500:
  *         description: Error creating orto
  *         content:
@@ -194,7 +202,7 @@ router.get("/search", ortoController.searchOrtos);
  *                 error:
  *                   type: object
  */
-router.post("/", ortoController.createOrto);
+router.post("/", checkToken, checkRole(['comu']), ortoController.createOrto);
 
 /**
  * @swagger
@@ -248,7 +256,9 @@ router.get("/:id", ortoController.getOrtoById);
  * /api/v1/orti/{id}:
  *   put:
  *     summary: Update orto by ID
- *     description: Update an existing green garden with new information
+ *     description: Update an existing green garden with new information. Only accessible by municipality users.
+ *     security:
+ *       - bearerAuth: []
  *     tags:
  *       - Orti
  *     parameters:
@@ -271,6 +281,10 @@ router.get("/:id", ortoController.getOrtoById);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/Orto'
+ *       401:
+ *         description: Unauthorized - No token provided
+ *       403:
+ *         description: Forbidden - Only municipality users can update orti
  *       404:
  *         description: Orto not found
  *         content:
@@ -294,14 +308,16 @@ router.get("/:id", ortoController.getOrtoById);
  *                 error:
  *                   type: object
  */
-router.put("/:id", ortoController.updateOrto);
+router.put("/:id", checkToken, checkRole(['comu']), ortoController.updateOrto);
 
 /**
  * @swagger
  * /api/v1/orti/{id}:
  *   delete:
  *     summary: Delete orto by ID
- *     description: Delete a green garden by its unique identifier
+ *     description: Delete a green garden by its unique identifier. Only accessible by municipality users.
+ *     security:
+ *       - bearerAuth: []
  *     tags:
  *       - Orti
  *     parameters:
@@ -322,6 +338,10 @@ router.put("/:id", ortoController.updateOrto);
  *                 message:
  *                   type: string
  *                   example: 'Orto deleted successfully'
+ *       401:
+ *         description: Unauthorized - No token provided
+ *       403:
+ *         description: Forbidden - Only municipality users can delete orti
  *       404:
  *         description: Orto not found
  *         content:
@@ -345,7 +365,7 @@ router.put("/:id", ortoController.updateOrto);
  *                 error:
  *                   type: object
  */
-router.delete("/:id", ortoController.deleteOrto);
+router.delete("/:id", checkToken, checkRole(['comu']), ortoController.deleteOrto);
 
 
 module.exports = router;
