@@ -1,4 +1,5 @@
 const Orto  = require('../model/orto');
+const Lotto = require('../model/lotto');
 const logger = require('../config/logger');
 
 exports.getAllOrtos = async (req, res) => {
@@ -76,4 +77,126 @@ exports.deleteOrto = async (req, res) => {
         logger.db('DELETE', 'Orto', false, { error: error.message, id: req.params.id });
         res.status(500).json({ message: req.t('errors.deleting_orto'), error });
     }               
+};
+
+exports.searchOrtos = async (req, res) => {
+    try {
+        const { longitude, latitude, radius, minSize, maxSize, hasSensors } = req.query;
+        
+        logger.debug('Searching ortos with filters', { 
+            longitude, 
+            latitude, 
+            radius, 
+            minSize, 
+            maxSize, 
+            hasSensors 
+        });
+
+        // Build the aggregation pipeline
+        let pipeline = [];
+
+        // 1. Geospatial filter (if coordinates and radius are provided)
+        if (longitude && latitude && radius) {
+            const long = parseFloat(longitude);
+            const lat = parseFloat(latitude);
+            const rad = parseFloat(radius);
+
+            if (isNaN(long) || isNaN(lat) || isNaN(rad)) {
+                return res.status(400).json({ 
+                    message: req.t('errors.invalid_coordinates') 
+                });
+            }
+
+            pipeline.push({
+                $geoNear: {
+                    near: {
+                        type: "Point",
+                        coordinates: [long, lat]
+                    },
+                    distanceField: "distance",
+                    maxDistance: rad,
+                    spherical: true
+                }
+            });
+        }
+
+        // 2. Populate lotti
+        pipeline.push({
+            $lookup: {
+                from: "lotto",
+                localField: "lotti",
+                foreignField: "_id",
+                as: "lottiDetails"
+            }
+        });
+
+        // 3. Filter by lotto properties
+        let lottoMatch = {};
+        
+        if (minSize !== undefined || maxSize !== undefined || hasSensors !== undefined) {
+            // Add a field to check if orto has at least one lotto matching criteria
+            pipeline.push({
+                $addFields: {
+                    matchingLotti: {
+                        $filter: {
+                            input: "$lottiDetails",
+                            as: "lotto",
+                            cond: {
+                                $and: [
+                                    minSize !== undefined ? { $gte: ["$$lotto.dimensione", parseFloat(minSize)] } : true,
+                                    maxSize !== undefined ? { $lte: ["$$lotto.dimensione", parseFloat(maxSize)] } : true,
+                                    hasSensors !== undefined ? { $eq: ["$$lotto.sensori", hasSensors === 'true'] } : true
+                                ]
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Keep only ortos with at least one matching lotto
+            pipeline.push({
+                $match: {
+                    $expr: {
+                        $gt: [{ $size: "$matchingLotti" }, 0]
+                    }
+                }
+            });
+        }
+
+        // 4. Project final structure
+        pipeline.push({
+            $project: {
+                nome: 1,
+                indirizzo: 1,
+                geometry: 1,
+                lotti: 1,
+                distance: 1,
+                lottiCount: { $size: "$lottiDetails" },
+                matchingLottiCount: { $size: "$matchingLotti" }
+            }
+        });
+
+        const ortos = await Orto.aggregate(pipeline);
+
+        logger.db('SEARCH', 'Orto', true, { 
+            count: ortos.length, 
+            filters: { longitude, latitude, radius, minSize, maxSize, hasSensors } 
+        });
+
+        res.status(200).json({
+            count: ortos.length,
+            filters: {
+                longitude: longitude || null,
+                latitude: latitude || null,
+                radius: radius || null,
+                minSize: minSize || null,
+                maxSize: maxSize || null,
+                hasSensors: hasSensors || null
+            },
+            data: ortos
+        });
+    } catch (error) {
+        logger.db('SEARCH', 'Orto', false, { error: error.message });
+        res.status(500).json({ message: req.t('errors.searching_ortos'), error });
+    }
 };

@@ -22,6 +22,8 @@
     "retrieving_affidamenti_orto": "Errore nel recupero degli affidamenti degli orti",
     "retrieving_affidamento_orto": "Errore nel recupero dell'affidamento dell'orto",
     "retrieving_active_affidamenti_orto": "Errore nel recupero degli affidamenti attivi degli orti",
+    "searching_ortos": "Errore nella ricerca degli orti",
+    "invalid_coordinates": "Coordinate non valide",
     "creating_orto": "Errore nella creazione dell'orto",
     "creating_utente": "Errore nella creazione dell'utente",
     "creating_lotto": "Errore nella creazione del lotto",

@@ -7,7 +7,7 @@ Ali Raja Faizan, Caria Antonio, Pedron Federico
 ### TO DO
 
 #### Testing
-- [ ] Test classes for all working modules
+- [x] Test classes for all working modules
 - [ ] Integration tests for authentication flows
 - [ ] E2E tests for main user stories
 
