@@ -8,6 +8,12 @@ jest.mock('../../model/affidaLotto');
 
 // Mock del middleware di autenticazione
 jest.mock('../../util/checkToken', () => (req, res, next) => {
+  req.user = { id: 'testUserId', email: 'test@test.com', ruolo: 'comu' };
+  next();
+});
+
+// Mock del middleware di autorizzazione
+jest.mock('../../util/checkRole', () => (roles) => (req, res, next) => {
   next();
 });
 
