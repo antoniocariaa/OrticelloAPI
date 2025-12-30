@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const avvisoController = require("../controllers/avvisoController");
+const checkToken = require('../util/checkToken');
+const checkRole = require('../util/checkRole');
 
 /**
  * @swagger
@@ -33,6 +35,94 @@ const avvisoController = require("../controllers/avvisoController");
  *                   type: object
  */
 router.get("/", avvisoController.getAllAvvisi);
+
+/**
+ * @swagger
+ * /api/v1/avvisi/filtered:
+ *   get:
+ *     summary: Get filtered notices with pagination
+ *     description: Retrieve notices filtered by multiple criteria including entity type, date range, category, and read status. Supports pagination.
+ *     tags:
+ *       - Avvisi
+ *     parameters:
+ *       - in: query
+ *         name: tipo
+ *         schema:
+ *           type: string
+ *           enum: [asso, comu]
+ *         description: Filter by entity type (association or municipality)
+ *       - in: query
+ *         name: entityId
+ *         schema:
+ *           type: string
+ *         description: Filter by specific entity ID (comune or associazione)
+ *       - in: query
+ *         name: categoria
+ *         schema:
+ *           type: string
+ *         description: Filter by category
+ *       - in: query
+ *         name: dataInizio
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: Filter notices from this date onwards (ISO format)
+ *       - in: query
+ *         name: dataFine
+ *         schema:
+ *           type: string
+ *           format: date-time
+ *         description: Filter notices up to this date (ISO format)
+ *       - in: query
+ *         name: target
+ *         schema:
+ *           type: string
+ *           enum: [asso, all]
+ *         description: Filter by target audience (for municipality notices)
+ *       - in: query
+ *         name: letto
+ *         schema:
+ *           type: boolean
+ *         description: Filter by read status (requires authentication)
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number for pagination
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: Number of items per page
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved filtered avvisi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Avviso'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     currentPage:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *                     totalItems:
+ *                       type: integer
+ *                     itemsPerPage:
+ *                       type: integer
+ *       500:
+ *         description: Error retrieving filtered avvisi
+ */
+router.get("/filtered", avvisoController.getAvvisiFiltered);
 
 /**
  * @swagger
@@ -78,7 +168,12 @@ router.get("/", avvisoController.getAllAvvisi);
  *                 error:
  *                   type: object
  */
-router.post("/", avvisoController.createAvviso);
+router.post(
+  "/",
+  checkToken,
+  checkRole(['comu', 'asso']),
+  avvisoController.createAvviso
+);
 
 /**
  * @swagger
@@ -188,7 +283,12 @@ router.get("/:id", avvisoController.getAvvisoById);
  *                 error:
  *                   type: object
  */
-router.put("/:id", avvisoController.updateAvviso);
+router.put(
+  "/:id",
+  checkToken,
+  checkRole(['comu', 'asso']),
+  avvisoController.updateAvviso
+);
 
 /**
  * @swagger
@@ -239,5 +339,112 @@ router.put("/:id", avvisoController.updateAvviso);
  *                 error:
  *                   type: object
  */
-router.delete("/:id", avvisoController.deleteAvviso);
+router.delete(
+  "/:id",
+  checkToken,
+  checkRole(['comu', 'asso']),
+  avvisoController.deleteAvviso
+);
+
+/**
+ * @swagger
+ * /api/v1/avvisi/{id}/read:
+ *   put:
+ *     summary: Mark notice as read
+ *     description: Mark an avviso as read by the authenticated user. Creates or updates read status.
+ *     tags:
+ *       - Avvisi
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB ObjectId of the avviso
+ *     responses:
+ *       200:
+ *         description: Notice marked as read successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Notice marked as read'
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     avvisoId:
+ *                       type: string
+ *                     dataLettura:
+ *                       type: string
+ *                       format: date-time
+ *       401:
+ *         description: Authentication required
+ *       404:
+ *         description: Avviso not found
+ *       500:
+ *         description: Error marking avviso as read
+ */
+router.put(
+  "/:id/read",
+  avvisoController.markAsRead
+);
+
+/**
+ * @swagger
+ * /api/v1/avvisi/read-status:
+ *   post:
+ *     summary: Get read status for multiple notices
+ *     description: Get read status for multiple avvisi for the authenticated user
+ *     tags:
+ *       - Avvisi
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avvisiIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Array of avviso IDs to check
+ *     responses:
+ *       200:
+ *         description: Read status retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   additionalProperties:
+ *                     type: object
+ *                     properties:
+ *                       letto:
+ *                         type: boolean
+ *                       dataLettura:
+ *                         type: string
+ *                         format: date-time
+ *                         nullable: true
+ *       401:
+ *         description: Authentication required
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Error retrieving read status
+ */
+router.post(
+  "/read-status",
+  avvisoController.getReadStatus
+);
+
 module.exports = router;

@@ -149,16 +149,16 @@ Ali Raja Faizan, Caria Antonio, Pedron Federico
 | `getAvvisoById` | GET | `All` | ✅ DONE | Notice details |
 | `updateAvviso` | PUT | `comu, asso` | ✅ DONE | Update own notice |
 | `deleteAvviso` | DELETE | `comu, asso` | ✅ DONE | Delete notice (only own) |
-| `getAvvisiFiltered` | GET | `All` | ❌ TODO | **RF3.4**: Filtered notices (entity, date, category) |
-| `markAsRead` | PUT | `All` | ❌ TODO | **RF3**: Mark notice as read |
+| `getAvvisiFiltered` | GET | `All` | ✅ DONE | **RF3.4**: Filtered notices (entity, date, category) |
+| `markAsRead` | PUT | `All` | ✅ DONE | **RF3**: Mark notice as read |
 
 **Priority Tasks:**
 - [ ] Implement notice visibility system (Public, Associations Only, Association-specific)
 - [ ] Add `target` field validation in `createAvviso`
-- [ ] Implement `getAvvisiFiltered` with filtering by entity, date, category
-- [ ] Implement `markAsRead` endpoint
-- [ ] Create `AvvisoLetto` model for read/unread tracking
-- [ ] Add role-based access control middleware
+- [x] Implement `getAvvisiFiltered` with filtering by entity, date, category
+- [x] Implement `markAsRead` endpoint
+- [x] Create `AvvisoLetto` model for read/unread tracking
+- [x] Add role-based access control middleware
 
 ### 4. ortoController.js 🏡 (Garden Management)
 | Method | Verb | Role | Status | Description / Requirements |
