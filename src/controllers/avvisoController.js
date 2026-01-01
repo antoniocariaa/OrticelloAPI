@@ -138,8 +138,8 @@ exports.getAvvisiFiltered = async (req, res) => {
         const avvisi = await avvisiQuery;
 
         // If user is authenticated and letto filter is specified
-        if (req.user && letto !== undefined) {
-            const userId = req.user.id;
+        if (req.loggedUser && letto !== undefined) {
+            const userId = req.loggedUser.id;
             const avvisiIds = avvisi.map(a => a._id);
             
             // Get all read avvisi by this user
@@ -198,7 +198,7 @@ exports.getAvvisiFiltered = async (req, res) => {
 exports.markAsRead = async (req, res) => {
     try {
         const avvisoId = req.params.id;
-        const userId = req.user?.id;
+        const userId = req.loggedUser?.id;
 
         // Verify avviso exists
         const avviso = await Avviso.findById(avvisoId);
@@ -247,7 +247,7 @@ exports.markAsRead = async (req, res) => {
         logger.error('Error marking avviso as read', { 
             error: error.message, 
             id: req.params.id,
-            userId: req.user?.id 
+            userId: req.loggedUser?.id 
         });
         res.status(500).json({ 
             message: req.t('errors.marking_avviso_read') || 'Error marking notice as read', 
@@ -262,7 +262,7 @@ exports.markAsRead = async (req, res) => {
  */
 exports.getReadStatus = async (req, res) => {
     try {
-        const userId = req.user?.id;
+        const userId = req.loggedUser?.id;
         const { avvisiIds } = req.body; // Array of avviso IDs
 
         if (!userId) {
@@ -301,7 +301,7 @@ exports.getReadStatus = async (req, res) => {
     } catch (error) {
         logger.error('Error retrieving read status', { 
             error: error.message, 
-            userId: req.user?.id 
+            userId: req.loggedUser?.id 
         });
         res.status(500).json({ 
             message: req.t('errors.retrieving_read_status') || 'Error retrieving read status', 
