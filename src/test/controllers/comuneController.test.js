@@ -8,7 +8,12 @@ jest.mock('../../model/org/comune');
 
 // Mock JWT middleware per bypassare autenticazione nei test
 jest.mock('../../util/checkToken', () => (req, res, next) => {
-  req.user = { id: 'testUserId', email: 'test@test.com' };
+  req.loggedUser = { id: 'testUserId', email: 'test@test.com', tipo: 'comu', admin: true };
+  next();
+});
+
+// Mock checkRole middleware per bypassare controllo ruoli nei test
+jest.mock('../../util/checkRole', () => () => (req, res, next) => {
   next();
 });
 

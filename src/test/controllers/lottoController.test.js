@@ -8,6 +8,7 @@ jest.mock('../../model/lotto');
 
 // Mock del middleware di autenticazione
 jest.mock('../../util/checkToken', () => (req, res, next) => {
+  req.loggedUser = { id: 'testUserId', email: 'test@test.com', tipo: 'comu', admin: false };
   next();
 });
 
