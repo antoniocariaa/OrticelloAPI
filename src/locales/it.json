@@ -13,14 +13,17 @@
     "retrieving_comune": "Errore nel recupero del comune",
     "retrieving_bandi": "Errore nel recupero dei bandi",
     "retrieving_bando": "Errore nel recupero del bando",
-    "retieving_avvisi": "Errore nel recupero degli avvisi",
+    "retrieving_avvisi": "Errore nel recupero degli avvisi",
     "retrieving_avviso": "Errore nel recupero dell'avviso",
     "retrieving_associazioni": "Errore nel recupero delle associazioni",
-    "retrieving_associazione": "Errore nel recupero dell'associaione",
+    "retrieving_associazione": "Errore nel recupero dell'associazione",
     "retrieving_affidamenti_lotto": "Errore nel recupero degli affidamenti dei lotti",
     "retrieving_affidamento_lotto": "Errore nel recupero dell'affidamento del lotto",
     "retrieving_affidamenti_orto": "Errore nel recupero degli affidamenti degli orti",
     "retrieving_affidamento_orto": "Errore nel recupero dell'affidamento dell'orto",
+    "retrieving_active_affidamenti_orto": "Errore nel recupero degli affidamenti attivi degli orti",
+    "searching_ortos": "Errore nella ricerca degli orti",
+    "invalid_coordinates": "Coordinate non valide",
     "creating_orto": "Errore nella creazione dell'orto",
     "creating_utente": "Errore nella creazione dell'utente",
     "creating_lotto": "Errore nella creazione del lotto",
@@ -49,6 +52,9 @@
     "deleting_associazione": "Errore nell'eliminazione dell'associazione",
     "deleting_affidamento_lotto": "Errore nell'eliminazione dell'affidamento del lotto",
     "deleting_affidamento_orto": "Errore nell'eliminazione dell'affidamento dell'orto",
+    "adding_member": "Errore nell'aggiunta del membro",
+    "removing_member": "Errore nella rimozione del membro",
+    "retrieving_members": "Errore nel recupero dei membri",
     "adding_coltura": "Errore nell'aggiunta della coltura",
     "removing_coltura": "Errore nella rimozione della coltura",
     "database_error": "Errore del database",
@@ -85,6 +91,8 @@
     "associazione_updated": "Associazione aggiornata con successo",
     "affidamento_lotto_updated": "Affidamento del lotto aggiornato con successo",
     "affidamento_orto_updated": "Affidamento dell'orto aggiornato con successo",
+    "member_added": "Membro aggiunto con successo",
+    "member_removed": "Membro rimosso con successo",
     "coltura_added": "Coltura aggiunta con successo",
     "coltura_removed": "Coltura rimossa con successo"
   },
@@ -112,6 +120,8 @@
     "password_updated": "Password aggiornata con successo",
     "old_password_incorrect": "Vecchia password non corretta",
     "invalid_duplicate_data": "Dati non validi o duplicati",
+    "member_already_exists": "Membro già presente nell'associazione",
+    "member_not_found": "Membro non trovato in questa associazione",
     "coltura_required": "La coltura è obbligatoria"
   },
   "auth": {
@@ -123,6 +133,8 @@
     "token_expired": "Token scaduto",
     "token_invalid": "Token non valido",
     "no_token": "Token non fornito",
-    "unauthorized": "Accesso non autorizzato"
+    "unauthorized": "Accesso non autorizzato",
+    "unauthorized_role": "Accesso proibito. Il tuo ruolo non permette questa operazione.",
+    "unauthorized_admin": "Accesso proibito. Sono richiesti privilegi di amministratore."
   }
 }

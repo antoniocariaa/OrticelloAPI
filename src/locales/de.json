@@ -13,7 +13,7 @@
     "retrieving_comune": "Fehler beim Abrufen der Gemeinde",
     "retrieving_bandi": "Fehler beim Abrufen der Ankündigungen",
     "retrieving_bando": "Fehler beim Abrufen der Ankündigung",
-    "retieving_avvisi": "Fehler beim Abrufen der Hinweise",
+    "retrieving_avvisi": "Fehler beim Abrufen der Hinweise",
     "retrieving_avviso": "Fehler beim Abrufen des Hinweises",
     "retrieving_associazioni": "Fehler beim Abrufen der Verbände",
     "retrieving_associazione": "Fehler beim Abrufen des Verbandes",
@@ -21,6 +21,9 @@
     "retrieving_affidamento_lotto": "Fehler beim Abrufen der Parzellen-Zuweisung",
     "retrieving_affidamenti_orto": "Fehler beim Abrufen der Garten-Zuweisungen",
     "retrieving_affidamento_orto": "Fehler beim Abrufen der Garten-Zuweisung",
+    "retrieving_active_affidamenti_orto": "Fehler beim Abrufen der aktiven Garten-Zuweisungen",
+    "searching_ortos": "Fehler bei der Suche nach Gärten",
+    "invalid_coordinates": "Ungültige Koordinaten",
     "creating_orto": "Fehler beim Erstellen des Gartens",
     "creating_utente": "Fehler beim Erstellen des Benutzers",
     "creating_lotto": "Fehler beim Erstellen der Parzelle",
@@ -49,6 +52,9 @@
     "deleting_associazione": "Fehler beim Löschen des Verbandes",
     "deleting_affidamento_lotto": "Fehler beim Löschen der Parzellen-Zuweisung",
     "deleting_affidamento_orto": "Fehler beim Löschen der Garten-Zuweisung",
+    "adding_member": "Fehler beim Hinzufügen des Mitglieds",
+    "removing_member": "Fehler beim Entfernen des Mitglieds",
+    "retrieving_members": "Fehler beim Abrufen der Mitglieder",
     "adding_coltura": "Fehler beim Hinzufügen der Kulturpflanze",
     "removing_coltura": "Fehler beim Entfernen der Kulturpflanze",
     "database_error": "Datenbankfehler",
@@ -85,6 +91,8 @@
     "associazione_updated": "Verband erfolgreich aktualisiert",
     "affidamento_lotto_updated": "Parzellen-Zuweisung erfolgreich aktualisiert",
     "affidamento_orto_updated": "Garten-Zuweisung erfolgreich aktualisiert",
+    "member_added": "Mitglied erfolgreich hinzugefügt",
+    "member_removed": "Mitglied erfolgreich entfernt",
     "coltura_added": "Kulturpflanze erfolgreich hinzugefügt",
     "coltura_removed": "Kulturpflanze erfolgreich entfernt"
   },
@@ -112,6 +120,8 @@
     "password_updated": "Passwort erfolgreich aktualisiert",
     "old_password_incorrect": "Altes Passwort falsch",
     "invalid_duplicate_data": "Ungültige oder doppelte Daten",
+    "member_already_exists": "Mitglied ist bereits im Verband vorhanden",
+    "member_not_found": "Mitglied nicht in diesem Verband gefunden",
     "coltura_required": "Kulturpflanze ist erforderlich"
   },
   "auth": {
@@ -123,6 +133,8 @@
     "token_expired": "Token abgelaufen",
     "token_invalid": "Ungültiges Token",
     "no_token": "Kein Token bereitgestellt",
-    "unauthorized": "Unbefugter Zugriff"
+    "unauthorized": "Unbefugter Zugriff",
+    "unauthorized_role": "Zugriff verweigert. Ihre Rolle erlaubt diesen Vorgang nicht.",
+    "unauthorized_admin": "Zugriff verweigert. Administratorrechte sind erforderlich."
   }
 }

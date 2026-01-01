@@ -9,6 +9,8 @@ servers:
   - url: https://orticelloapi.onrender.com
     description: Production server
 tags:
+  - name: Authentication
+    description: User authentication endpoints
   - name: Orti
     description: Garden management endpoints
   - name: Lotti
@@ -32,6 +34,11 @@ tags:
   - name: Sensor
     description: Sensor data endpoints
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     Orto:
       type: object
@@ -483,14 +490,17 @@ components:
           description: Sensor payload (TODO - structure to be defined)
           example: "Soil moisture: 45%, Temperature: 18°C"
 paths:
-  /api/v1/affida-lotti:
+  /api/v1/affidaLotti:
     get:
       summary: Get list of lotto assignments
       description: Retrieve a list of all lotto assignments (affidaLotti). Returns an
         array showing which users have been assigned to which lotti, including
-        assignment dates and optional colture information.
+        assignment dates and optional colture information. Accessible to
+        **Comune** and **Associazioni**.
       tags:
         - AffidaLotti
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successfully retrieved list of affida lotti
@@ -500,6 +510,10 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AffidaLotto"
+        "401":
+          description: Unauthorized - Authentication required (missing or invalid JWT token)
+        "403":
+          description: Forbidden - Insufficient permissions
         "500":
           description: Error retrieving affida lotti
           content:
@@ -515,9 +529,11 @@ paths:
     post:
       summary: Create a new lotto assignment
       description: Create a new assignment of a lotto to a user with start and end
-        dates, and optionally a list of crops
+        dates, and optionally a list of crops. Accessible to authenticated users
       tags:
         - AffidaLotti
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -541,6 +557,10 @@ paths:
                   message:
                     type: string
                     example: Invalid input data
+        "401":
+          description: Unauthorized - Authentication required (missing or invalid JWT token)
+        "403":
+          description: Forbidden - Insufficient permissions
         "500":
           description: Error creating affida lotto
           content:
@@ -553,12 +573,50 @@ paths:
                     example: Error creating affida lotto
                   error:
                     type: object
-  /api/v1/affida-lotti/{id}:
+  /api/v1/affidaLotti/attivi:
+    get:
+      summary: Get active lotto assignments
+      description: Retrieve only lotto assignments that have already started and not
+        yet ended (data_inizio <= now <= data_fine). Results include populated
+        lotto and utente data and are sorted by end date. Accessible to
+        **Comune** and **Associazini**
+      tags:
+        - AffidaLotti
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved list of active affida lotti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AffidaLotto"
+        "401":
+          description: Unauthorized - Authentication required (missing or invalid JWT token)
+        "403":
+          description: Forbidden - Insufficient permissions
+        "500":
+          description: Error retrieving active affida lotti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving active affida lotti
+                  error:
+                    type: object
+  /api/v1/affidaLotti/{id}:
     get:
       summary: Get lotto assignment by ID
       description: Retrieve a single lotto assignment by its unique identifier
       tags:
         - AffidaLotti
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -573,6 +631,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AffidaLotto"
+        "401":
+          description: Unauthorized - Authentication required (missing or invalid JWT token)
         "404":
           description: AffidaLotto not found
           content:
@@ -598,9 +658,11 @@ paths:
     put:
       summary: Update lotto assignment by ID
       description: Update an existing lotto assignment with new information (dates,
-        colture, etc.)
+        colture, etc.). Used by **Comune** and **Associazioni**
       tags:
         - AffidaLotti
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -631,6 +693,10 @@ paths:
                   message:
                     type: string
                     example: Invalid input data
+        "401":
+          description: Unauthorized - Authentication required (missing or invalid JWT token)
+        "403":
+          description: Forbidden - Insufficient permissions
         "404":
           description: AffidaLotto not found
           content:
@@ -655,9 +721,12 @@ paths:
                     type: object
     delete:
       summary: Delete lotto assignment by ID
-      description: Remove an existing lotto assignment from the system
+      description: Remove an existing lotto assignment from the system. Accessible ony
+        to **Comune** and **Associazioni**
       tags:
         - AffidaLotti
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -676,6 +745,10 @@ paths:
                   message:
                     type: string
                     example: AffidaLotto deleted successfully
+        "401":
+          description: Unauthorized - Authentication required (missing or invalid JWT token)
+        "403":
+          description: Forbidden - Insufficient permissions
         "404":
           description: AffidaLotto not found
           content:
@@ -698,13 +771,15 @@ paths:
                     example: Error deleting affida lotto
                   error:
                     type: object
-  /api/v1/affida-lotti/{id}/colture:
+  /api/v1/affidaLotti/{id}/colture:
     post:
       summary: Add a crop to lotto assignment
       description: Add a new crop (coltura) to the list of crops for a specific lotto
-        assignment
+        assignment. Accessible only to the **Cittadino** owning the assignment
       tags:
         - AffidaLotti
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -740,6 +815,10 @@ paths:
                   message:
                     type: string
                     example: Coltura name is required
+        "401":
+          description: Unauthorized - Authentication required (missing or invalid JWT token)
+        "403":
+          description: Forbidden - Insufficient permissions
         "404":
           description: AffidaLotto not found
           content:
@@ -762,13 +841,15 @@ paths:
                     example: Error adding coltura
                   error:
                     type: object
-  /api/v1/affida-lotti/{id}/colture/{coltura}:
+  /api/v1/affidaLotti/{id}/colture/{coltura}:
     delete:
       summary: Remove a crop from lotto assignment
       description: Remove a specific crop (coltura) from the list of crops for a lotto
         assignment
       tags:
         - AffidaLotti
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -789,6 +870,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AffidaLotto"
+        "401":
+          description: Unauthorized - Authentication required (missing or invalid JWT token)
+        "403":
+          description: Forbidden - Insufficient permissions
         "404":
           description: AffidaLotto not found or coltura not found
           content:
@@ -811,14 +896,26 @@ paths:
                     example: Error removing coltura
                   error:
                     type: object
-  /api/v1/affida-orti:
+  /api/v1/affidaOrti:
     get:
       summary: Get list of orto assignments
-      description: Retrieve a list of all orto assignments (affidaOrti). Returns an
-        array showing which associazioni have been assigned to which orti,
-        including assignment start and end dates.
+      description: >
+        Retrieve a list of all orto assignments (affidaOrti). Returns an array
+        showing which associazioni 
+
+        have been assigned to which orti, including assignment start and end
+        dates.
+
+
+        **Access Control:**
+
+        - **Comune**: Can view all orto assignments
+
+        - **Associazioni**: Can view only their own assignments
       tags:
         - AffidaOrti
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successfully retrieved list of affida orti
@@ -828,8 +925,28 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/AffidaOrto"
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - User does not have the required role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
         "500":
-          description: Error retrieving affida orti
+          description: Internal server error while retrieving affida orti
           content:
             application/json:
               schema:
@@ -842,16 +959,32 @@ paths:
                     type: object
     post:
       summary: Create a new orto assignment
-      description: Create a new assignment of an orto to an associazione with start
-        and end dates
+      description: >
+        Create a new assignment of an orto to an associazione with start and end
+        dates.
+
+
+        **Access Control:**
+
+        - **Strictly reserved for Comune users only (RF18)**
+
+
+        **Business Rule (RF18):** Il Comune assegna gli orti alle associazioni
       tags:
         - AffidaOrti
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/AffidaOrto"
+            example:
+              orto: 507f1f77bcf86cd799439011
+              associazione: 507f191e810c19729de860ea
+              dataInizio: 2024-01-01
+              dataFine: 2025-12-31
       responses:
         "201":
           description: AffidaOrto created successfully
@@ -860,7 +993,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/AffidaOrto"
         "400":
-          description: Invalid input data
+          description: Invalid input data - Missing required fields or invalid format
           content:
             application/json:
               schema:
@@ -869,8 +1002,32 @@ paths:
                   message:
                     type: string
                     example: Invalid input data
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - Only Comune users can create orto assignments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden - Only Comune can create assignments
         "500":
-          description: Error creating affida orto
+          description: Internal server error while creating affida orto
           content:
             application/json:
               schema:
@@ -881,12 +1038,88 @@ paths:
                     example: Error creating affida orto
                   error:
                     type: object
-  /api/v1/affida-orti/{id}:
+  /api/v1/affidaOrti/active:
     get:
-      summary: Get orto assignment by ID
-      description: Retrieve a single orto assignment by its unique identifier
+      summary: Get list of active orto assignments
+      description: >
+        Retrieve a list of orto assignments that are currently active (where
+        today's date falls within 
+
+        the assignment date range). Returns an array showing which associazioni
+        are currently assigned 
+
+        to which orti.
+
+
+        **Access Control:**
+
+        - **Comune**: Can view all active assignments
+
+        - **Associazioni**: Can view only their own active assignments
       tags:
         - AffidaOrti
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved list of active affida orti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AffidaOrto"
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - User does not have the required role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
+        "500":
+          description: Internal server error while retrieving active affida orti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving active affida orti
+                  error:
+                    type: object
+  /api/v1/affidaOrti/{id}:
+    get:
+      summary: Get orto assignment by ID
+      description: >
+        Retrieve a single orto assignment by its unique MongoDB ObjectId.
+        Returns detailed information 
+
+        about the assignment including the associated orto and associazione.
+
+
+        **Access Control:**
+
+        - **Comune**: Can view any assignment
+
+        - **Associazioni**: Can view only their own assignments
+      tags:
+        - AffidaOrti
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -894,6 +1127,7 @@ paths:
           schema:
             type: string
           description: MongoDB ObjectId of the affida orto
+          example: 507f1f77bcf86cd799439011
       responses:
         "200":
           description: Successfully retrieved affida orto
@@ -901,8 +1135,28 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/AffidaOrto"
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - User does not have the required role
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
         "404":
-          description: AffidaOrto not found
+          description: AffidaOrto not found with the specified ID
           content:
             application/json:
               schema:
@@ -912,7 +1166,7 @@ paths:
                     type: string
                     example: AffidaOrto not found
         "500":
-          description: Error retrieving affida orto
+          description: Internal server error while retrieving affida orto
           content:
             application/json:
               schema:
@@ -925,23 +1179,40 @@ paths:
                     type: object
     put:
       summary: Update orto assignment by ID
-      description: Update an existing orto assignment with new information (dates,
-        orto, associazione)
+      description: >
+        Update an existing orto assignment with new information (dates, orto,
+        associazione).
+
+
+        **Access Control:**
+
+        - **Strictly reserved for Comune users only**
+
+
+        Solo il Comune gestisce i contratti macro di assegnazione degli orti.
       tags:
         - AffidaOrti
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the affida orto
+          description: MongoDB ObjectId of the affida orto to update
+          example: 507f1f77bcf86cd799439011
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/AffidaOrto"
+            example:
+              orto: 507f1f77bcf86cd799439011
+              associazione: 507f191e810c19729de860ea
+              dataInizio: 2024-01-01
+              dataFine: 2026-12-31
       responses:
         "200":
           description: AffidaOrto updated successfully
@@ -950,7 +1221,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/AffidaOrto"
         "400":
-          description: Invalid input data
+          description: Invalid input data - Missing required fields or invalid format
           content:
             application/json:
               schema:
@@ -959,8 +1230,32 @@ paths:
                   message:
                     type: string
                     example: Invalid input data
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - Only Comune users can update orto assignments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
         "404":
-          description: AffidaOrto not found
+          description: AffidaOrto not found with the specified ID
           content:
             application/json:
               schema:
@@ -970,7 +1265,7 @@ paths:
                     type: string
                     example: AffidaOrto not found
         "500":
-          description: Error updating affida orto
+          description: Internal server error while updating affida orto
           content:
             application/json:
               schema:
@@ -983,16 +1278,29 @@ paths:
                     type: object
     delete:
       summary: Delete orto assignment by ID
-      description: Remove an existing orto assignment from the system
+      description: >
+        Remove an existing orto assignment from the system (Revoke management).
+
+
+        **Access Control:**
+
+        - **Strictly reserved for Comune users only**
+
+
+        Solo il Comune può revocare la gestione degli orti assegnati alle
+        associazioni.
       tags:
         - AffidaOrti
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the affida orto
+          description: MongoDB ObjectId of the affida orto to delete
+          example: 507f1f77bcf86cd799439011
       responses:
         "200":
           description: AffidaOrto deleted successfully
@@ -1004,8 +1312,28 @@ paths:
                   message:
                     type: string
                     example: AffidaOrto deleted successfully
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - Only Comune users can delete orto assignments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
         "404":
-          description: AffidaOrto not found
+          description: AffidaOrto not found with the specified ID
           content:
             application/json:
               schema:
@@ -1015,7 +1343,7 @@ paths:
                     type: string
                     example: AffidaOrto not found
         "500":
-          description: Error deleting affida orto
+          description: Internal server error while deleting affida orto
           content:
             application/json:
               schema:
@@ -1056,7 +1384,10 @@ paths:
                     type: string
     post:
       summary: Create a new associazione
-      description: Create a new association with the provided information
+      description: Create a new association with the provided information. Only
+        accessible by municipality users.
+      security:
+        - bearerAuth: []
       tags:
         - Associazioni
       requestBody:
@@ -1084,6 +1415,10 @@ paths:
                     example: Dati non validi o duplicati
                   error:
                     type: string
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only municipality users can create associations
         "500":
           description: Error creating associazione
           content:
@@ -1140,7 +1475,10 @@ paths:
                     type: string
     put:
       summary: Update associazione by ID
-      description: Update an existing association with new information
+      description: Update an existing association with new information. Accessible by
+        association admins and municipality users.
+      security:
+        - bearerAuth: []
       tags:
         - Associazioni
       parameters:
@@ -1175,6 +1513,10 @@ paths:
                     example: Dati aggiornati non validi
                   error:
                     type: string
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only association admins or municipality users can update
         "404":
           description: Associazione not found
           content:
@@ -1199,7 +1541,10 @@ paths:
                     type: string
     delete:
       summary: Delete associazione by ID
-      description: Delete an association by its unique identifier
+      description: Delete an association by its unique identifier. Only accessible by
+        municipality users.
+      security:
+        - bearerAuth: []
       tags:
         - Associazioni
       parameters:
@@ -1220,6 +1565,10 @@ paths:
                   message:
                     type: string
                     example: Associazione eliminata con successo
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only municipality users can delete associations
         "404":
           description: Associazione not found
           content:
@@ -1242,6 +1591,322 @@ paths:
                     example: Errore durante l'eliminazione
                   error:
                     type: string
+  /api/v1/associazioni/{id}/membri:
+    get:
+      summary: Get all members of an associazione
+      description: Retrieve a list of all users (utenti) who are members of a specific
+        association. Accessible by association and municipality users.
+      security:
+        - bearerAuth: []
+      tags:
+        - Associazioni
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the associazione
+      responses:
+        "200":
+          description: Successfully retrieved members list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  associazione:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      nome:
+                        type: string
+                  count:
+                    type: integer
+                    description: Number of members
+                  membri:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        nome:
+                          type: string
+                        cognome:
+                          type: string
+                        email:
+                          type: string
+                        telefono:
+                          type: string
+                        admin:
+                          type: boolean
+                        createdAt:
+                          type: string
+                          format: date-time
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only association and municipality users can view members
+        "404":
+          description: Associazione not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Associazione non trovata
+        "500":
+          description: Error retrieving members
+    post:
+      summary: Add a member to an associazione
+      description: Add an existing user as a member of the association. The user's
+        type will be changed to 'asso' and linked to this association. Only
+        accessible by association admins (RF22).
+      security:
+        - bearerAuth: []
+      tags:
+        - Associazioni
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the associazione
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - utenteId
+              properties:
+                utenteId:
+                  type: string
+                  description: MongoDB ObjectId of the user to add as member
+                  example: 507f1f77bcf86cd799439011
+      responses:
+        "200":
+          description: Member added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Membro aggiunto con successo
+                  data:
+                    type: object
+                    properties:
+                      utente:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          nome:
+                            type: string
+                          cognome:
+                            type: string
+                          email:
+                            type: string
+                          tipo:
+                            type: string
+                            example: asso
+                      associazione:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          nome:
+                            type: string
+        "400":
+          description: Bad request - User already member or validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Membro già presente nell'associazione
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only association admins can add members
+        "404":
+          description: Associazione or Utente not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Error adding member
+  /api/v1/associazioni/{id}/membri/{utenteId}:
+    delete:
+      summary: Remove a member from an associazione
+      description: Remove a user from the association. The user's type will be changed
+        back to 'citt' (citizen) and the association link will be removed. Only
+        accessible by association admins (RF22).
+      security:
+        - bearerAuth: []
+      tags:
+        - Associazioni
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the associazione
+        - in: path
+          name: utenteId
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the user to remove
+      responses:
+        "200":
+          description: Member removed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Membro rimosso con successo
+                  data:
+                    type: object
+                    properties:
+                      utente:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          nome:
+                            type: string
+                          cognome:
+                            type: string
+                          email:
+                            type: string
+                          tipo:
+                            type: string
+                            example: citt
+        "400":
+          description: User is not a member of this association
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Membro non trovato in questa associazione
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only association admins can remove members
+        "404":
+          description: Associazione or Utente not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Error removing member
+  /api/v1/authentication:
+    post:
+      summary: Authenticate user and generate JWT token
+      description: Authenticate a user with email and password or Google token.
+        Returns a JWT token valid for 24 hours.
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address (required if not using googleToken)
+                  example: paolo.rossi@rossi.it
+                password:
+                  type: string
+                  description: User's password (required if not using googleToken)
+                  example: 12345678
+                googleToken:
+                  type: string
+                  description: Google authentication token (alternative to email/password)
+            examples:
+              emailPassword:
+                summary: Login with email and password
+                value:
+                  email: paolo.rossi@rossi.it
+                  password: 12345678
+              googleAuth:
+                summary: Login with Google token
+                value:
+                  googleToken: eyJhbGciOiJSUzI1NiIsImtpZCI6...
+      responses:
+        "200":
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Token generated
+                  token:
+                    type: string
+                    description: JWT token (expires in 24 hours)
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  email:
+                    type: string
+                    example: paolo.rossi@rossi.it
+                  id:
+                    type: string
+                    description: User's MongoDB ObjectId
+                    example: 693bfed09c0ff8cb58ab35fe
+                  self:
+                    type: string
+                    description: Link to user resource
+                    example: /api/v1/utenti/693bfed09c0ff8cb58ab35fe
+        "401":
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                userNotFound:
+                  value:
+                    message: Authentication failed. User not found.
+                wrongPassword:
+                  value:
+                    message: Authentication failed. Wrong password.
   /api/v1/avvisi:
     get:
       summary: Get list of notices
@@ -1313,6 +1978,94 @@ paths:
                     example: Error creating avviso
                   error:
                     type: object
+  /api/v1/avvisi/filtered:
+    get:
+      summary: Get filtered notices with pagination
+      description: Retrieve notices filtered by multiple criteria including entity
+        type, date range, category, and read status. Supports pagination.
+      tags:
+        - Avvisi
+      parameters:
+        - in: query
+          name: tipo
+          schema:
+            type: string
+            enum:
+              - asso
+              - comu
+          description: Filter by entity type (association or municipality)
+        - in: query
+          name: entityId
+          schema:
+            type: string
+          description: Filter by specific entity ID (comune or associazione)
+        - in: query
+          name: categoria
+          schema:
+            type: string
+          description: Filter by category
+        - in: query
+          name: dataInizio
+          schema:
+            type: string
+            format: date-time
+          description: Filter notices from this date onwards (ISO format)
+        - in: query
+          name: dataFine
+          schema:
+            type: string
+            format: date-time
+          description: Filter notices up to this date (ISO format)
+        - in: query
+          name: target
+          schema:
+            type: string
+            enum:
+              - asso
+              - all
+          description: Filter by target audience (for municipality notices)
+        - in: query
+          name: letto
+          schema:
+            type: boolean
+          description: Filter by read status (requires authentication)
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Page number for pagination
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+          description: Number of items per page
+      responses:
+        "200":
+          description: Successfully retrieved filtered avvisi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Avviso"
+                  pagination:
+                    type: object
+                    properties:
+                      currentPage:
+                        type: integer
+                      totalPages:
+                        type: integer
+                      totalItems:
+                        type: integer
+                      itemsPerPage:
+                        type: integer
+        "500":
+          description: Error retrieving filtered avvisi
   /api/v1/avvisi/{id}:
     get:
       summary: Get notice by ID
@@ -1457,14 +2210,108 @@ paths:
                     example: Error deleting avviso
                   error:
                     type: object
+  /api/v1/avvisi/{id}/read:
+    put:
+      summary: Mark notice as read
+      description: Mark an avviso as read by the authenticated user. Creates or
+        updates read status.
+      tags:
+        - Avvisi
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the avviso
+      responses:
+        "200":
+          description: Notice marked as read successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Notice marked as read
+                  data:
+                    type: object
+                    properties:
+                      avvisoId:
+                        type: string
+                      dataLettura:
+                        type: string
+                        format: date-time
+        "401":
+          description: Authentication required
+        "404":
+          description: Avviso not found
+        "500":
+          description: Error marking avviso as read
+  /api/v1/avvisi/read-status:
+    post:
+      summary: Get read status for multiple notices
+      description: Get read status for multiple avvisi for the authenticated user
+      tags:
+        - Avvisi
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                avvisiIds:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of avviso IDs to check
+      responses:
+        "200":
+          description: Read status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        letto:
+                          type: boolean
+                        dataLettura:
+                          type: string
+                          format: date-time
+                          nullable: true
+        "400":
+          description: Invalid input
+        "401":
+          description: Authentication required
+        "500":
+          description: Error retrieving read status
   /api/v1/bandi:
     get:
       summary: Get list of announcements
-      description: Retrieve a list of all announcements (bandi). Returns an array of
-        bando objects with details including titolo, data_inizio, data_fine,
-        messaggio, and optional link.
+      description: Retrieve a list of all announcements. Use query param 'active=true'
+        to filter only current ones.
+      security:
+        - bearerAuth: []
       tags:
         - Bandi
+      parameters:
+        - in: query
+          name: active
+          schema:
+            type: boolean
+          description: Se impostato a true, restituisce solo i bandi non scaduti (ordinati
+            per scadenza).
       responses:
         "200":
           description: Successfully retrieved list of bandi
@@ -1476,20 +2323,11 @@ paths:
                   $ref: "#/components/schemas/Bando"
         "500":
           description: Error retrieving bandi
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Error retrieving bandi
-                  error:
-                    type: object
     post:
       summary: Create a new announcement
-      description: Create a new bando with the provided information including title,
-        start and end dates, message, and optional link
+      description: Create a new bando. Only accessible by Comune.
+      security:
+        - bearerAuth: []
       tags:
         - Bandi
       requestBody:
@@ -1507,30 +2345,34 @@ paths:
                 $ref: "#/components/schemas/Bando"
         "400":
           description: Invalid input data
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Invalid input data
         "500":
           description: Error creating bando
+  /api/v1/bandi/attivi:
+    get:
+      summary: Get active announcements
+      description: Retrieve only bandi that have already started and not yet ended
+        (data_inizio <= now <= data_fine). Results are sorted by end date.
+      security:
+        - bearerAuth: []
+      tags:
+        - Bandi
+      responses:
+        "200":
+          description: Successfully retrieved list of active bandi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Error creating bando
-                  error:
-                    type: object
+                type: array
+                items:
+                  $ref: "#/components/schemas/Bando"
+        "500":
+          description: Error retrieving active bandi
   /api/v1/bandi/{id}:
     get:
       summary: Get announcement by ID
-      description: Retrieve a single bando by its unique identifier
+      description: Retrieve a single bando by ID.
+      security:
+        - bearerAuth: []
       tags:
         - Bandi
       parameters:
@@ -1539,7 +2381,6 @@ paths:
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the bando
       responses:
         "200":
           description: Successfully retrieved bando
@@ -1549,29 +2390,13 @@ paths:
                 $ref: "#/components/schemas/Bando"
         "404":
           description: Bando not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Bando not found
         "500":
           description: Error retrieving bando
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Error retrieving bando
-                  error:
-                    type: object
     put:
       summary: Update announcement by ID
-      description: Update an existing bando with new information
+      description: Update an existing bando. Only accessible by Comune.
+      security:
+        - bearerAuth: []
       tags:
         - Bandi
       parameters:
@@ -1580,7 +2405,6 @@ paths:
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the bando
       requestBody:
         required: true
         content:
@@ -1594,41 +2418,15 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Bando"
-        "400":
-          description: Invalid input data
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Invalid input data
         "404":
           description: Bando not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Bando not found
         "500":
           description: Error updating bando
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Error updating bando
-                  error:
-                    type: object
     delete:
       summary: Delete announcement by ID
-      description: Remove an existing bando from the system
+      description: Remove an existing bando. Only accessible by Comune.
+      security:
+        - bearerAuth: []
       tags:
         - Bandi
       parameters:
@@ -1637,47 +2435,33 @@ paths:
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the bando
       responses:
         "200":
           description: Bando deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Bando deleted successfully
         "404":
           description: Bando not found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Bando not found
         "500":
           description: Error deleting bando
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Error deleting bando
-                  error:
-                    type: object
   /api/v1/comune:
     get:
       summary: Get list of comuni
-      description: Retrieve a list of all comuni (municipalities). Returns an array of
-        comune objects with their details.
+      description: >
+        Retrieve a list of all comuni (municipalities). Returns an array of
+        comune objects 
+
+        with their complete details including name, address, contact
+        information, and other 
+
+        administrative data.
+
+
+        **Access Control:**
+
+        - Accessible to all authenticated users
       tags:
         - Comune
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successfully retrieved list of comuni
@@ -1687,8 +2471,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Comune"
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
         "500":
-          description: Error retrieving comuni
+          description: Internal server error while retrieving comuni
           content:
             application/json:
               schema:
@@ -1698,18 +2492,41 @@ paths:
                     type: string
                     example: Errore nel recupero dei comuni
                   error:
-                    type: string
+                    type: object
     post:
       summary: Create a new comune
-      description: Create a new municipality with the provided information
+      description: >
+        Create a new municipality entity with the provided information including
+        administrative 
+
+        details, contact information, and geographic data.
+
+
+        **Access Control:**
+
+        - **Strictly reserved for Comune Admin users only**
+
+
+        Solo un Admin del Comune (o un SuperAdmin se esistesse) può creare
+        l'entità Comune.
       tags:
         - Comune
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/Comune"
+            example:
+              nome: Bolzano
+              indirizzo: Piazza Municipio, 5
+              cap: "39100"
+              provincia: BZ
+              telefono: +39 0471 997111
+              email: info@comune.bolzano.it
+              pec: comune.bolzano@legalmail.it
       responses:
         "201":
           description: Comune created successfully
@@ -1718,7 +2535,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/Comune"
         "400":
-          description: Invalid data or duplicate entry
+          description: Invalid data or duplicate entry - Required fields missing or
+            invalid format
           content:
             application/json:
               schema:
@@ -1727,10 +2545,32 @@ paths:
                   message:
                     type: string
                     example: Dati non validi o duplicati
-                  error:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - Only Comune Admin users can create municipalities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden - Insufficient privileges
         "500":
-          description: Error creating comune
+          description: Internal server error while creating comune
           content:
             application/json:
               schema:
@@ -1740,13 +2580,24 @@ paths:
                     type: string
                     example: Errore nella creazione del comune
                   error:
-                    type: string
+                    type: object
   /api/v1/comune/{id}:
     get:
       summary: Get comune by ID
-      description: Retrieve a single municipality by its unique identifier
+      description: >
+        Retrieve a single municipality by its unique MongoDB ObjectId. Returns
+        complete 
+
+        details about the specific comune.
+
+
+        **Access Control:**
+
+        - Accessible to all authenticated users
       tags:
         - Comune
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -1754,6 +2605,7 @@ paths:
           schema:
             type: string
           description: MongoDB ObjectId of the comune
+          example: 507f1f77bcf86cd799439011
       responses:
         "200":
           description: Successfully retrieved comune
@@ -1761,8 +2613,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Comune"
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
         "404":
-          description: Comune not found
+          description: Comune not found with the specified ID
           content:
             application/json:
               schema:
@@ -1772,7 +2634,7 @@ paths:
                     type: string
                     example: Comune non trovato
         "500":
-          description: Error retrieving comune
+          description: Internal server error while retrieving comune
           content:
             application/json:
               schema:
@@ -1782,25 +2644,48 @@ paths:
                     type: string
                     example: Errore nel recupero del comune
                   error:
-                    type: string
+                    type: object
     put:
       summary: Update comune by ID
-      description: Update an existing municipality with new information
+      description: >
+        Update an existing municipality with new information. Allows
+        modification of administrative 
+
+        details, contact information, and other comune attributes.
+
+
+        **Access Control:**
+
+        - **Strictly reserved for Comune Admin users only**
+
+
+        Solo l'Admin del Comune può modificare i dati dell'ente.
       tags:
         - Comune
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the comune
+          description: MongoDB ObjectId of the comune to update
+          example: 507f1f77bcf86cd799439011
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/Comune"
+            example:
+              nome: Bolzano
+              indirizzo: Piazza Municipio, 5
+              cap: "39100"
+              provincia: BZ
+              telefono: +39 0471 997111
+              email: info@comune.bolzano.it
+              pec: comune.bolzano@legalmail.it
       responses:
         "200":
           description: Comune updated successfully
@@ -1809,7 +2694,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Comune"
         "400":
-          description: Invalid update data
+          description: Invalid update data - Missing required fields or invalid format
           content:
             application/json:
               schema:
@@ -1818,10 +2703,32 @@ paths:
                   message:
                     type: string
                     example: Dati aggiornati non validi
-                  error:
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
                     type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - Only Comune Admin users can update municipalities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden - Insufficient privileges
         "404":
-          description: Comune not found
+          description: Comune not found with the specified ID
           content:
             application/json:
               schema:
@@ -1831,7 +2738,7 @@ paths:
                     type: string
                     example: Comune non trovato
         "500":
-          description: Error updating comune
+          description: Internal server error while updating comune
           content:
             application/json:
               schema:
@@ -1841,19 +2748,37 @@ paths:
                     type: string
                     example: Errore nell'aggiornamento del comune
                   error:
-                    type: string
+                    type: object
     delete:
       summary: Delete comune by ID
-      description: Delete a municipality by its unique identifier
+      description: >
+        Delete a municipality by its unique identifier. This operation
+        permanently removes 
+
+        the comune from the system.
+
+
+        **Access Control:**
+
+        - **Strictly reserved for Comune Admin users only**
+
+
+        **Warning:** This operation may have cascading effects on related
+        entities (orti, 
+
+        affidamenti, etc.). Use with caution.
       tags:
         - Comune
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the comune
+          description: MongoDB ObjectId of the comune to delete
+          example: 507f1f77bcf86cd799439011
       responses:
         "200":
           description: Comune deleted successfully
@@ -1865,8 +2790,28 @@ paths:
                   message:
                     type: string
                     example: Comune eliminato con successo
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - Only Comune Admin users can delete municipalities
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden - Insufficient privileges
         "404":
-          description: Comune not found
+          description: Comune not found with the specified ID
           content:
             application/json:
               schema:
@@ -1876,7 +2821,7 @@ paths:
                     type: string
                     example: Comune non trovato
         "500":
-          description: Error deleting comune
+          description: Internal server error while deleting comune
           content:
             application/json:
               schema:
@@ -1886,14 +2831,29 @@ paths:
                     type: string
                     example: Errore durante l'eliminazione
                   error:
-                    type: string
+                    type: object
   /api/v1/lotti:
     get:
       summary: Get list of lotti
-      description: Retrieve a list of all lotti (plots). Returns an array of lotto
-        objects with their details.
+      description: >
+        Retrieve a list of all lotti (plots). Returns an array of lotto objects
+        with their 
+
+        complete details including dimensions, status, sensor information, and
+        associated orto.
+
+
+        **Access Control:**
+
+        - Accessible to **all authenticated users** (Cittadini, Associazioni,
+        Comune)
+
+
+        **Business Rules:** RF6, RF24, RF17 - Tutti devono poter vedere i lotti
       tags:
         - Lotti
+      security:
+        - bearerAuth: []
       responses:
         "200":
           description: Successfully retrieved list of lotti
@@ -1903,8 +2863,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Lotto"
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
         "500":
-          description: Error retrieving lotti
+          description: Internal server error while retrieving lotti
           content:
             application/json:
               schema:
@@ -1917,15 +2887,45 @@ paths:
                     type: object
     post:
       summary: Create a new lotto
-      description: Create a new plot with the provided information
+      description: >
+        Create a new plot configuration with detailed specifications including
+        dimensions, 
+
+        location coordinates, sensor assignments, and associated orto.
+
+
+        **Access Control:**
+
+        - **Strictly reserved for Comune users only**
+
+
+        **Business Rules:** RF16/RF17 - Solo il Comune definisce la struttura
+        degli orti e 
+
+        aggiunge lotti
       tags:
         - Lotti
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/Lotto"
+            example:
+              numero: A1
+              superficie: 50
+              orto: 507f1f77bcf86cd799439011
+              coordinate:
+                lat: 46.4983
+                lng: 11.3548
+              sensori:
+                - tipo: umidita
+                  id: SENS001
+                - tipo: temperatura
+                  id: SENS002
+              stato: disponibile
       responses:
         "201":
           description: Lotto created successfully
@@ -1933,8 +2933,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Lotto"
+        "400":
+          description: Invalid input data - Missing required fields or invalid format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - Only Comune users can create lotti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden - Only Comune can create lotti
         "500":
-          description: Error creating lotto
+          description: Internal server error while creating lotto
           content:
             application/json:
               schema:
@@ -1948,9 +2982,23 @@ paths:
   /api/v1/lotti/{id}:
     get:
       summary: Get lotto by ID
-      description: Retrieve a single plot by its unique identifier
+      description: >
+        Retrieve a single plot by its unique MongoDB ObjectId. Returns detailed
+        information 
+
+        about the specific lotto including its dimensions, location, status,
+        sensors, and 
+
+        associated orto.
+
+
+        **Access Control:**
+
+        - Accessible to all authenticated users
       tags:
         - Lotti
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -1958,6 +3006,7 @@ paths:
           schema:
             type: string
           description: MongoDB ObjectId of the lotto
+          example: 507f1f77bcf86cd799439011
       responses:
         "200":
           description: Successfully retrieved lotto
@@ -1965,8 +3014,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Lotto"
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
         "404":
-          description: Lotto not found
+          description: Lotto not found with the specified ID
           content:
             application/json:
               schema:
@@ -1976,7 +3035,7 @@ paths:
                     type: string
                     example: Lotto not found
         "500":
-          description: Error retrieving lotto
+          description: Internal server error while retrieving lotto
           content:
             application/json:
               schema:
@@ -1989,22 +3048,52 @@ paths:
                     type: object
     put:
       summary: Update lotto by ID
-      description: Update an existing plot with new information
+      description: >
+        Update an existing plot information including dimensions, location
+        coordinates, 
+
+        sensor configurations, status, and other attributes.
+
+
+        **Access Control:**
+
+        - **Strictly reserved for Comune users only**
+
+
+        Solo il Comune può modificare la configurazione dei lotti.
       tags:
         - Lotti
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the lotto
+          description: MongoDB ObjectId of the lotto to update
+          example: 507f1f77bcf86cd799439011
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/Lotto"
+            example:
+              numero: A1
+              superficie: 55
+              orto: 507f1f77bcf86cd799439011
+              coordinate:
+                lat: 46.4983
+                lng: 11.3548
+              sensori:
+                - tipo: umidita
+                  id: SENS001
+                - tipo: temperatura
+                  id: SENS002
+                - tipo: ph
+                  id: SENS003
+              stato: occupato
       responses:
         "200":
           description: Lotto updated successfully
@@ -2012,8 +3101,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Lotto"
+        "400":
+          description: Invalid input data - Missing required fields or invalid format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid input data
+                  errors:
+                    type: array
+                    items:
+                      type: string
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - Only Comune users can update lotti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
         "404":
-          description: Lotto not found
+          description: Lotto not found with the specified ID
           content:
             application/json:
               schema:
@@ -2023,7 +3146,7 @@ paths:
                     type: string
                     example: Lotto not found
         "500":
-          description: Error updating lotto
+          description: Internal server error while updating lotto
           content:
             application/json:
               schema:
@@ -2036,16 +3159,37 @@ paths:
                     type: object
     delete:
       summary: Delete lotto by ID
-      description: Delete a plot by its unique identifier
+      description: >
+        Delete a plot by its unique identifier. This operation permanently
+        removes the lotto 
+
+        from the system.
+
+
+        **Access Control:**
+
+        - **Strictly reserved for Comune users only**
+
+
+        **Business Rule:** RF17.3 - Il Comune può rimuovere lotti
+
+
+        **Warning:** This operation may affect related entities (assignments,
+        sensor data, etc.). 
+
+        Ensure the lotto is not currently assigned before deletion.
       tags:
         - Lotti
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: MongoDB ObjectId of the lotto
+          description: MongoDB ObjectId of the lotto to delete
+          example: 507f1f77bcf86cd799439011
       responses:
         "200":
           description: Lotto deleted successfully
@@ -2057,8 +3201,28 @@ paths:
                   message:
                     type: string
                     example: Lotto deleted successfully
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "403":
+          description: Forbidden - Only Comune users can delete lotti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Forbidden
         "404":
-          description: Lotto not found
+          description: Lotto not found with the specified ID
           content:
             application/json:
               schema:
@@ -2068,7 +3232,7 @@ paths:
                     type: string
                     example: Lotto not found
         "500":
-          description: Error deleting lotto
+          description: Internal server error while deleting lotto
           content:
             application/json:
               schema:
@@ -2180,7 +3344,10 @@ paths:
                     type: object
     post:
       summary: Create a new orto
-      description: Create a new green garden with the provided information
+      description: Create a new green garden with the provided information. Only
+        accessible by municipality users.
+      security:
+        - bearerAuth: []
       tags:
         - Orti
       requestBody:
@@ -2196,6 +3363,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Orto"
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only municipality users can create orti
         "500":
           description: Error creating orto
           content:
@@ -2206,6 +3377,128 @@ paths:
                   message:
                     type: string
                     example: Error creating orto
+                  error:
+                    type: object
+  /api/v1/orti/search:
+    get:
+      summary: Search green gardens with filters
+      description: Search for orti based on geographic location, plot size, and sensor
+        availability
+      tags:
+        - Orti
+      parameters:
+        - in: query
+          name: longitude
+          schema:
+            type: number
+            format: float
+          description: Longitude for geographic search (requires latitude and radius)
+          example: 11.3426
+        - in: query
+          name: latitude
+          schema:
+            type: number
+            format: float
+          description: Latitude for geographic search (requires longitude and radius)
+          example: 44.4949
+        - in: query
+          name: radius
+          schema:
+            type: number
+            format: float
+          description: Search radius in meters from the given coordinates
+          example: 5000
+        - in: query
+          name: minSize
+          schema:
+            type: number
+            format: float
+          description: Minimum plot size (dimensione) in square meters
+          example: 50
+        - in: query
+          name: maxSize
+          schema:
+            type: number
+            format: float
+          description: Maximum plot size (dimensione) in square meters
+          example: 200
+        - in: query
+          name: hasSensors
+          schema:
+            type: boolean
+          description: Filter orti that have plots with sensors
+          example: true
+      responses:
+        "200":
+          description: Successfully retrieved filtered orti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                    description: Number of orti found
+                  filters:
+                    type: object
+                    description: Applied filters
+                    properties:
+                      longitude:
+                        type: number
+                      latitude:
+                        type: number
+                      radius:
+                        type: number
+                      minSize:
+                        type: number
+                      maxSize:
+                        type: number
+                      hasSensors:
+                        type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        nome:
+                          type: string
+                        indirizzo:
+                          type: string
+                        geometry:
+                          type: object
+                        lotti:
+                          type: array
+                        distance:
+                          type: number
+                          description: Distance in meters (only if geographic search is used)
+                        lottiCount:
+                          type: integer
+                          description: Total number of plots
+                        matchingLottiCount:
+                          type: integer
+                          description: Number of plots matching the filter criteria
+        "400":
+          description: Invalid parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid coordinates
+        "500":
+          description: Error searching orti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error searching ortos
                   error:
                     type: object
   /api/v1/orti/{id}:
@@ -2252,7 +3545,10 @@ paths:
                     type: object
     put:
       summary: Update orto by ID
-      description: Update an existing green garden with new information
+      description: Update an existing green garden with new information. Only
+        accessible by municipality users.
+      security:
+        - bearerAuth: []
       tags:
         - Orti
       parameters:
@@ -2275,6 +3571,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Orto"
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only municipality users can update orti
         "404":
           description: Orto not found
           content:
@@ -2299,7 +3599,10 @@ paths:
                     type: object
     delete:
       summary: Delete orto by ID
-      description: Delete a green garden by its unique identifier
+      description: Delete a green garden by its unique identifier. Only accessible by
+        municipality users.
+      security:
+        - bearerAuth: []
       tags:
         - Orti
       parameters:
@@ -2320,6 +3623,10 @@ paths:
                   message:
                     type: string
                     example: Orto deleted successfully
+        "401":
+          description: Unauthorized - No token provided
+        "403":
+          description: Forbidden - Only municipality users can delete orti
         "404":
           description: Orto not found
           content:
@@ -2414,6 +3721,159 @@ paths:
                   error:
                     type: object
   /api/v1/utenti:
+    post:
+      summary: Create a new user
+      description: Register a new user in the system. Password is hashed before
+        storage. No authentication required for this endpoint.
+      tags:
+        - Utenti
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nome
+                - cognome
+                - codicefiscale
+                - email
+                - password
+                - indirizzo
+                - telefono
+              properties:
+                nome:
+                  type: string
+                  description: User's first name
+                  example: Paolo
+                cognome:
+                  type: string
+                  description: User's last name
+                  example: Rossi
+                codicefiscale:
+                  type: string
+                  description: Tax ID (validated for EU countries)
+                  example: RSSMRA80A01H501U
+                email:
+                  type: string
+                  format: email
+                  description: User's email (must be unique)
+                  example: paolo.rossi@rossi.it
+                password:
+                  type: string
+                  description: User's password (will be hashed)
+                  example: securePassword123
+                indirizzo:
+                  type: string
+                  description: User's address
+                  example: Via Roma 10, Trento
+                telefono:
+                  type: string
+                  description: Mobile phone number (validated)
+                  example: 393331234567
+                tipo:
+                  type: string
+                  enum:
+                    - citt
+                    - asso
+                    - comu
+                  description: User type (citt=citizen, asso=association, comu=municipality)
+                  default: citt
+                  example: citt
+                associazione:
+                  type: string
+                  description: Associazione ObjectId (required if tipo=asso)
+                  example: 507f1f77bcf86cd799439014
+                comune:
+                  type: string
+                  description: Comune ObjectId (required if tipo=comu)
+                  example: 507f1f77bcf86cd799439015
+                admin:
+                  type: boolean
+                  description: Admin flag (required if tipo != citt)
+                  default: false
+                  example: false
+            examples:
+              citizen:
+                summary: Create a citizen user
+                value:
+                  nome: Paolo
+                  cognome: Rossi
+                  codicefiscale: RSSMRA80A01H501U
+                  email: paolo.rossi@rossi.it
+                  password: securePassword123
+                  indirizzo: Via Roma 10, Trento
+                  telefono: 393331234567
+                  tipo: citt
+              association:
+                summary: Create an association user
+                value:
+                  nome: Mario
+                  cognome: Verdi
+                  codicefiscale: VRDMRA75B15H501T
+                  email: mario.verdi@ortitrento.it
+                  password: securePassword123
+                  indirizzo: Via delle Associazioni 45, Trento
+                  telefono: 393331234568
+                  tipo: asso
+                  associazione: 507f1f77bcf86cd799439014
+                  admin: true
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Utente creato con successo
+                  utente:
+                    $ref: "#/components/schemas/Utente"
+                  self:
+                    type: string
+                    description: Link to created user resource
+                    example: /api/v1/utenti/693bfed09c0ff8cb58ab35fe
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore di validazione
+                  errors:
+                    type: array
+                    items:
+                      type: string
+                    example:
+                      - PLRS12345678lmnn non è un codice fiscale valido per
+                        nessun paese dell'UE
+        "409":
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Utente già esistente con questa email
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Errore nella creazione dell'utente
+                  error:
+                    type: string
     get:
       summary: Get list of users
       description: Retrieve a list of all users (utenti). Returns an array of utente

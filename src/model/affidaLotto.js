@@ -30,13 +30,23 @@ const affidaLotto = new Schema({
         ref: "Utente",
         required: true
     },
+    data_richiesta: {
+        type: Date,
+        default: Date.now,
+        required: true
+    },
+    stato: {
+        type: String,
+        enum: ["pending", "accepted", "rejected"],
+        default: "pending"
+    },
     data_inizio: {  
         type: Date,
-        required: true
+        required: false
     },  
     data_fine: {  
         type: Date,
-        required: true
+        required: false
     },
     colture:[String] // possible future implementation of a list of colture planted by the user
 
