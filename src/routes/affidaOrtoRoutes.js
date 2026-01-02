@@ -64,7 +64,7 @@ const checkRole = require('../util/checkRole');
  */
 router.get("/", 
     checkToken, 
-    checkRole(['comu', 'asso']), 
+    checkRole(['comu', 'asso','citt']), 
     affidaOrtoController.getAllAffidaOrti
 );
 
@@ -129,7 +129,7 @@ router.get("/",
  */
 router.get("/active", 
     checkToken, 
-    checkRole(['comu', 'asso']), 
+    checkRole(['comu', 'asso','citt']), 
     affidaOrtoController.getActiveAffidaOrti
 );
 

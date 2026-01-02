@@ -86,7 +86,7 @@ router.get(
 router.get(
   "/attivi",
   checkToken,
-  checkRole(['comu', 'asso']),
+  checkRole(['comu', 'asso','citt']),
   affidaLottoController.getAffidaLottiAttivi
 );
 
