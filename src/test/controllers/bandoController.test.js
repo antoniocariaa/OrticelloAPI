@@ -14,6 +14,7 @@ jest.mock('../../util/checkToken', () => (req, res, next) => {
 
 // Mock checkRole middleware
 jest.mock('../../util/checkRole', () => (roles) => (req, res, next) => {
+  req.loggedUser = { id: 'testUserId', email: 'test@test.com', tipo: 'comu', admin: false };
   next();
 });
 

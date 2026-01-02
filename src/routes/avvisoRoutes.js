@@ -444,6 +444,7 @@ router.put(
  */
 router.post(
   "/read-status",
+  checkToken,
   avvisoController.getReadStatus
 );
 

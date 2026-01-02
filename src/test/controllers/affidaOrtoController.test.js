@@ -8,9 +8,10 @@ jest.mock('../../model/affidaOrto');
 
 // Mock del middleware di autenticazione
 jest.mock('../../util/checkToken', () => (_req, _res, next) => {
+  _req.loggedUser = { id: 'testUserId', email: 'test@test.com', tipo: 'comu', admin: false };
   next();
 });
-
+  
 describe('AffidaOrtoController', () => {
   beforeEach(() => {
     // Reset dei mock prima di ogni test
