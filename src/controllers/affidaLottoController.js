@@ -34,6 +34,109 @@ exports.getAffidaLottiAttivi = async (req, res) => {
     }
 };
 
+exports.getRichiestePending = async (req, res) => {
+    try {
+        const richiestePending = await AffidaLotto.find({ stato: 'pending' })
+            .populate("lotto")
+            .populate("utente")
+            .sort({ data_richiesta: -1 });
+        
+        res.status(200).json(richiestePending);
+    } catch (error) {
+        logger.error('Error retrieving pending requests', { error: error.message });
+        res.status(500).json({ message: "Errore nel recupero richieste pending", error });
+    }
+};
+
+exports.getStoricoAssegnazioni = async (req, res) => {
+    try {
+        const userType = req.loggedUser.tipo;
+        const userId = req.loggedUser.id || req.loggedUser._id;
+        const now = new Date();
+
+        let query;
+
+        // Se è un'associazione, filtra solo i lotti degli orti gestiti
+        if (userType === 'asso') {
+            const Utente = require('../model/utente');
+            const AffidaOrto = require('../model/affidaOrto');
+            const Orto = require('../model/orto');
+            
+            // Recupera l'utente completo per ottenere l'ID dell'associazione
+            const utente = await Utente.findById(userId);
+            
+            if (!utente || !utente.associazione) {
+                return res.status(400).json({ message: "Utente non associato a nessuna associazione" });
+            }
+
+            const associazioneId = utente.associazione;
+            
+            // Trova gli orti assegnati all'associazione
+            const affidamentiOrti = await AffidaOrto.find({ 
+                associazione: associazioneId 
+            });
+            
+            if (affidamentiOrti.length === 0) {
+                return res.status(200).json([]);
+            }
+            
+            // Estrai gli ID degli orti
+            const ortiIds = affidamentiOrti.map(aff => aff.orto);
+            
+            // Trova tutti i lotti di questi orti
+            const orti = await Orto.find({ _id: { $in: ortiIds } });
+            
+            const lottiIds = [];
+            orti.forEach(orto => {
+                if (orto.lotti && Array.isArray(orto.lotti)) {
+                    lottiIds.push(...orto.lotti);
+                }
+            });
+            
+            if (lottiIds.length === 0) {
+                return res.status(200).json([]);
+            }
+            
+            // Query con $and per combinare correttamente le condizioni
+            query = {
+                $and: [
+                    {
+                        $or: [
+                            { stato: 'rejected' },
+                            { 
+                                stato: 'accepted',
+                                data_fine: { $lt: now }
+                            }
+                        ]
+                    },
+                    { lotto: { $in: lottiIds } }
+                ]
+            };
+        } else {
+            // Per il comune, nessun filtro sui lotti
+            query = {
+                $or: [
+                    { stato: 'rejected' },
+                    { 
+                        stato: 'accepted',
+                        data_fine: { $lt: now }
+                    }
+                ]
+            };
+        }
+
+        const storicoAssegnazioni = await AffidaLotto.find(query)
+            .populate("lotto")
+            .populate("utente")
+            .sort({ data_richiesta: -1 });
+        
+        res.status(200).json(storicoAssegnazioni);
+    } catch (error) {
+        logger.error('Error retrieving historical assignments', { error: error.message, stack: error.stack });
+        res.status(500).json({ message: "Errore nel recupero storico assegnazioni", error: error.message });
+    }
+};
+
 exports.createAffidaLotto = async (req, res) => {
     try {
         const userId = req.loggedUser.id || req.loggedUser._id; 

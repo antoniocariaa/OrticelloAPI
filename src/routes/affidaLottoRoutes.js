@@ -140,6 +140,146 @@ router.get(
 
 /**
  * @swagger
+ * /api/v1/affidaLotti/pending:
+ *   get:
+ *     summary: Get pending lotto assignment requests
+ *     description: |
+ *       Retrieve all lotto assignment requests that are in pending status, awaiting approval
+ *       from associations. Returns a list of requests sorted by request date (most recent first).
+ *       
+ *       **Access Control:**
+ *       - **Comune**: Can view all pending requests across all orti
+ *       - **Associazioni**: Can view pending requests for lotti in their managed orti
+ *       
+ *       **Business Rules:**
+ *       - RF6.3: Citizens request lotto assignments
+ *       - RF18: Associations/Comune approve or reject requests
+ *     tags:
+ *       - AffidaLotti
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved list of pending requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/AffidaLotto'
+ *       401:
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
+ *       403:
+ *         description: Forbidden - User does not have the required role
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
+ *       500:
+ *         description: Internal server error while retrieving pending requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error retrieving pending requests'
+ *                 error:
+ *                   type: object
+ */
+router.get(
+  "/pending",
+  checkToken,
+  checkRole(['comu', 'asso']),
+  affidaLottoController.getRichiestePending
+);
+
+/**
+ * @swagger
+ * /api/v1/affidaLotti/storico:
+ *   get:
+ *     summary: Get historical lotto assignments (accepted and rejected)
+ *     description: |
+ *       Retrieve the history of lotto assignments that have been accepted or rejected.
+ *       
+ *       **Access Control and Filtering:**
+ *       - **Comune**: Can view all historical assignments across all orti
+ *       - **Associazioni**: Can view only assignments for lotti within their managed orti
+ *       
+ *       Returns assignments with status 'accepted' or 'rejected', sorted by request date
+ *       (most recent first). Useful for viewing past decisions and assignment history.
+ *       
+ *       **Business Rules:**
+ *       - Shows completed request workflow (approved or rejected)
+ *       - Filtered by association's managed orti for transparency
+ *     tags:
+ *       - AffidaLotti
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved historical assignments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/AffidaLotto'
+ *       401:
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
+ *       403:
+ *         description: Forbidden - User does not have the required role
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
+ *       500:
+ *         description: Internal server error while retrieving historical assignments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error retrieving historical assignments'
+ *                 error:
+ *                   type: object
+ */
+router.get(
+  "/storico",
+  checkToken,
+  checkRole(['comu', 'asso']),
+  affidaLottoController.getStoricoAssegnazioni
+);
+
+/**
+ * @swagger
  * /api/v1/affidaLotti/{id}:
  *   get:
  *     summary: Get lotto assignment by ID
