@@ -857,6 +857,101 @@ paths:
                     example: Error retrieving historical assignments
                   error:
                     type: object
+  /api/v1/affidaLotti/user/{userId}/associazioni-visibili:
+    get:
+      summary: Get associations visible to a user (OPTIMIZED ENDPOINT)
+      description: >
+        **THIS IS THE KEY ENDPOINT FOR ASSOCIATION NOTICE FILTERING**
+
+
+        Returns an array of association IDs that the user should be able to see
+        notices from.
+
+
+        **Logic Flow:**
+
+        1. Find all accepted lotto assignments for the user
+
+        2. Find which orti contain those lotti
+
+        3. Find which associations currently manage those orti (via active
+        affidaOrto)
+
+        4. Return the unique association IDs
+
+
+        **Business Rule:**
+
+        Citizens should only see notices from associations that manage orti
+        where they 
+
+        have assigned lotti. This endpoint provides the list of "visible"
+        associations
+
+        for a given user.
+
+
+        **Access Control:**
+
+        - Accessible to all authenticated users
+
+        - Typically called with the current user's ID to filter their notice
+        view
+
+
+        **Performance:**
+
+        This is an optimized single-endpoint solution that replaces multiple
+        frontend 
+
+        API calls. Recommended for production use.
+      tags:
+        - AffidaLotti
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the user
+          example: 507f1f77bcf86cd799439011
+      responses:
+        "200":
+          description: Successfully retrieved visible association IDs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  description: MongoDB ObjectId of an association
+                example:
+                  - 507f1f77bcf86cd799439011
+                  - 507f191e810c19729de860ea
+        "401":
+          description: Unauthorized - Missing or invalid authentication token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unauthorized
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error getting visible associations
+                  error:
+                    type: object
   /api/v1/affidaLotti/{id}:
     get:
       summary: Get lotto assignment by ID

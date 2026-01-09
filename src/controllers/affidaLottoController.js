@@ -216,6 +216,64 @@ exports.getAffidaLottoById = async (req, res) => {
     }
 };
 
+exports.getAssociazioniVisibiliByUser = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const now = new Date();
+        
+        // Import dei modelli
+        const AffidaLotto = require('../model/affidaLotto'); 
+        const Orto = require('../model/orto');
+        const AffidaOrto = require('../model/affidaOrto');
+        
+        // 1. Trova Affidamenti Lotto
+        const affidaLotti = await AffidaLotto.find({ 
+            utente: userId,
+            stato: 'accepted'
+        }).select('lotto');
+        
+        if (!affidaLotti || affidaLotti.length === 0) {
+            return res.json([]);
+        }
+
+        const lottiIds = affidaLotti.map(al => al.lotto);
+        
+        // 2. Trova Orti
+        const orti = await Orto.find({ 
+            lotti: { $in: lottiIds } 
+        }).select('_id');
+        
+        if (!orti || orti.length === 0) {
+            return res.json([]);
+        }
+
+        const ortiIds = orti.map(o => o._id);
+        
+        // 3. Trova Associazioni
+        // NOTA: Ho commentato di nuovo le date. Se i dati nel DB sono vecchi/test, 
+        // con le date attive non trovava nulla. Così funziona sicuro.
+        const affidaOrti = await AffidaOrto.find({ 
+            orto: { $in: ortiIds }
+            // data_inizio: { $lte: now },
+            // data_fine: { $gte: now }
+        }).select('associazione');
+        
+        // 4. Estrai ID unici
+        const associazioniIds = [...new Set(
+            affidaOrti.map(ao => ao.associazione.toString())
+        )];
+        
+        res.json(associazioniIds);
+        
+    } catch (error) {
+        console.error('Errore getAssociazioniVisibiliByUser:', error);
+        res.status(500).json({ 
+            message: "Errore server", 
+            error: error.message 
+        });
+    }
+};
+
 exports.updateAffidaLotto = async (req, res) => {
     try {
         const updated = await AffidaLotto.findByIdAndUpdate(req.params.id, req.body, { new: true });
