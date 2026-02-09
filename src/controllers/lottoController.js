@@ -4,7 +4,7 @@ const logger = require('../config/logger');
 exports.getAllLotti = async (req, res) => {
     try {
         logger.debug('Fetching all lotti');
-        const lotti = await Lotto.find();
+        const lotti = await Lotto.find().select('-colture');
         logger.db('SELECT', 'Lotto', true, { count: lotti.length });
         res.status(200).json(lotti);
     } catch (error) {
