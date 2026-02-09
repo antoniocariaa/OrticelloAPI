@@ -1,5 +1,5 @@
-const Orto  = require('../model/orto');
-const Lotto = require('../model/lotto');
+const Orto = require('../model/garden/orto');
+const Lotto = require('../model/garden/lotto');
 const logger = require('../config/logger');
 
 exports.getAllOrtos = async (req, res) => {
@@ -11,7 +11,7 @@ exports.getAllOrtos = async (req, res) => {
     } catch (error) {
         logger.db('SELECT', 'Orto', false, { error: error.message });
         res.status(500).json({ message: req.t('errors.retrieving_ortos'), error });
-    }   
+    }
 };
 
 exports.createOrto = async (req, res) => {
@@ -24,7 +24,7 @@ exports.createOrto = async (req, res) => {
     } catch (error) {
         logger.db('INSERT', 'Orto', false, { error: error.message, data: req.body });
         res.status(500).json({ message: req.t('errors.creating_orto'), error });
-    }  
+    }
 };
 
 exports.getOrtoById = async (req, res) => {
@@ -40,17 +40,17 @@ exports.getOrtoById = async (req, res) => {
     } catch (error) {
         logger.db('SELECT', 'Orto', false, { error: error.message, id: req.params.id });
         res.status(500).json({ message: req.t('errors.retrieving_orto'), error });
-    }   
+    }
 };
 
 exports.updateOrto = async (req, res) => {
     try {
         logger.debug('Updating orto', { id: req.params.id, data: req.body });
-        const updatedOrto = await Orto.findByIdAndUpdate(req.params.id, req.body, { new: true });    
+        const updatedOrto = await Orto.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedOrto) {
             logger.warn('Orto not found for update', { id: req.params.id });
             return res.status(404).json({ message: req.t('notFound.orto') });
-        }  
+        }
         logger.db('UPDATE', 'Orto', true, { id: req.params.id, nome: updatedOrto.nome });
         res.status(200).json({ message: req.t('success.orto_updated'), data: updatedOrto });
     } catch (error) {
@@ -65,7 +65,7 @@ exports.deleteOrto = async (req, res) => {
         const deletedOrto = await Orto.findByIdAndDelete(req.params.id);
 
         //TO-DO: Verificare se ci sono utenti che possiedono questo orto prima di eliminarlo
-        
+
 
         if (!deletedOrto) {
             logger.warn('Orto not found for deletion', { id: req.params.id });
@@ -76,20 +76,20 @@ exports.deleteOrto = async (req, res) => {
     } catch (error) {
         logger.db('DELETE', 'Orto', false, { error: error.message, id: req.params.id });
         res.status(500).json({ message: req.t('errors.deleting_orto'), error });
-    }               
+    }
 };
 
 exports.searchOrtos = async (req, res) => {
     try {
         const { longitude, latitude, radius, minSize, maxSize, hasSensors } = req.query;
-        
-        logger.debug('Searching ortos with filters', { 
-            longitude, 
-            latitude, 
-            radius, 
-            minSize, 
-            maxSize, 
-            hasSensors 
+
+        logger.debug('Searching ortos with filters', {
+            longitude,
+            latitude,
+            radius,
+            minSize,
+            maxSize,
+            hasSensors
         });
 
         // Build the aggregation pipeline
@@ -105,8 +105,8 @@ exports.searchOrtos = async (req, res) => {
         // If any geographic parameter is provided, all three must be provided
         if (hasAnyGeoParam) {
             if (!hasLongitude || !hasLatitude || !hasRadius) {
-                return res.status(400).json({ 
-                    message: req.t('errors.invalid_coordinates') 
+                return res.status(400).json({
+                    message: req.t('errors.invalid_coordinates')
                 });
             }
 
@@ -115,8 +115,8 @@ exports.searchOrtos = async (req, res) => {
             const rad = parseFloat(radius);
 
             if (isNaN(long) || isNaN(lat) || isNaN(rad)) {
-                return res.status(400).json({ 
-                    message: req.t('errors.invalid_coordinates') 
+                return res.status(400).json({
+                    message: req.t('errors.invalid_coordinates')
                 });
             }
 
@@ -145,7 +145,7 @@ exports.searchOrtos = async (req, res) => {
 
         // 3. Filter by lotto properties
         let lottoMatch = {};
-        
+
         if (minSize !== undefined || maxSize !== undefined || hasSensors !== undefined) {
             // Add a field to check if orto has at least one lotto matching criteria
             pipeline.push({
@@ -191,9 +191,9 @@ exports.searchOrtos = async (req, res) => {
 
         const ortos = await Orto.aggregate(pipeline);
 
-        logger.db('SEARCH', 'Orto', true, { 
-            count: ortos.length, 
-            filters: { longitude, latitude, radius, minSize, maxSize, hasSensors } 
+        logger.db('SEARCH', 'Orto', true, {
+            count: ortos.length,
+            filters: { longitude, latitude, radius, minSize, maxSize, hasSensors }
         });
 
         res.status(200).json({

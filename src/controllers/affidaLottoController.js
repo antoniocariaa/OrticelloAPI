@@ -1,4 +1,4 @@
-const AffidaLotto = require('../model/affidaLotto');
+const AffidaLotto = require('../model/assignment/affidaLotto');
 const logger = require('../config/logger');
 
 exports.getAllAffidaLotti = async (req, res) => {
@@ -17,7 +17,7 @@ exports.getAffidaLottiAttivi = async (req, res) => {
     try {
         const now = new Date();
         const query = {
-            stato: 'accepted',        
+            stato: 'accepted',
             data_inizio: { $lte: now },
             data_fine: { $gte: now }
         };
@@ -26,7 +26,7 @@ exports.getAffidaLottiAttivi = async (req, res) => {
             .populate("lotto")
             .populate("utente")
             .sort({ data_fine: 1 });
-        
+
         res.status(200).json(affidamentiAttivi);
     } catch (error) {
         logger.error('Error retrieving active affida lotti', { error: error.message });
@@ -36,13 +36,13 @@ exports.getAffidaLottiAttivi = async (req, res) => {
 
 exports.createAffidaLotto = async (req, res) => {
     try {
-        const userId = req.loggedUser.id || req.loggedUser._id; 
+        const userId = req.loggedUser.id || req.loggedUser._id;
 
         const payload = {
             ...req.body,
-            utente: userId, 
+            utente: userId,
             data_richiesta: new Date(),
-            stato: 'pending' 
+            stato: 'pending'
         };
 
         const newAffidamento = new AffidaLotto(payload);
@@ -63,7 +63,7 @@ exports.gestisciRichiesta = async (req, res) => {
 
     try {
         const richiesta = await AffidaLotto.findById(id);
-        
+
         if (!richiesta) {
             return res.status(404).json({ message: "Richiesta non trovata" });
         }
@@ -74,19 +74,19 @@ exports.gestisciRichiesta = async (req, res) => {
             dataFine.setFullYear(now.getFullYear() + 1); // Dura 1 anno
 
             // AGGIORNAMENTO STATO E DATE
-            richiesta.stato = 'accepted'; 
+            richiesta.stato = 'accepted';
             richiesta.data_inizio = now;
             richiesta.data_fine = dataFine;
-            
+
             await richiesta.save();
-            
+
             logger.db('UPDATE', 'AffidaLotto', true, { id, action: 'approved' });
             return res.status(200).json({ message: "Richiesta approvata con successo", data: richiesta });
 
         } else if (azione === 'rifiuta') {
             richiesta.stato = 'rejected';
             await richiesta.save();
-            
+
             logger.db('UPDATE', 'AffidaLotto', true, { id, action: 'rejected' });
             return res.status(200).json({ message: "Richiesta rifiutata" });
         } else {

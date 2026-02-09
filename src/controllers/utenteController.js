@@ -1,10 +1,10 @@
-const Utente = require('../model/utente');
+const Utente = require('../model/user/utente');
 const bcrypt = require('bcrypt');
 const logger = require('../config/logger');
 
 exports.getAllUtenti = async (req, res) => {
     try {
-        const utenti = await Utente.find().select('-password'); 
+        const utenti = await Utente.find().select('-password');
         logger.db('SELECT', 'Utente', true, { count: utenti.length });
         res.status(200).json(utenti);
     } catch (error) {
@@ -17,7 +17,7 @@ exports.getUtenteById = async (req, res) => {
     try {
         logger.debug('Fetching utente by ID', { id: req.params.id });
         const utente = await Utente.findById(req.params.id).select('-password');
-        
+
         if (!utente) {
             logger.warn('Utente not found', { id: req.params.id });
             return res.status(404).json({ message: req.t('notFound.utente') });
@@ -49,7 +49,7 @@ exports.createUtente = async (req, res) => {
         // Creazione dell'oggetto base (campi comuni)
         // impostiamo 'citt' come default se il tipo non è specificato
         const userType = tipo || 'citt';
-        
+
         const baseData = {
             nome,
             cognome,
@@ -68,21 +68,21 @@ exports.createUtente = async (req, res) => {
             }
             baseData.associazione = associazione;
             baseData.admin = (admin !== undefined) ? admin : false; // Default false se non specificato
-        } 
+        }
         else if (userType === 'comu') {
             if (!comune) {
                 return res.status(400).json({ message: "Il campo 'comune' è obbligatorio per il tipo 'comu'" });
             }
             baseData.comune = comune;
             baseData.admin = (admin !== undefined) ? admin : false; // Default false se non specificato
-        } 
+        }
 
         // Salvataggio
         const nuovoUtente = new Utente(baseData);
 
         logger.debug('Creating new utente', { email: nuovoUtente.email });
-         const savedUtente = await nuovoUtente.save();
-        
+        const savedUtente = await nuovoUtente.save();
+
         logger.db('INSERT', 'Utente', true, { id: savedUtente._id, email: savedUtente.email });
 
         // Preparazione risposta (rimozione password)
@@ -99,31 +99,31 @@ exports.createUtente = async (req, res) => {
         // Gestione errori di validazione Mongoose
         if (error.name === 'ValidationError') {
             logger.db('INSERT', 'Utente', false, { error: error.message, data: req.body });
-            
+
             // Estrae tutti i messaggi di errore in un array
             const errorMessages = Object.values(error.errors).map(e => e.message);
-            
-            return res.status(400).json({ 
-                message: req.t('errors.validation_error'), 
+
+            return res.status(400).json({
+                message: req.t('errors.validation_error'),
                 errors: errorMessages
             });
         }
-        
+
         // Gestione errori generici
-        logger.error('Error creating utente', error); 
+        logger.error('Error creating utente', error);
         res.status(500).json({ message: req.t('errors.creating_utente'), error: error.message });
     }
 };
 
 exports.updateUtente = async (req, res) => {
-    try{
+    try {
         logger.debug('Updating utente', { id: req.params.id, data: req.body });
         const utenteId = req.params.id;
         const updateData = req.body;
-        
+
         const updatedUtente = await Utente.findByIdAndUpdate(utenteId, updateData, { new: true, runValidators: true }).select('-password');
-        
-        if(!updatedUtente){
+
+        if (!updatedUtente) {
             logger.warn('Utente not found for update', { id: req.params.id });
             return res.status(404).json({ message: req.t('notFound.utente') });
         }
@@ -134,11 +134,11 @@ exports.updateUtente = async (req, res) => {
             utente: updatedUtente
         });
 
-    } catch(error){
+    } catch (error) {
         logger.db('UPDATE', 'Utente', false, { error: error.message, id: req.params.id });
         if (error.name === 'ValidationError') {
-            return res.status(400).json({ 
-                message: req.t('errors.validation_error'), 
+            return res.status(400).json({
+                message: req.t('errors.validation_error'),
                 errors: Object.values(error.errors).map(e => e.message)
             });
         }
@@ -147,12 +147,12 @@ exports.updateUtente = async (req, res) => {
 };
 
 exports.deleteUtente = async (req, res) => {
-    try{
+    try {
         logger.debug('Deleting utente', { id: req.params.id });
         const utenteId = req.params.id;
 
         const utente = await Utente.findById(utenteId);
-        if(!utente){
+        if (!utente) {
             logger.warn('Utente not found for deletion', { id: req.params.id });
             return res.status(404).json({ message: req.t('notFound.utente') });
         }
@@ -161,32 +161,32 @@ exports.deleteUtente = async (req, res) => {
             await Utente.findByIdAndDelete(utenteId);
             logger.db('DELETE', 'Utente', true, { id: req.params.id, email: utente.email });
             return res.status(200).json({ message: req.t('success.utente_deleted') });
-        }else{
+        } else {
             logger.warn('Authentication failed for utente deletion', { id: req.params.id });
             return res.status(401).json({ message: req.t('errors.authentication_error') });
         }
-        
-    } catch(error){
+
+    } catch (error) {
         logger.db('DELETE', 'Utente', false, { error: error.message, id: req.params.id });
         res.status(500).json({ message: req.t('errors.deleting_utente'), error: error.message });
     }
 };
 
 exports.updatePassword = async (req, res) => {
-    try{
+    try {
 
         logger.debug('Updating utente password', { id: req.params.id });
         const utenteId = req.params.id;
         const { oldPassword, newPassword } = req.body;
 
         const utente = await Utente.findById(utenteId);
-        if(!utente){
+        if (!utente) {
             logger.warn('Utente not found for password update', { id: req.params.id });
             return res.status(404).json({ message: req.t('notFound.utente') });
         }
 
         const isMatch = await bcrypt.compare(oldPassword, utente.password);
-        if(!isMatch){
+        if (!isMatch) {
             logger.warn('Old password incorrect for utente password update', { id: req.params.id });
             return res.status(401).json({ message: req.t('validation.old_password_incorrect') });
         }
@@ -198,8 +198,8 @@ exports.updatePassword = async (req, res) => {
         await utente.save();
 
         res.status(200).json({ message: req.t('success.password_updated') });
-    } catch(error){
+    } catch (error) {
         logger.db('UPDATE', 'Utente', false, { error: error.message, id: req.params.id });
         res.status(500).json({ message: req.t('errors.updating_password'), error: error.message });
-    }   
+    }
 }
