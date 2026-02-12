@@ -1,5 +1,5 @@
-const Associazione = require('../model/org/associazione');
-const Utente = require('../model/utente');
+const Associazione = require('../model/organization/associazione');
+const Utente = require('../model/user/utente');
 const logger = require('../config/logger');
 
 exports.getAllAssociazioni = async (req, res) => {
@@ -8,9 +8,9 @@ exports.getAllAssociazioni = async (req, res) => {
         res.status(200).json(associazioni);
     } catch (error) {
         logger.error('Error retrieving associazioni', { error: error.message });
-        res.status(500).json({ 
-            message: req.t('errors.retrieving_associazioni'), 
-            error: error.message 
+        res.status(500).json({
+            message: req.t('errors.retrieving_associazioni'),
+            error: error.message
         });
     }
 };
@@ -18,18 +18,18 @@ exports.getAllAssociazioni = async (req, res) => {
 exports.getAssociazioneById = async (req, res) => {
     try {
         const associazione = await Associazione.findById(req.params.id);
-        
+
         if (!associazione) {
             logger.warn('Associazione not found', { id: req.params.id });
             return res.status(404).json({ message: req.t('notFound.associazione') });
         }
-        
+
         res.status(200).json(associazione);
     } catch (error) {
         logger.error('Error retrieving associazione by ID', { error: error.message, id: req.params.id });
-        res.status(500).json({ 
-            message: req.t('errors.retrieving_associazione'), 
-            error: error.message 
+        res.status(500).json({
+            message: req.t('errors.retrieving_associazione'),
+            error: error.message
         });
     }
 };
@@ -44,15 +44,15 @@ exports.createAssociazione = async (req, res) => {
     } catch (error) {
         if (error.name === 'ValidationError' || error.code === 11000) {
             logger.db('INSERT', 'Associazione', false, { error: error.message, data: req.body });
-            return res.status(400).json({ 
-                message: req.t('validation.invalid_duplicate_data'), 
-                error: error.message 
+            return res.status(400).json({
+                message: req.t('validation.invalid_duplicate_data'),
+                error: error.message
             });
         }
         logger.error('Error creating associazione', { error: error.message, data: req.body });
-        res.status(500).json({ 
-            message: req.t('errors.creating_associazione'), 
-            error: error.message 
+        res.status(500).json({
+            message: req.t('errors.creating_associazione'),
+            error: error.message
         });
     }
 };
@@ -60,11 +60,11 @@ exports.createAssociazione = async (req, res) => {
 exports.updateAssociazione = async (req, res) => {
     try {
         const associazioneAggiornata = await Associazione.findByIdAndUpdate(
-            req.params.id, 
-            req.body, 
-            { 
-                new: true,           
-                runValidators: true 
+            req.params.id,
+            req.body,
+            {
+                new: true,
+                runValidators: true
             }
         );
 
@@ -77,15 +77,15 @@ exports.updateAssociazione = async (req, res) => {
     } catch (error) {
         if (error.name === 'ValidationError') {
             logger.db('UPDATE', 'Associazione', false, { error: error.message, id: req.params.id });
-            return res.status(400).json({ 
-                message: req.t('validation.invalid_duplicate_data'), 
-                error: error.message 
+            return res.status(400).json({
+                message: req.t('validation.invalid_duplicate_data'),
+                error: error.message
             });
         }
         logger.error('Error updating associazione', { error: error.message, id: req.params.id });
-        res.status(500).json({ 
-            message: req.t('errors.updating_associazione'), 
-            error: error.message 
+        res.status(500).json({
+            message: req.t('errors.updating_associazione'),
+            error: error.message
         });
     }
 };
@@ -103,9 +103,9 @@ exports.deleteAssociazione = async (req, res) => {
         res.status(200).json({ message: req.t('success.associazione_deleted') });
     } catch (error) {
         logger.error('Error deleting associazione', { error: error.message, id: req.params.id });
-        res.status(500).json({ 
-            message: req.t('errors.deleting_associazione'), 
-            error: error.message 
+        res.status(500).json({
+            message: req.t('errors.deleting_associazione'),
+            error: error.message
         });
     }
 };
@@ -132,8 +132,8 @@ exports.addMember = async (req, res) => {
         // Verifica che l'utente non sia già associato
         if (utente.associazione && utente.associazione.toString() === associazioneId) {
             logger.warn('Utente already member of associazione', { utenteId, associazioneId });
-            return res.status(400).json({ 
-                message: req.t('validation.member_already_exists') 
+            return res.status(400).json({
+                message: req.t('validation.member_already_exists')
             });
         }
 
@@ -142,14 +142,14 @@ exports.addMember = async (req, res) => {
         utente.associazione = associazioneId;
         await utente.save();
 
-        logger.db('UPDATE', 'Utente', true, { 
-            id: utenteId, 
+        logger.db('UPDATE', 'Utente', true, {
+            id: utenteId,
             associazioneId,
-            action: 'added_to_associazione' 
+            action: 'added_to_associazione'
         });
 
-        res.status(200).json({ 
-            message: req.t('success.member_added'), 
+        res.status(200).json({
+            message: req.t('success.member_added'),
             data: {
                 utente: {
                     id: utente._id,
@@ -166,24 +166,24 @@ exports.addMember = async (req, res) => {
         });
     } catch (error) {
         if (error.name === 'ValidationError') {
-            logger.db('UPDATE', 'Utente', false, { 
-                error: error.message, 
+            logger.db('UPDATE', 'Utente', false, {
+                error: error.message,
                 associazioneId: req.params.id,
                 utenteId: req.body.utenteId
             });
-            return res.status(400).json({ 
-                message: req.t('validation.invalid_duplicate_data'), 
-                error: error.message 
+            return res.status(400).json({
+                message: req.t('validation.invalid_duplicate_data'),
+                error: error.message
             });
         }
-        logger.error('Error adding member to associazione', { 
-            error: error.message, 
+        logger.error('Error adding member to associazione', {
+            error: error.message,
             associazioneId: req.params.id,
-            utenteId: req.body.utenteId 
+            utenteId: req.body.utenteId
         });
-        res.status(500).json({ 
-            message: req.t('errors.adding_member'), 
-            error: error.message 
+        res.status(500).json({
+            message: req.t('errors.adding_member'),
+            error: error.message
         });
     }
 };
@@ -210,8 +210,8 @@ exports.removeMember = async (req, res) => {
         // Verifica che l'utente sia effettivamente membro di questa associazione
         if (!utente.associazione || utente.associazione.toString() !== associazioneId) {
             logger.warn('Utente is not member of this associazione', { utenteId, associazioneId });
-            return res.status(400).json({ 
-                message: req.t('validation.member_not_found') 
+            return res.status(400).json({
+                message: req.t('validation.member_not_found')
             });
         }
 
@@ -221,13 +221,13 @@ exports.removeMember = async (req, res) => {
         utente.admin = false;
         await utente.save();
 
-        logger.db('UPDATE', 'Utente', true, { 
-            id: utenteId, 
+        logger.db('UPDATE', 'Utente', true, {
+            id: utenteId,
             associazioneId,
-            action: 'removed_from_associazione' 
+            action: 'removed_from_associazione'
         });
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: req.t('success.member_removed'),
             data: {
                 utente: {
@@ -240,14 +240,14 @@ exports.removeMember = async (req, res) => {
             }
         });
     } catch (error) {
-        logger.error('Error removing member from associazione', { 
-            error: error.message, 
+        logger.error('Error removing member from associazione', {
+            error: error.message,
             associazioneId: req.params.id,
-            utenteId: req.params.utenteId 
+            utenteId: req.params.utenteId
         });
-        res.status(500).json({ 
-            message: req.t('errors.removing_member'), 
-            error: error.message 
+        res.status(500).json({
+            message: req.t('errors.removing_member'),
+            error: error.message
         });
     }
 };
@@ -264,14 +264,14 @@ exports.getMembers = async (req, res) => {
         }
 
         // Trova tutti gli utenti che appartengono a questa associazione
-        const membri = await Utente.find({ 
+        const membri = await Utente.find({
             associazione: associazioneId,
             tipo: 'asso'
         }).select('nome cognome email telefono admin createdAt');
 
-        logger.db('SELECT', 'Utente', true, { 
+        logger.db('SELECT', 'Utente', true, {
             associazioneId,
-            count: membri.length 
+            count: membri.length
         });
 
         res.status(200).json({
@@ -283,13 +283,13 @@ exports.getMembers = async (req, res) => {
             membri
         });
     } catch (error) {
-        logger.error('Error getting members of associazione', { 
-            error: error.message, 
-            associazioneId: req.params.id 
+        logger.error('Error getting members of associazione', {
+            error: error.message,
+            associazioneId: req.params.id
         });
-        res.status(500).json({ 
-            message: req.t('errors.retrieving_members'), 
-            error: error.message 
+        res.status(500).json({
+            message: req.t('errors.retrieving_members'),
+            error: error.message
         });
     }
 };

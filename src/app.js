@@ -4,8 +4,6 @@ var mongoose = require('mongoose');
 var cors = require('cors');
 var swaggerUi = require('swagger-ui-express');
 var { initializeSwagger } = require('./config/swagger');
-var swaggerUi = require('swagger-ui-express');
-var { initializeSwagger } = require('./config/swagger');
 var detectLanguage = require('./util/detectLanguage');
 
 const logger = require('./config/logger');

@@ -9,7 +9,15 @@ const checkRole = require('../util/checkRole');
  * /api/v1/affidaLotti:
  *   get:
  *     summary: Get list of lotto assignments
- *     description: Retrieve a list of all lotto assignments (affidaLotti). Returns an array showing which users have been assigned to which lotti, including assignment dates and optional colture information. Accessible to **Comune** and **Associazioni**.
+ *     description: |
+ *       Retrieve a list of all lotto assignments (affidaLotti). Returns an array showing which 
+ *       users have been assigned to which lotti, including assignment dates and optional colture 
+ *       information.
+ *       
+ *       **Access Control:**
+ *       - **Comune**: Can view all lotto assignments
+ *       - **Associazioni**: Can view assignments within their managed orti
+ *       - **Cittadini**: Can view assignments (for map visualization)
  *     tags:
  *       - AffidaLotti
  *     security:
@@ -24,11 +32,27 @@ const checkRole = require('../util/checkRole');
  *               items:
  *                 $ref: '#/components/schemas/AffidaLotto'
  *       401:
- *         description: Unauthorized - Authentication required (missing or invalid JWT token)
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
  *       403:
- *         description: Forbidden - Insufficient permissions 
+ *         description: Forbidden - User does not have the required role
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
  *       500:
- *         description: Error retrieving affida lotti
+ *         description: Internal server error while retrieving affida lotti
  *         content:
  *           application/json:
  *             schema:
@@ -43,7 +67,7 @@ const checkRole = require('../util/checkRole');
 router.get(
   "/",
   checkToken,
-  checkRole(['comu', 'asso']),
+  checkRole(['comu', 'asso', 'citt']),
   affidaLottoController.getAllAffidaLotti
 );
 
@@ -52,7 +76,15 @@ router.get(
  * /api/v1/affidaLotti/attivi:
  *   get:
  *     summary: Get active lotto assignments
- *     description: Retrieve only lotto assignments that have already started and not yet ended (data_inizio <= now <= data_fine). Results include populated lotto and utente data and are sorted by end date. Accessible to **Comune** and **Associazini**
+ *     description: |
+ *       Retrieve only lotto assignments that have already started and not yet ended 
+ *       (data_inizio <= now <= data_fine). Results include populated lotto and utente data 
+ *       and are sorted by end date. Used to filter occupied lots on the map.
+ *       
+ *       **Access Control:**
+ *       - **Comune**: Can view all active assignments
+ *       - **Associazioni**: Can view active assignments within their managed orti
+ *       - **Cittadini**: Can view active assignments (for map visualization)
  *     tags:
  *       - AffidaLotti
  *     security:
@@ -67,11 +99,27 @@ router.get(
  *               items:
  *                 $ref: '#/components/schemas/AffidaLotto'
  *       401:
- *         description: Unauthorized - Authentication required (missing or invalid JWT token)
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
  *       403:
- *         description: Forbidden - Insufficient permissions 
+ *         description: Forbidden - User does not have the required role
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
  *       500:
- *         description: Error retrieving active affida lotti
+ *         description: Internal server error while retrieving active affida lotti
  *         content:
  *           application/json:
  *             schema:
@@ -86,49 +134,41 @@ router.get(
 router.get(
   "/attivi",
   checkToken,
-  checkRole(['comu', 'asso']),
+  checkRole(['comu', 'asso', 'citt']),
   affidaLottoController.getAffidaLottiAttivi
 );
 
 /**
  * @swagger
- * /api/v1/affidaLotti:
- *   post:
- *     summary: Create a new lotto assignment
- *     description: Create a new assignment of a lotto to a user with start and end dates, and optionally a list of crops. Accessible to authenticated users
+ * /api/v1/affidaLotti/pending:
+ *   get:
+ *     summary: Get pending lotto assignment requests
+ *     description: |
+ *       Retrieve all lotto assignment requests that are in pending status, awaiting approval
+ *       from associations. Returns a list of requests sorted by request date (most recent first).
+ *       
+ *       **Access Control:**
+ *       - **Comune**: Can view all pending requests across all orti
+ *       - **Associazioni**: Can view pending requests for lotti in their managed orti
+ *       
+ *       **Business Rules:**
+ *       - RF6.3: Citizens request lotto assignments
+ *       - RF18: Associations/Comune approve or reject requests
  *     tags:
  *       - AffidaLotti
  *     security:
  *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/AffidaLotto'
  *     responses:
- *       201:
- *         description: AffidaLotto created successfully
+ *       200:
+ *         description: Successfully retrieved list of pending requests
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/AffidaLotto'
- *       400:
- *         description: Invalid input data
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'Invalid input data'
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/AffidaLotto'
  *       401:
- *         description: Unauthorized - Authentication required (missing or invalid JWT token)
- *       403:
- *         description: Forbidden - Insufficient permissions 
- *       500:
- *         description: Error creating affida lotto
+ *         description: Unauthorized - Missing or invalid authentication token
  *         content:
  *           application/json:
  *             schema:
@@ -136,17 +176,186 @@ router.get(
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 'Error creating affida lotto'
+ *                   example: 'Unauthorized'
+ *       403:
+ *         description: Forbidden - User does not have the required role
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
+ *       500:
+ *         description: Internal server error while retrieving pending requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error retrieving pending requests'
  *                 error:
  *                   type: object
  */
-// RF6.3: Richiesta Cittadino
-// RF18: Assegnazione Comune / Associazione
-router.post(
-  "/",
+router.get(
+  "/pending",
   checkToken,
-  checkRole(['citt', 'asso', 'comu']),
-  affidaLottoController.createAffidaLotto
+  checkRole(['comu', 'asso']),
+  affidaLottoController.getRichiestePending
+);
+
+/**
+ * @swagger
+ * /api/v1/affidaLotti/storico:
+ *   get:
+ *     summary: Get historical lotto assignments (accepted and rejected)
+ *     description: |
+ *       Retrieve the history of lotto assignments that have been accepted or rejected.
+ *       
+ *       **Access Control and Filtering:**
+ *       - **Comune**: Can view all historical assignments across all orti
+ *       - **Associazioni**: Can view only assignments for lotti within their managed orti
+ *       
+ *       Returns assignments with status 'accepted' or 'rejected', sorted by request date
+ *       (most recent first). Useful for viewing past decisions and assignment history.
+ *       
+ *       **Business Rules:**
+ *       - Shows completed request workflow (approved or rejected)
+ *       - Filtered by association's managed orti for transparency
+ *     tags:
+ *       - AffidaLotti
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved historical assignments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/AffidaLotto'
+ *       401:
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
+ *       403:
+ *         description: Forbidden - User does not have the required role
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
+ *       500:
+ *         description: Internal server error while retrieving historical assignments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error retrieving historical assignments'
+ *                 error:
+ *                   type: object
+ */
+router.get(
+  "/storico",
+  checkToken,
+  checkRole(['comu', 'asso']),
+  affidaLottoController.getStoricoAssegnazioni
+);
+
+/**
+ * @swagger
+ * /api/v1/affidaLotti/user/{userId}/associazioni-visibili:
+ *   get:
+ *     summary: Get associations visible to a user (OPTIMIZED ENDPOINT)
+ *     description: |
+ *       **THIS IS THE KEY ENDPOINT FOR ASSOCIATION NOTICE FILTERING**
+ *       
+ *       Returns an array of association IDs that the user should be able to see notices from.
+ *       
+ *       **Logic Flow:**
+ *       1. Find all accepted lotto assignments for the user
+ *       2. Find which orti contain those lotti
+ *       3. Find which associations currently manage those orti (via active affidaOrto)
+ *       4. Return the unique association IDs
+ *       
+ *       **Business Rule:**
+ *       Citizens should only see notices from associations that manage orti where they 
+ *       have assigned lotti. This endpoint provides the list of "visible" associations
+ *       for a given user.
+ *       
+ *       **Access Control:**
+ *       - Accessible to all authenticated users
+ *       - Typically called with the current user's ID to filter their notice view
+ *       
+ *       **Performance:**
+ *       This is an optimized single-endpoint solution that replaces multiple frontend 
+ *       API calls. Recommended for production use.
+ *     tags:
+ *       - AffidaLotti
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB ObjectId of the user
+ *         example: '507f1f77bcf86cd799439011'
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved visible association IDs
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *                 description: MongoDB ObjectId of an association
+ *               example: ['507f1f77bcf86cd799439011', '507f191e810c19729de860ea']
+ *       401:
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error getting visible associations'
+ *                 error:
+ *                   type: object
+ */
+router.get(
+  "/user/:userId/associazioni-visibili",
+  checkToken,
+  affidaLottoController.getAssociazioniVisibiliByUser
 );
 
 /**
@@ -154,7 +363,12 @@ router.post(
  * /api/v1/affidaLotti/{id}:
  *   get:
  *     summary: Get lotto assignment by ID
- *     description: Retrieve a single lotto assignment by its unique identifier
+ *     description: |
+ *       Retrieve a single lotto assignment by its unique MongoDB ObjectId. Returns detailed 
+ *       information including the assigned lotto, user, dates, and crops.
+ *       
+ *       **Access Control:**
+ *       - Accessible to all authenticated users
  *     tags:
  *       - AffidaLotti
  *     security:
@@ -166,6 +380,7 @@ router.post(
  *         schema:
  *           type: string
  *         description: MongoDB ObjectId of the affida lotto
+ *         example: '507f1f77bcf86cd799439011'
  *     responses:
  *       200:
  *         description: Successfully retrieved affida lotto
@@ -174,9 +389,17 @@ router.post(
  *             schema:
  *               $ref: '#/components/schemas/AffidaLotto'
  *       401:
- *         description: Unauthorized - Authentication required (missing or invalid JWT token)
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
  *       404:
- *         description: AffidaLotto not found
+ *         description: AffidaLotto not found with the specified ID
  *         content:
  *           application/json:
  *             schema:
@@ -186,7 +409,7 @@ router.post(
  *                   type: string
  *                   example: 'AffidaLotto not found'
  *       500:
- *         description: Error retrieving affida lotto
+ *         description: Internal server error while retrieving affida lotto
  *         content:
  *           application/json:
  *             schema:
@@ -206,10 +429,113 @@ router.get(
 
 /**
  * @swagger
- * /api/v1/affidaLotti/{id}:
+ * /api/v1/affidaLotti:
+ *   post:
+ *     summary: Create a new lotto assignment request
+ *     description: |
+ *       Create a new lotto assignment or assignment request. The behavior varies based on user role:
+ *       - **Cittadini**: Create a request for a lotto (RF6.3) - dates are optional/pending approval
+ *       - **Comune/Associazioni**: Directly assign a lotto with confirmed dates (RF18)
+ *       
+ *       Optionally includes a list of crops (colture) the user plans to cultivate.
+ *       
+ *       **Business Rules:**
+ *       - RF6.3: Richiesta Cittadino
+ *       - RF18: Assegnazione diretta Comune/Associazione
+ *     tags:
+ *       - AffidaLotti
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AffidaLotto'
+ *           example:
+ *             lotto: '507f1f77bcf86cd799439011'
+ *             utente: '507f191e810c19729de860ea'
+ *             data_inizio: '2024-03-01'
+ *             data_fine: '2024-12-31'
+ *             colture: ['Pomodori', 'Zucchine', 'Basilico']
+ *     responses:
+ *       201:
+ *         description: AffidaLotto created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AffidaLotto'
+ *       400:
+ *         description: Invalid input data - Missing required fields or invalid format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Invalid input data'
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *       401:
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
+ *       403:
+ *         description: Forbidden - User does not have the required role
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
+ *       500:
+ *         description: Internal server error while creating affida lotto
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error creating affida lotto'
+ *                 error:
+ *                   type: object
+ */
+router.post(
+  "/",
+  checkToken,
+  checkRole(['citt', 'asso', 'comu']),
+  affidaLottoController.createAffidaLotto
+);
+
+/**
+ * @swagger
+ * /api/v1/affidaLotti/{id}/gestisci:
  *   put:
- *     summary: Update lotto assignment by ID
- *     description: Update an existing lotto assignment with new information (dates, colture, etc.). Used by **Comune** and **Associazioni**
+ *     summary: Approve or reject a lotto assignment request
+ *     description: |
+ *       Allows **Associazione** or **Comune** to approve or reject a citizen's lotto assignment 
+ *       request.
+ *       
+ *       **Actions:**
+ *       - **accetta**: Approves the request and sets start/end dates, making the assignment active
+ *       - **rifiuta**: Rejects and deletes the request
+ *       
+ *       **Access Control:**
+ *       - **Strictly reserved for Associazioni and Comune users**
+ *       
+ *       This is a fundamental route for the request approval workflow.
  *     tags:
  *       - AffidaLotti
  *     security:
@@ -220,22 +546,36 @@ router.get(
  *         required: true
  *         schema:
  *           type: string
- *         description: MongoDB ObjectId of the affida lotto
+ *         description: MongoDB ObjectId of the affida lotto request
+ *         example: '507f1f77bcf86cd799439011'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/AffidaLotto'
+ *             type: object
+ *             required:
+ *               - azione
+ *             properties:
+ *               azione:
+ *                 type: string
+ *                 enum: [accetta, rifiuta]
+ *                 description: Action to perform on the request
+ *               data_inizio:
+ *                 type: string
+ *                 format: date
+ *                 description: Start date (required if azione is 'accetta')
+ *               data_fine:
+ *                 type: string
+ *                 format: date
+ *                 description: End date (required if azione is 'accetta')
+ *           example:
+ *             azione: 'accetta'
+ *             data_inizio: '2024-03-01'
+ *             data_fine: '2024-12-31'
  *     responses:
  *       200:
- *         description: AffidaLotto updated successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/AffidaLotto'
- *       404:
- *         description: AffidaLotto not found
+ *         description: Request processed successfully
  *         content:
  *           application/json:
  *             schema:
@@ -243,9 +583,113 @@ router.get(
  *               properties:
  *                 message:
  *                   type: string
- *                   example: 'AffidaLotto not found'
+ *                   example: 'Richiesta accettata con successo'
+ *                 affidaLotto:
+ *                   $ref: '#/components/schemas/AffidaLotto'
  *       400:
- *         description: Invalid input data
+ *         description: Invalid action or missing required fields
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Azione non valida o dati mancanti'
+ *       401:
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
+ *       403:
+ *         description: Forbidden - Only Associazioni and Comune can manage requests
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
+ *       404:
+ *         description: AffidaLotto request not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Richiesta non trovata'
+ *       500:
+ *         description: Internal server error while processing request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Errore nella gestione della richiesta'
+ *                 error:
+ *                   type: object
+ */
+router.put(
+  "/:id/gestisci",
+  checkToken,
+  checkRole(['asso', 'comu']),
+  affidaLottoController.gestisciRichiesta
+);
+
+/**
+ * @swagger
+ * /api/v1/affidaLotti/{id}:
+ *   put:
+ *     summary: Update lotto assignment by ID
+ *     description: |
+ *       Update an existing lotto assignment with new information such as dates, notes, or 
+ *       other attributes. Generic update endpoint for assignment modifications.
+ *       
+ *       **Access Control:**
+ *       - **Strictly reserved for Associazioni and Comune users**
+ *       
+ *       **Business Rule:** RF25 - Modifica/approvazione affido
+ *     tags:
+ *       - AffidaLotti
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: MongoDB ObjectId of the affida lotto to update
+ *         example: '507f1f77bcf86cd799439011'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/AffidaLotto'
+ *           example:
+ *             data_inizio: '2024-03-15'
+ *             data_fine: '2025-03-14'
+ *             note: 'Estensione periodo di assegnazione'
+ *     responses:
+ *       200:
+ *         description: AffidaLotto updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AffidaLotto'
+ *       400:
+ *         description: Invalid input data - Missing required fields or invalid format
  *         content:
  *           application/json:
  *             schema:
@@ -254,12 +698,42 @@ router.get(
  *                 message:
  *                   type: string
  *                   example: 'Invalid input data'
+ *                 errors:
+ *                   type: array
+ *                   items:
+ *                     type: string
  *       401:
- *         description: Unauthorized - Authentication required (missing or invalid JWT token)
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
  *       403:
- *         description: Forbidden - Insufficient permissions 
+ *         description: Forbidden - Only Associazioni and Comune can update assignments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
+ *       404:
+ *         description: AffidaLotto not found with the specified ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'AffidaLotto not found'
  *       500:
- *         description: Error updating affida lotto
+ *         description: Internal server error while updating affida lotto
  *         content:
  *           application/json:
  *             schema:
@@ -271,7 +745,6 @@ router.get(
  *                 error:
  *                   type: object
  */
-// RF25: Modifica / approvazione affido
 router.put(
   "/:id",
   checkToken,
@@ -284,7 +757,15 @@ router.put(
  * /api/v1/affidaLotti/{id}:
  *   delete:
  *     summary: Delete lotto assignment by ID
- *     description: Remove an existing lotto assignment from the system. Accessible ony to **Comune** and **Associazioni**
+ *     description: |
+ *       Remove an existing lotto assignment from the system. This permanently deletes the 
+ *       assignment record.
+ *       
+ *       **Access Control:**
+ *       - **Strictly reserved for Associazioni and Comune users**
+ *       
+ *       **Warning:** This operation cannot be undone. Consider the impact on historical 
+ *       records and user assignments.
  *     tags:
  *       - AffidaLotti
  *     security:
@@ -295,7 +776,8 @@ router.put(
  *         required: true
  *         schema:
  *           type: string
- *         description: MongoDB ObjectId of the affida lotto
+ *         description: MongoDB ObjectId of the affida lotto to delete
+ *         example: '507f1f77bcf86cd799439011'
  *     responses:
  *       200:
  *         description: AffidaLotto deleted successfully
@@ -308,11 +790,27 @@ router.put(
  *                   type: string
  *                   example: 'AffidaLotto deleted successfully'
  *       401:
- *         description: Unauthorized - Authentication required (missing or invalid JWT token)
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
  *       403:
- *         description: Forbidden - Insufficient permissions 
+ *         description: Forbidden - Only Associazioni and Comune can delete assignments
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
  *       404:
- *         description: AffidaLotto not found
+ *         description: AffidaLotto not found with the specified ID
  *         content:
  *           application/json:
  *             schema:
@@ -322,7 +820,7 @@ router.put(
  *                   type: string
  *                   example: 'AffidaLotto not found'
  *       500:
- *         description: Error deleting affida lotto
+ *         description: Internal server error while deleting affida lotto
  *         content:
  *           application/json:
  *             schema:
@@ -341,13 +839,17 @@ router.delete(
   affidaLottoController.deleteAffidaLotto
 );
 
-// --- NUOVE ROTTE ---
 /**
  * @swagger
  * /api/v1/affidaLotti/{id}/colture:
  *   post:
  *     summary: Add a crop to lotto assignment
- *     description: Add a new crop (coltura) to the list of crops for a specific lotto assignment. Accessible only to the **Cittadino** owning the assignment
+ *     description: |
+ *       Add a new crop (coltura) to the list of crops for a specific lotto assignment. 
+ *       This allows citizens to track what they're growing on their assigned plot.
+ *       
+ *       **Access Control:**
+ *       - **Strictly reserved for Cittadini** - Only the owner of the assignment can add crops
  *     tags:
  *       - AffidaLotti
  *     security:
@@ -359,12 +861,15 @@ router.delete(
  *         schema:
  *           type: string
  *         description: MongoDB ObjectId of the affida lotto
+ *         example: '507f1f77bcf86cd799439011'
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - coltura
  *             properties:
  *               coltura:
  *                 type: string
@@ -377,18 +882,8 @@ router.delete(
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/AffidaLotto'
- *       404:
- *         description: AffidaLotto not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: 'AffidaLotto not found'
  *       400:
- *         description: Invalid input data
+ *         description: Invalid input data - Coltura name is required
  *         content:
  *           application/json:
  *             schema:
@@ -398,11 +893,37 @@ router.delete(
  *                   type: string
  *                   example: 'Coltura name is required'
  *       401:
- *         description: Unauthorized - Authentication required (missing or invalid JWT token)
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
  *       403:
- *         description: Forbidden - Insufficient permissions 
+ *         description: Forbidden - Only the assignment owner can add crops
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
+ *       404:
+ *         description: AffidaLotto not found with the specified ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'AffidaLotto not found'
  *       500:
- *         description: Error adding coltura
+ *         description: Internal server error while adding coltura
  *         content:
  *           application/json:
  *             schema:
@@ -426,7 +947,12 @@ router.post(
  * /api/v1/affidaLotti/{id}/colture/{coltura}:
  *   delete:
  *     summary: Remove a crop from lotto assignment
- *     description: Remove a specific crop (coltura) from the list of crops for a lotto assignment
+ *     description: |
+ *       Remove a specific crop (coltura) from the list of crops for a lotto assignment. 
+ *       Useful when a citizen changes what they're growing or harvests a crop.
+ *       
+ *       **Access Control:**
+ *       - **Strictly reserved for Cittadini** - Only the owner of the assignment can remove crops
  *     tags:
  *       - AffidaLotti
  *     security:
@@ -438,12 +964,14 @@ router.post(
  *         schema:
  *           type: string
  *         description: MongoDB ObjectId of the affida lotto
+ *         example: '507f1f77bcf86cd799439011'
  *       - in: path
  *         name: coltura
  *         required: true
  *         schema:
  *           type: string
  *         description: Name of the crop to remove
+ *         example: 'Pomodori'
  *     responses:
  *       200:
  *         description: Coltura removed successfully
@@ -452,11 +980,27 @@ router.post(
  *             schema:
  *               $ref: '#/components/schemas/AffidaLotto'
  *       401:
- *         description: Unauthorized - Authentication required (missing or invalid JWT token)
+ *         description: Unauthorized - Missing or invalid authentication token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Unauthorized'
  *       403:
- *         description: Forbidden - Insufficient permissions 
+ *         description: Forbidden - Only the assignment owner can remove crops
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Forbidden'
  *       404:
- *         description: AffidaLotto not found or coltura not found
+ *         description: AffidaLotto not found or coltura not found in the assignment
  *         content:
  *           application/json:
  *             schema:
@@ -466,7 +1010,7 @@ router.post(
  *                   type: string
  *                   example: 'AffidaLotto not found or coltura not found'
  *       500:
- *         description: Error removing coltura
+ *         description: Internal server error while removing coltura
  *         content:
  *           application/json:
  *             schema:

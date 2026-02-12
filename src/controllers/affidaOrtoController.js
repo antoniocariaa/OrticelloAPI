@@ -1,4 +1,4 @@
-const AffidaOrto = require('../model/affidaOrto');
+const AffidaOrto = require('../model/assignment/affidaOrto');
 const logger = require('../config/logger');
 
 exports.getAllAffidaOrti = async (req, res) => {

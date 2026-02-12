@@ -1,4 +1,4 @@
-const bando = require('../model/news/bando');
+const bando = require('../model/announcement/bando');
 const logger = require('../config/logger');
 
 exports.getAllBandi = async (req, res) => {
@@ -14,7 +14,7 @@ exports.getAllBandi = async (req, res) => {
 
         // RF26.3: Ordinamento per data di scadenza (i più urgenti prima)
         const bandi = await bando.find(query).sort({ data_fine: 1 });
-        
+
         res.status(200).json(bandi);
     }
     catch (error) {
@@ -26,7 +26,7 @@ exports.getAllBandi = async (req, res) => {
 exports.getBandiAttivi = async (req, res) => {
     try {
         const now = new Date();
-        
+
         // Filtra i bandi che sono già iniziati e non ancora terminati
         const query = {
             data_inizio: { $lte: now },  // Già iniziati
@@ -37,7 +37,7 @@ exports.getBandiAttivi = async (req, res) => {
 
         // Ordinamento per data di scadenza (i più urgenti prima)
         const bandiAttivi = await bando.find(query).sort({ data_fine: 1 });
-        
+
         res.status(200).json(bandiAttivi);
     }
     catch (error) {
@@ -57,7 +57,7 @@ exports.createBando = async (req, res) => {
 
         const newBando = new bando(req.body);
         const savedBando = await newBando.save();
-        
+
         logger.db('INSERT', 'Bando', true, { id: savedBando._id, titolo: savedBando.titolo });
         res.status(201).json({ data: savedBando, message: req.t('success.bando_created') });
     } catch (error) {
@@ -66,7 +66,7 @@ exports.createBando = async (req, res) => {
             logger.warn('Validation error creating bando', { error: error.message });
             return res.status(400).json({ message: req.t('errors.invalid_input'), error: error.message });
         }
-        
+
         logger.error('Error creating bando', { error: error.message, data: req.body });
         res.status(500).json({ message: req.t('errors.creating_bando'), error });
     }

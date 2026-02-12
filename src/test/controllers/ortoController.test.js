@@ -1,10 +1,10 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../../app');
-const Orto = require('../../model/orto');
+const Orto = require('../../model/garden/orto');
 
 // Mock del model Orto
-jest.mock('../../model/orto');
+jest.mock('../../model/garden/orto');
 
 // Mock JWT middleware per bypassare autenticazione nei test
 jest.mock('../../util/checkToken', () => (req, res, next) => {
