@@ -1,10 +1,10 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../../app');
-const Lotto = require('../../model/lotto');
+const Lotto = require('../../model/garden/lotto');
 
 // Mock del model Lotto
-jest.mock('../../model/lotto');
+jest.mock('../../model/garden/lotto');
 
 // Mock del middleware di autenticazione
 jest.mock('../../util/checkToken', () => (req, res, next) => {
@@ -40,7 +40,9 @@ describe('LottoController', () => {
         }
       ];
 
-      Lotto.find.mockResolvedValue(mockLotti);
+      Lotto.find.mockReturnValue({
+        select: jest.fn().mockResolvedValue(mockLotti)
+      });
 
       const response = await request(app)
         .get('/api/v1/lotti')
@@ -52,7 +54,9 @@ describe('LottoController', () => {
 
     test('should return error 500 when database fails', async () => {
       const mockError = new Error('Database connection failed');
-      Lotto.find.mockRejectedValue(mockError);
+      Lotto.find.mockReturnValue({
+        select: jest.fn().mockRejectedValue(mockError)
+      });
 
       const response = await request(app)
         .get('/api/v1/lotti')

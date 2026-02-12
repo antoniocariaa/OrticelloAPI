@@ -1,12 +1,12 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../../app');
-const Avviso = require('../../model/news/avviso');
-const AvvisoLetto = require('../../model/news/avvisoLetto');
+const Avviso = require('../../model/announcement/avviso');
+const AvvisoLetto = require('../../model/announcement/avvisoLetto');
 
 // Mock del model avviso e avvisoLetto
-jest.mock('../../model/news/avviso');
-jest.mock('../../model/news/avvisoLetto');
+jest.mock('../../model/announcement/avviso');
+jest.mock('../../model/announcement/avvisoLetto');
 
 // Mock JWT middleware per bypassare autenticazione nei test
 jest.mock('../../util/checkToken', () => (req, res, next) => {

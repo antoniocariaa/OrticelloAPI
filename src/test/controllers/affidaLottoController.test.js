@@ -1,14 +1,14 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../../app');
-const AffidaLotto = require('../../model/affidaLotto');
+const AffidaLotto = require('../../model/assignment/affidaLotto');
 
 // Mock del model AffidaLotto
-jest.mock('../../model/affidaLotto');
+jest.mock('../../model/assignment/affidaLotto');
 
 // Mock del middleware di autenticazione
 jest.mock('../../util/checkToken', () => (req, res, next) => {
-  req.user = { id: 'testUserId', email: 'test@test.com', ruolo: 'comu' };
+  req.loggedUser = { id: 'testUserId', email: 'test@test.com', ruolo: 'comu' };
   next();
 });
 
@@ -67,7 +67,7 @@ describe('AffidaLottoController', () => {
         .get('/api/v1/affidaLotti')
         .expect(500);
 
-      expect(response.body).toHaveProperty('message', 'Errore nel recupero degli affidamenti dei lotti');
+      expect(response.body).toHaveProperty('message', 'Errore nel recupero degli affidamenti');
       expect(response.body).toHaveProperty('error');
     });
   });
@@ -120,7 +120,7 @@ describe('AffidaLottoController', () => {
         .get('/api/v1/affidaLotti/attivi')
         .expect(500);
 
-      expect(response.body).toHaveProperty('message', 'Errore nel recupero degli affidamenti dei lotti');
+      expect(response.body).toHaveProperty('message', 'Errore nel recupero affidamenti attivi');
       expect(response.body).toHaveProperty('error');
     });
   });
@@ -150,7 +150,7 @@ describe('AffidaLottoController', () => {
         .expect(201);
 
       expect(saveMock).toHaveBeenCalledTimes(1);
-      expect(response.body).toHaveProperty('message', 'Affidamento del lotto creato con successo');
+      expect(response.body).toHaveProperty('message', 'Richiesta inviata con successo');
       expect(response.body).toHaveProperty('data', mockSavedAffidamento);
     });
 
@@ -166,7 +166,7 @@ describe('AffidaLottoController', () => {
         .send({ lotto: '507f1f77bcf86cd799439021' })
         .expect(500);
 
-      expect(response.body).toHaveProperty('message', 'Errore nella creazione dell\'affidamento del lotto');
+      expect(response.body).toHaveProperty('message', 'Errore durante la creazione della richiesta');
       expect(response.body).toHaveProperty('error');
     });
   });
@@ -205,7 +205,7 @@ describe('AffidaLottoController', () => {
         .get('/api/v1/affidaLotti/507f1f77bcf86cd799439011')
         .expect(404);
 
-      expect(response.body).toHaveProperty('message', 'Affidamento del lotto non trovato');
+      expect(response.body).toHaveProperty('message', 'Affidamento non trovato');
     });
 
     test('should return error 500 when retrieval fails', async () => {
@@ -221,7 +221,7 @@ describe('AffidaLottoController', () => {
         .get('/api/v1/affidaLotti/507f1f77bcf86cd799439011')
         .expect(500);
 
-      expect(response.body).toHaveProperty('message', 'Errore nel recupero dell\'affidamento del lotto');
+      expect(response.body).toHaveProperty('message', 'Errore nel recupero dettaglio');
       expect(response.body).toHaveProperty('error');
     });
   });
@@ -248,7 +248,7 @@ describe('AffidaLottoController', () => {
         updateData,
         { new: true }
       );
-      expect(response.body).toHaveProperty('message', 'Affidamento del lotto aggiornato con successo');
+      expect(response.body).toHaveProperty('message', 'Aggiornato con successo');
       expect(response.body).toHaveProperty('data', mockUpdatedAffidamento);
     });
 
@@ -260,7 +260,7 @@ describe('AffidaLottoController', () => {
         .send({ data_fine: '2025-12-31T00:00:00.000Z' })
         .expect(404);
 
-      expect(response.body).toHaveProperty('message', 'Affidamento del lotto non trovato');
+      expect(response.body).toHaveProperty('message', 'Non trovato');
     });
   });
 
@@ -278,7 +278,7 @@ describe('AffidaLottoController', () => {
         .expect(200);
 
       expect(AffidaLotto.findByIdAndDelete).toHaveBeenCalledWith('507f1f77bcf86cd799439011');
-      expect(response.body).toHaveProperty('message', 'Affidamento del lotto eliminato con successo');
+      expect(response.body).toHaveProperty('message', 'Eliminato con successo');
     });
 
     test('should return 404 when affida lotto not found', async () => {
@@ -288,7 +288,7 @@ describe('AffidaLottoController', () => {
         .delete('/api/v1/affidaLotti/507f1f77bcf86cd799439011')
         .expect(404);
 
-      expect(response.body).toHaveProperty('message', 'Affidamento del lotto non trovato');
+      expect(response.body).toHaveProperty('message', 'Non trovato');
     });
   });
 });

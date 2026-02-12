@@ -1,10 +1,10 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../../app');
-const Comune = require('../../model/org/comune');
+const Comune = require('../../model/organization/comune');
 
 // Mock del model Comune
-jest.mock('../../model/org/comune');
+jest.mock('../../model/organization/comune');
 
 // Mock JWT middleware per bypassare autenticazione nei test
 jest.mock('../../util/checkToken', () => (req, res, next) => {
