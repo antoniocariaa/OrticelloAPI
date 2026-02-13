@@ -13,6 +13,18 @@ exports.getAllUtenti = async (req, res) => {
     }
 };
 
+
+exports.getComuneUtenti = async (req, res) => {
+    try {
+        const utenti = await Utente.find({ tipo: 'comu' }).select('-password');
+        logger.db('SELECT', 'Utente', true, { count: utenti.length });
+        res.status(200).json(utenti);
+    } catch (error) {
+        logger.db('SELECT', 'Utente', false, { error: error.message });
+        res.status(500).json({ message: req.t('errors.retrieving_utenti'), error: error.message });
+    }
+};
+
 exports.getUtenteById = async (req, res) => {
     try {
         logger.debug('Fetching utente by ID', { id: req.params.id });
