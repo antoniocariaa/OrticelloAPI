@@ -314,9 +314,12 @@ router.get("/comune", utenteController.getComuneUtenti);
  *                   type: object
  */
 router.get("/:id", utenteController.getUtenteById);
-router.put("/:id", utenteController.updateUtente);
-router.delete("/:id", utenteController.deleteUtente);
 
 router.put("/updatePassword/:id", utenteController.updatePassword);
+router.put("/removeComuneRole/:id", utenteController.removeComuneRole);
+router.put("/addComuneMember", utenteController.addComuneMember);
+
+router.put("/:id", utenteController.updateUtente);
+router.delete("/:id", utenteController.deleteUtente);
 
 module.exports = router;

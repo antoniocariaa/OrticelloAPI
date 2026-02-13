@@ -215,3 +215,88 @@ exports.updatePassword = async (req, res) => {
         res.status(500).json({ message: req.t('errors.updating_password'), error: error.message });
     }
 }
+
+exports.removeComuneRole = async (req, res) => {
+    try {
+        const utenteId = req.params.id;
+        logger.debug('Removing comune role from utente', { id: utenteId });
+
+        const utente = await Utente.findById(utenteId);
+        if (!utente) {
+            logger.warn('Utente not found for role removal', { id: utenteId });
+            return res.status(404).json({ message: req.t('notFound.utente') });
+        }
+
+        if (utente.tipo !== 'comu') {
+            return res.status(400).json({ message: 'L\'utente non è di tipo comune' });
+        }
+
+        await Utente.updateOne(
+            { _id: utenteId },
+            {
+                $set: { tipo: 'citt', admin: false },
+                $unset: { comune: 1 }
+            }
+        );
+
+        const updatedUtente = await Utente.findById(utenteId).select('-password');
+
+        logger.db('UPDATE', 'Utente', true, { id: utenteId, action: 'removeComuneRole' });
+        res.status(200).json({
+            message: req.t('success.comune_role_removed'),
+            utente: updatedUtente
+        });
+    } catch (error) {
+        logger.db('UPDATE', 'Utente', false, { error: error.message, id: req.params.id });
+        res.status(500).json({ message: req.t('errors.updating_utente'), error: error.message });
+    }
+};
+
+exports.addComuneMember = async (req, res) => {
+    try {
+        const { email, admin, comune } = req.body;
+        logger.debug('Adding comune member', { email, admin, comune });
+
+        if (!email) {
+            return res.status(400).json({ message: req.t('validation.required_field') });
+        }
+
+        // Use provided comune or null
+        const comuneId = comune || null;
+
+        const utente = await Utente.findOne({ email });
+        if (!utente) {
+            return res.status(404).json({ message: req.t('notFound.utente') });
+        }
+
+        if (utente.tipo === 'comu') {
+            return res.status(400).json({ message: req.t('members.already_comune') });
+        }
+
+        if (utente.tipo !== 'citt') {
+            return res.status(400).json({ message: req.t('members.not_citizen') });
+        }
+
+        await Utente.updateOne(
+            { _id: utente._id },
+            {
+                $set: {
+                    tipo: 'comu',
+                    comune: comuneId,
+                    admin: admin || false
+                }
+            }
+        );
+
+        const updatedUtente = await Utente.findById(utente._id).select('-password');
+
+        logger.db('UPDATE', 'Utente', true, { id: utente._id, action: 'addComuneMember' });
+        res.status(200).json({
+            message: req.t('success.comune_member_added'),
+            utente: updatedUtente
+        });
+    } catch (error) {
+        logger.db('UPDATE', 'Utente', false, { error: error.message });
+        res.status(500).json({ message: req.t('errors.updating_utente'), error: error.message });
+    }
+};
