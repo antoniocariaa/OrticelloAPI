@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
+var Schema = mongoose.Schema;
 
 /**
  * Represents the assignment of a garden plot ("Lotto") to a user ("Utente").
