@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
+var Schema = mongoose.Schema;
 
 /**
  * Schema for assigning an Orto to an Associazione within a date range.

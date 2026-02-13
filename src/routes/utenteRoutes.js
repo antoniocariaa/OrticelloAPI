@@ -192,6 +192,38 @@ router.get("/", utenteController.getAllUtenti);
 
 /**
  * @swagger
+ * /api/v1/utenti/comune:
+ *   get:
+ *     summary: Get list of users of the same comune
+ *     description: Retrieve a list of all users (utenti) that belong to the same comune as the logged in user.
+ *     tags:
+ *       - Utenti
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved list of utenti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Utente'
+ *       500:
+ *         description: Error retrieving utenti
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: 'Error retrieving utenti'
+ *                 error:
+ *                   type: object
+ */
+router.get("/comune", utenteController.getComuneUtenti);
+
+/**
+ * @swagger
  * /api/v1/utenti/{id}:
  *   get:
  *     summary: Get utente by ID
@@ -282,9 +314,12 @@ router.get("/", utenteController.getAllUtenti);
  *                   type: object
  */
 router.get("/:id", utenteController.getUtenteById);
-router.put("/:id", utenteController.updateUtente);
-router.delete("/:id", utenteController.deleteUtente);
 
 router.put("/updatePassword/:id", utenteController.updatePassword);
+router.put("/removeComuneRole/:id", utenteController.removeComuneRole);
+router.put("/addComuneMember", utenteController.addComuneMember);
+
+router.put("/:id", utenteController.updateUtente);
+router.delete("/:id", utenteController.deleteUtente);
 
 module.exports = router;

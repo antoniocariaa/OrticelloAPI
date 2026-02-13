@@ -58,9 +58,9 @@ exports.getStoricoAssegnazioni = async (req, res) => {
 
         // Se è un'associazione, filtra solo i lotti degli orti gestiti
         if (userType === 'asso') {
-            const Utente = require('../model/utente');
-            const AffidaOrto = require('../model/affidaOrto');
-            const Orto = require('../model/orto');
+            const Utente = require('../model/user/utente');
+            const AffidaOrto = require('../model/assignment/affidaOrto');
+            const Orto = require('../model/garden/orto');
             
             // Recupera l'utente completo per ottenere l'ID dell'associazione
             const utente = await Utente.findById(userId);
@@ -222,9 +222,9 @@ exports.getAssociazioniVisibiliByUser = async (req, res) => {
         const now = new Date();
         
         // Import dei modelli
-        const AffidaLotto = require('../model/affidaLotto'); 
-        const Orto = require('../model/orto');
-        const AffidaOrto = require('../model/affidaOrto');
+        const AffidaLotto = require('../model/assignment/affidaLotto'); 
+        const Orto = require('../model/garden/orto');
+        const AffidaOrto = require('../model/assignment/affidaOrto');
         
         // 1. Trova Affidamenti Lotto
         const affidaLotti = await AffidaLotto.find({ 
