@@ -313,11 +313,15 @@ router.get("/comune", utenteController.getComuneUtenti);
  *                 error:
  *                   type: object
  */
+router.get("/associazione", utenteController.getAssociazioneUtenti);
 router.get("/:id", utenteController.getUtenteById);
 
 router.put("/updatePassword/:id", utenteController.updatePassword);
 router.put("/removeComuneRole/:id", utenteController.removeComuneRole);
 router.put("/addComuneMember", utenteController.addComuneMember);
+
+router.put("/removeAssociazioneRole/:id", utenteController.removeAssociazioneRole);
+router.put("/addAssociazioneMember", utenteController.addAssociazioneMember);
 
 router.put("/:id", utenteController.updateUtente);
 router.delete("/:id", utenteController.deleteUtente);

@@ -94,7 +94,9 @@
     "member_added": "Mitglied erfolgreich hinzugefügt",
     "member_removed": "Mitglied erfolgreich entfernt",
     "coltura_added": "Kulturpflanze erfolgreich hinzugefügt",
-    "coltura_removed": "Kulturpflanze erfolgreich entfernt"
+    "coltura_removed": "Kulturpflanze erfolgreich entfernt",
+    "associazione_role_removed": "Vereinsrolle erfolgreich entfernt",
+    "associazione_member_added": "Vereinsmitglied erfolgreich hinzugefügt"
   },
   "notFound": {
     "orto": "Garten nicht gefunden",
@@ -136,5 +138,9 @@
     "unauthorized": "Unbefugter Zugriff",
     "unauthorized_role": "Zugriff verweigert. Ihre Rolle erlaubt diesen Vorgang nicht.",
     "unauthorized_admin": "Zugriff verweigert. Administratorrechte sind erforderlich."
+  },
+  "members_asso": {
+    "already_asso": "Benutzer ist bereits Vereinsmitglied",
+    "not_citizen": "Benutzer ist kein Bürger und kann nicht hinzugefügt werden"
   }
 }

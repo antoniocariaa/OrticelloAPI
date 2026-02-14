@@ -94,7 +94,9 @@
     "member_added": "Member added successfully",
     "member_removed": "Member removed successfully",
     "coltura_added": "Crop added successfully",
-    "coltura_removed": "Crop removed successfully"
+    "coltura_removed": "Crop removed successfully",
+    "associazione_role_removed": "Association role removed successfully",
+    "associazione_member_added": "Association member added successfully"
   },
   "notFound": {
     "orto": "Garden not found",
@@ -136,5 +138,9 @@
     "unauthorized": "Unauthorized access",
     "unauthorized_role": "Forbidden access. Your role does not permit this operation.",
     "unauthorized_admin": "Forbidden access. Administrator privileges are required."
+  },
+  "members_asso": {
+    "already_asso": "User is already an Association member",
+    "not_citizen": "User is not a Citizen and cannot be added"
   }
 }

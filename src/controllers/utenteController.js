@@ -261,7 +261,6 @@ exports.addComuneMember = async (req, res) => {
             return res.status(400).json({ message: req.t('validation.required_field') });
         }
 
-        // Use provided comune or null
         const comuneId = comune || null;
 
         const utente = await Utente.findOne({ email });
@@ -293,6 +292,103 @@ exports.addComuneMember = async (req, res) => {
         logger.db('UPDATE', 'Utente', true, { id: utente._id, action: 'addComuneMember' });
         res.status(200).json({
             message: req.t('success.comune_member_added'),
+            utente: updatedUtente
+        });
+    } catch (error) {
+        logger.db('UPDATE', 'Utente', false, { error: error.message });
+        res.status(500).json({ message: req.t('errors.updating_utente'), error: error.message });
+    }
+};
+
+exports.getAssociazioneUtenti = async (req, res) => {
+    try {
+        const loggedUser = await Utente.findById(req.loggedUser.id);
+        const associazioneId = loggedUser?.associazione;
+        const utenti = await Utente.find({ tipo: 'asso', associazione: associazioneId }).select('-password');
+        logger.db('SELECT', 'Utente', true, { count: utenti.length });
+        res.status(200).json(utenti);
+    } catch (error) {
+        logger.db('SELECT', 'Utente', false, { error: error.message });
+        res.status(500).json({ message: req.t('errors.retrieving_utenti'), error: error.message });
+    }
+};
+
+exports.removeAssociazioneRole = async (req, res) => {
+    try {
+        const utenteId = req.params.id;
+        logger.debug('Removing associazione role from utente', { id: utenteId });
+
+        const utente = await Utente.findById(utenteId);
+        if (!utente) {
+            logger.warn('Utente not found for role removal', { id: utenteId });
+            return res.status(404).json({ message: req.t('notFound.utente') });
+        }
+
+        if (utente.tipo !== 'asso') {
+            return res.status(400).json({ message: 'L\'utente non è di tipo associazione' });
+        }
+
+        await Utente.updateOne(
+            { _id: utenteId },
+            {
+                $set: { tipo: 'citt', admin: false },
+                $unset: { associazione: 1 }
+            }
+        );
+
+        const updatedUtente = await Utente.findById(utenteId).select('-password');
+
+        logger.db('UPDATE', 'Utente', true, { id: utenteId, action: 'removeAssociazioneRole' });
+        res.status(200).json({
+            message: req.t('success.associazione_role_removed'),
+            utente: updatedUtente
+        });
+    } catch (error) {
+        logger.db('UPDATE', 'Utente', false, { error: error.message, id: req.params.id });
+        res.status(500).json({ message: req.t('errors.updating_utente'), error: error.message });
+    }
+};
+
+exports.addAssociazioneMember = async (req, res) => {
+    try {
+        const { email, admin } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ message: req.t('validation.required_field') });
+        }
+
+        const loggedUser = await Utente.findById(req.loggedUser.id);
+        if (!loggedUser || !loggedUser.associazione) {
+            logger.warn('Admin user has no associazione reference', { id: req.loggedUser.id });
+            return res.status(400).json({ message: 'Admin user has no associazione reference' });
+        }
+
+        const associazioneId = loggedUser.associazione;
+        logger.debug('Adding associazione member', { email, admin, associazioneId });
+
+        const utente = await Utente.findOne({ email });
+        if (!utente) {
+            return res.status(404).json({ message: req.t('notFound.utente') });
+        }
+
+        if (utente.tipo === 'asso') {
+            return res.status(400).json({ message: req.t('members_asso.already_asso') });
+        }
+
+        if (utente.tipo !== 'citt') {
+            return res.status(400).json({ message: req.t('members_asso.not_citizen') });
+        }
+
+        utente.tipo = 'asso';
+        utente.associazione = associazioneId;
+        utente.admin = admin || false;
+        await utente.save();
+
+        const updatedUtente = await Utente.findById(utente._id).select('-password');
+
+        logger.db('UPDATE', 'Utente', true, { id: utente._id, action: 'addAssociazioneMember', associazione: associazioneId });
+        res.status(200).json({
+            message: req.t('success.associazione_member_added'),
             utente: updatedUtente
         });
     } catch (error) {
