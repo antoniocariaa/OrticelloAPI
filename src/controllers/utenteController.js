@@ -313,12 +313,29 @@ exports.getAssociazioneUtenti = async (req, res) => {
     }
 };
 
+exports.getUtentiByAssociazioneId = async (req, res) => {
+    try {
+        const associazioneId = req.params.id;
+        logger.debug('Fetching utenti by associazione ID', { associazioneId });
+
+        const utenti = await Utente.find({ associazione: associazioneId }).select('-password');
+
+        logger.db('SELECT', 'Utente', true, { count: utenti.length, associazioneId });
+        res.status(200).json(utenti);
+    } catch (error) {
+        logger.db('SELECT', 'Utente', false, { error: error.message, associazioneId: req.params.id });
+        res.status(500).json({ message: req.t('errors.retrieving_utenti'), error: error.message });
+    }
+};
+
 exports.removeAssociazioneRole = async (req, res) => {
     try {
         const utenteId = req.params.id;
         logger.debug('Removing associazione role from utente', { id: utenteId });
 
+        const loggedUser = await Utente.findById(req.loggedUser.id);
         const utente = await Utente.findById(utenteId);
+
         if (!utente) {
             logger.warn('Utente not found for role removal', { id: utenteId });
             return res.status(404).json({ message: req.t('notFound.utente') });
@@ -326,6 +343,16 @@ exports.removeAssociazioneRole = async (req, res) => {
 
         if (utente.tipo !== 'asso') {
             return res.status(400).json({ message: 'L\'utente non è di tipo associazione' });
+        }
+
+        if (loggedUser.tipo === 'asso') {
+            if (!loggedUser.associazione || !utente.associazione || loggedUser.associazione.toString() !== utente.associazione.toString()) {
+                return res.status(403).json({ message: req.t('errors.authorization_error') });
+            }
+        } else if (loggedUser.tipo === 'comu') {
+
+        } else {
+            return res.status(403).json({ message: req.t('errors.authorization_error') });
         }
 
         await Utente.updateOne(
@@ -349,21 +376,83 @@ exports.removeAssociazioneRole = async (req, res) => {
     }
 };
 
+exports.updateAssociazioneMember = async (req, res) => {
+    try {
+        const { id, admin } = req.body;
+
+        if (!id) {
+            return res.status(400).json({ message: req.t('validation.required_field') });
+        }
+
+        const loggedUser = await Utente.findById(req.loggedUser.id);
+        const utente = await Utente.findById(id);
+
+        if (!utente) {
+            return res.status(404).json({ message: req.t('notFound.utente') });
+        }
+
+        if (utente.tipo !== 'asso') {
+            return res.status(400).json({ message: 'L\'utente non è di tipo associazione' });
+        }
+
+        // Permission Check
+        if (loggedUser.tipo === 'asso') {
+            if (!loggedUser.associazione || !utente.associazione || loggedUser.associazione.toString() !== utente.associazione.toString()) {
+                return res.status(403).json({ message: req.t('errors.authorization_error') });
+            }
+        } else if (loggedUser.tipo === 'comu') {
+            // Allowed
+        } else {
+            return res.status(403).json({ message: req.t('errors.authorization_error') });
+        }
+
+        utente.admin = admin;
+        await utente.save();
+
+        const updatedUtente = await Utente.findById(utente._id).select('-password');
+
+        logger.db('UPDATE', 'Utente', true, { id: utente._id, action: 'updateAssociazioneMember', admin });
+        res.status(200).json({
+            message: req.t('success.utente_updated'),
+            utente: updatedUtente
+        });
+
+    } catch (error) {
+        logger.db('UPDATE', 'Utente', false, { error: error.message });
+        res.status(500).json({ message: req.t('errors.updating_utente'), error: error.message });
+    }
+};
+
 exports.addAssociazioneMember = async (req, res) => {
     try {
-        const { email, admin } = req.body;
+        const { email, admin, associazione } = req.body;
 
         if (!email) {
             return res.status(400).json({ message: req.t('validation.required_field') });
         }
 
         const loggedUser = await Utente.findById(req.loggedUser.id);
-        if (!loggedUser || !loggedUser.associazione) {
-            logger.warn('Admin user has no associazione reference', { id: req.loggedUser.id });
-            return res.status(400).json({ message: 'Admin user has no associazione reference' });
+
+        let associazioneId;
+
+        // If the user is an admin of an association, use their association ID
+        if (loggedUser.tipo === 'asso') {
+            if (!loggedUser.associazione) {
+                logger.warn('Admin user has no associazione reference', { id: req.loggedUser.id });
+                return res.status(400).json({ message: 'Admin user has no associazione reference' });
+            }
+            associazioneId = loggedUser.associazione;
+        }
+        // If the user is a comune user, they must provide the association ID
+        else if (loggedUser.tipo === 'comu') {
+            if (!associazione) {
+                return res.status(400).json({ message: "Il campo 'associazione' è obbligatorio per gli utenti del comune" });
+            }
+            associazioneId = associazione;
+        } else {
+            return res.status(403).json({ message: req.t('errors.authorization_error') });
         }
 
-        const associazioneId = loggedUser.associazione;
         logger.debug('Adding associazione member', { email, admin, associazioneId });
 
         const utente = await Utente.findOne({ email });

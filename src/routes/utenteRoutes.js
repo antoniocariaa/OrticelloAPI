@@ -314,6 +314,7 @@ router.get("/comune", utenteController.getComuneUtenti);
  *                   type: object
  */
 router.get("/associazione", utenteController.getAssociazioneUtenti);
+router.get("/associazione/:id", utenteController.getUtentiByAssociazioneId);
 router.get("/:id", utenteController.getUtenteById);
 
 router.put("/updatePassword/:id", utenteController.updatePassword);
@@ -322,6 +323,7 @@ router.put("/addComuneMember", utenteController.addComuneMember);
 
 router.put("/removeAssociazioneRole/:id", utenteController.removeAssociazioneRole);
 router.put("/addAssociazioneMember", utenteController.addAssociazioneMember);
+router.put("/updateAssociazioneMember", utenteController.updateAssociazioneMember);
 
 router.put("/:id", utenteController.updateUtente);
 router.delete("/:id", utenteController.deleteUtente);
