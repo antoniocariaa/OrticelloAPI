@@ -94,7 +94,9 @@
     "member_added": "Membro aggiunto con successo",
     "member_removed": "Membro rimosso con successo",
     "coltura_added": "Coltura aggiunta con successo",
-    "coltura_removed": "Coltura rimossa con successo"
+    "coltura_removed": "Coltura rimossa con successo",
+    "associazione_role_removed": "Ruolo dell'Associazione rimosso con successo",
+    "associazione_member_added": "Membro dell'Associazione aggiunto con successo"
   },
   "notFound": {
     "orto": "Orto non trovato",
@@ -136,5 +138,9 @@
     "unauthorized": "Accesso non autorizzato",
     "unauthorized_role": "Accesso proibito. Il tuo ruolo non permette questa operazione.",
     "unauthorized_admin": "Accesso proibito. Sono richiesti privilegi di amministratore."
+  },
+  "members_asso": {
+    "already_asso": "L'utente è già membro di un'Associazione",
+    "not_citizen": "L'utente non è un Cittadino e non può essere aggiunto"
   }
 }
