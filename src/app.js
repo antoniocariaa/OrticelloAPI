@@ -21,6 +21,7 @@ var avvisoRoutes = require("./routes/avvisoRoutes");
 var bandoRoutes = require("./routes/bandoRoutes");
 var meteoRoutes = require("./routes/meteoRoutes");
 var sensorRoutes = require("./routes/sensorRoutes");
+var consigliRoutes = require("./routes/consigliRoutes");
 var authentication = require("./routes/authentication");
 var checkToken = require("./util/checkToken");
 
@@ -79,6 +80,7 @@ app.use("/api/v1/avvisi", checkToken);
 app.use("/api/v1/bandi", checkToken);
 app.use("/api/v1/meteo", checkToken);
 app.use("/api/v1/sensor", checkToken);
+app.use("/api/v1/consigli", checkToken);
 const swaggerSpec = initializeSwagger();
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
@@ -98,6 +100,7 @@ app.use("/api/v1/avvisi", avvisoRoutes);
 app.use("/api/v1/bandi", bandoRoutes);
 app.use("/api/v1/meteo", meteoRoutes);
 app.use("/api/v1/sensor", sensorRoutes);
+app.use("/api/v1/consigli", consigliRoutes);
 /* Default 404 handler */
 app.use((req, res) => {
 	logger.warn('404 - Route not found', {

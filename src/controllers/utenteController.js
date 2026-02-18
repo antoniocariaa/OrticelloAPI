@@ -485,3 +485,32 @@ exports.addAssociazioneMember = async (req, res) => {
         res.status(500).json({ message: req.t('errors.updating_utente'), error: error.message });
     }
 };
+
+exports.downgradeAssociationMembers = async (req, res) => {
+    try {
+        const associazioneId = req.params.id;
+        logger.debug('Downgrading members of associazione', { id: associazioneId });
+
+        const result = await Utente.updateMany(
+            { associazione: associazioneId },
+            {
+                $set: { tipo: 'citt' },
+                $unset: { associazione: 1, admin: 1 }
+            }
+        );
+
+        logger.db('UPDATE', 'Utente', true, {
+            action: 'downgradeAssociationMembers',
+            associazioneId,
+            modifiedCount: result.modifiedCount
+        });
+
+        res.status(200).json({
+            message: req.t('success.members_downgraded'),
+            count: result.modifiedCount
+        });
+    } catch (error) {
+        logger.db('UPDATE', 'Utente', false, { error: error.message, associazioneId: req.params.id });
+        res.status(500).json({ message: req.t('errors.updating_utente'), error: error.message });
+    }
+};

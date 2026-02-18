@@ -324,6 +324,7 @@ router.put("/addComuneMember", utenteController.addComuneMember);
 router.put("/removeAssociazioneRole/:id", utenteController.removeAssociazioneRole);
 router.put("/addAssociazioneMember", utenteController.addAssociazioneMember);
 router.put("/updateAssociazioneMember", utenteController.updateAssociazioneMember);
+router.put("/downgradeAssociationMembers/:id", utenteController.downgradeAssociationMembers);
 
 router.put("/:id", utenteController.updateUtente);
 router.delete("/:id", utenteController.deleteUtente);

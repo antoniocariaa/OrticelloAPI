@@ -2,9 +2,17 @@ const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../../app');
 const Associazione = require('../../model/organization/associazione');
+const Utente = require('../../model/user/utente');
+const AffidaOrto = require('../../model/assignment/affidaOrto');
+const AffidaLotto = require('../../model/assignment/affidaLotto');
+const Orto = require('../../model/garden/orto');
 
 // Mock del model Associazione
 jest.mock('../../model/organization/associazione');
+jest.mock('../../model/user/utente');
+jest.mock('../../model/assignment/affidaOrto');
+jest.mock('../../model/assignment/affidaLotto');
+jest.mock('../../model/garden/orto');
 
 // Mock JWT middleware per bypassare autenticazione nei test
 jest.mock('../../util/checkToken', () => (req, res, next) => {
@@ -26,7 +34,7 @@ describe('AssociazioneController', () => {
   afterAll(async () => {
     // Close mongoose connection to prevent open handles
     await mongoose.connection.close();
-  });
+  }, 10000);
 
   describe('GET /api/v1/associazioni', () => {
     test('should return all associazioni with status 200', async () => {
@@ -242,18 +250,24 @@ describe('AssociazioneController', () => {
         nome: 'Associazione Eliminata'
       };
 
+      // Mock all dependencies for deleteAssociazione
+      Associazione.findById.mockResolvedValue(mockDeletedAssociazione);
+      Utente.updateMany.mockResolvedValue({ modifiedCount: 2 });
+      AffidaOrto.find.mockResolvedValue([]);
+      AffidaOrto.deleteMany.mockResolvedValue({ deletedCount: 0 });
       Associazione.findByIdAndDelete.mockResolvedValue(mockDeletedAssociazione);
 
       const response = await request(app)
         .delete('/api/v1/associazioni/507f1f77bcf86cd799439011')
         .expect(200);
 
+      expect(Associazione.findById).toHaveBeenCalledWith('507f1f77bcf86cd799439011');
       expect(Associazione.findByIdAndDelete).toHaveBeenCalledWith('507f1f77bcf86cd799439011');
       expect(response.body.message).toBe('Associazione eliminata con successo');
     });
 
     test('should return 404 when associazione not found', async () => {
-      Associazione.findByIdAndDelete.mockResolvedValue(null);
+      Associazione.findById.mockResolvedValue(null);
 
       const response = await request(app)
         .delete('/api/v1/associazioni/507f1f77bcf86cd799439011')
@@ -264,7 +278,7 @@ describe('AssociazioneController', () => {
 
     test('should return error 500 when deletion fails', async () => {
       const mockError = new Error('Database error');
-      Associazione.findByIdAndDelete.mockRejectedValue(mockError);
+      Associazione.findById.mockRejectedValue(mockError);
 
       const response = await request(app)
         .delete('/api/v1/associazioni/507f1f77bcf86cd799439011')
