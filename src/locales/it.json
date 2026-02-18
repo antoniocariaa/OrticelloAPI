@@ -9,6 +9,10 @@
     "retrieving_sensors": "Errore nel recupero dei sensori",
     "retrieving_sensor": "Errore nel recupero del sensore",
     "retrieving_meteo": "Errore nel recupero di dati meteo",
+    "missing_colture": "Elenco colture obbligatorio",
+    "ai_api_key_missing": "Chiave API AI non configurata",
+    "generating_consigli": "Errore nella generazione dei consigli",
+    "ai_rate_limit": "Troppe richieste. Riprova tra qualche secondo",
     "retrieving_comuni": "Errore nel recupero dei comuni",
     "retrieving_comune": "Errore nel recupero del comune",
     "retrieving_bandi": "Errore nel recupero dei bandi",
@@ -94,7 +98,9 @@
     "member_added": "Membro aggiunto con successo",
     "member_removed": "Membro rimosso con successo",
     "coltura_added": "Coltura aggiunta con successo",
-    "coltura_removed": "Coltura rimossa con successo"
+    "coltura_removed": "Coltura rimossa con successo",
+    "associazione_role_removed": "Ruolo dell'Associazione rimosso con successo",
+    "associazione_member_added": "Membro dell'Associazione aggiunto con successo"
   },
   "notFound": {
     "orto": "Orto non trovato",
@@ -136,5 +142,9 @@
     "unauthorized": "Accesso non autorizzato",
     "unauthorized_role": "Accesso proibito. Il tuo ruolo non permette questa operazione.",
     "unauthorized_admin": "Accesso proibito. Sono richiesti privilegi di amministratore."
+  },
+  "members_asso": {
+    "already_asso": "L'utente è già membro di un'Associazione",
+    "not_citizen": "L'utente non è un Cittadino e non può essere aggiunto"
   }
 }

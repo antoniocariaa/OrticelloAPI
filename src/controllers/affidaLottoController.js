@@ -1,4 +1,4 @@
-const AffidaLotto = require('../model/affidaLotto');
+const AffidaLotto = require('../model/assignment/affidaLotto');
 const logger = require('../config/logger');
 
 exports.getAllAffidaLotti = async (req, res) => {
@@ -17,7 +17,7 @@ exports.getAffidaLottiAttivi = async (req, res) => {
     try {
         const now = new Date();
         const query = {
-            stato: 'accepted',        
+            stato: 'accepted',
             data_inizio: { $lte: now },
             data_fine: { $gte: now }
         };
@@ -26,7 +26,7 @@ exports.getAffidaLottiAttivi = async (req, res) => {
             .populate("lotto")
             .populate("utente")
             .sort({ data_fine: 1 });
-        
+
         res.status(200).json(affidamentiAttivi);
     } catch (error) {
         logger.error('Error retrieving active affida lotti', { error: error.message });
@@ -58,9 +58,9 @@ exports.getStoricoAssegnazioni = async (req, res) => {
 
         // Se è un'associazione, filtra solo i lotti degli orti gestiti
         if (userType === 'asso') {
-            const Utente = require('../model/utente');
-            const AffidaOrto = require('../model/affidaOrto');
-            const Orto = require('../model/orto');
+            const Utente = require('../model/user/utente');
+            const AffidaOrto = require('../model/assignment/affidaOrto');
+            const Orto = require('../model/garden/orto');
             
             // Recupera l'utente completo per ottenere l'ID dell'associazione
             const utente = await Utente.findById(userId);
@@ -139,13 +139,13 @@ exports.getStoricoAssegnazioni = async (req, res) => {
 
 exports.createAffidaLotto = async (req, res) => {
     try {
-        const userId = req.loggedUser.id || req.loggedUser._id; 
+        const userId = req.loggedUser.id || req.loggedUser._id;
 
         const payload = {
             ...req.body,
-            utente: userId, 
+            utente: userId,
             data_richiesta: new Date(),
-            stato: 'pending' 
+            stato: 'pending'
         };
 
         const newAffidamento = new AffidaLotto(payload);
@@ -166,7 +166,7 @@ exports.gestisciRichiesta = async (req, res) => {
 
     try {
         const richiesta = await AffidaLotto.findById(id);
-        
+
         if (!richiesta) {
             return res.status(404).json({ message: "Richiesta non trovata" });
         }
@@ -177,19 +177,19 @@ exports.gestisciRichiesta = async (req, res) => {
             dataFine.setFullYear(now.getFullYear() + 1); // Dura 1 anno
 
             // AGGIORNAMENTO STATO E DATE
-            richiesta.stato = 'accepted'; 
+            richiesta.stato = 'accepted';
             richiesta.data_inizio = now;
             richiesta.data_fine = dataFine;
-            
+
             await richiesta.save();
-            
+
             logger.db('UPDATE', 'AffidaLotto', true, { id, action: 'approved' });
             return res.status(200).json({ message: "Richiesta approvata con successo", data: richiesta });
 
         } else if (azione === 'rifiuta') {
             richiesta.stato = 'rejected';
             await richiesta.save();
-            
+
             logger.db('UPDATE', 'AffidaLotto', true, { id, action: 'rejected' });
             return res.status(200).json({ message: "Richiesta rifiutata" });
         } else {
@@ -222,9 +222,9 @@ exports.getAssociazioniVisibiliByUser = async (req, res) => {
         const now = new Date();
         
         // Import dei modelli
-        const AffidaLotto = require('../model/affidaLotto'); 
-        const Orto = require('../model/orto');
-        const AffidaOrto = require('../model/affidaOrto');
+        const AffidaLotto = require('../model/assignment/affidaLotto'); 
+        const Orto = require('../model/garden/orto');
+        const AffidaOrto = require('../model/assignment/affidaOrto');
         
         // 1. Trova Affidamenti Lotto
         const affidaLotti = await AffidaLotto.find({ 

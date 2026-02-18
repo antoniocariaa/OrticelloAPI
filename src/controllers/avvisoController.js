@@ -1,5 +1,5 @@
-const Avviso = require('../model/news/avviso');
-const AvvisoLetto = require('../model/news/avvisoLetto');
+const Avviso = require('../model/announcement/avviso');
+const AvvisoLetto = require('../model/announcement/avvisoLetto');
 const logger = require('../config/logger');
 
 exports.getAllAvvisi = async (req, res) => {
@@ -141,7 +141,7 @@ exports.getAvvisiFiltered = async (req, res) => {
         if (req.loggedUser && letto !== undefined) {
             const userId = req.loggedUser.id;
             const avvisiIds = avvisi.map(a => a._id);
-            
+
             // Get all read avvisi by this user
             const avvisiLetti = await AvvisoLetto.find({
                 utente: userId,
@@ -184,13 +184,13 @@ exports.getAvvisiFiltered = async (req, res) => {
         });
 
     } catch (error) {
-        logger.error('Error retrieving filtered avvisi', { 
-            error: error.message, 
-            query: req.query 
+        logger.error('Error retrieving filtered avvisi', {
+            error: error.message,
+            query: req.query
         });
-        res.status(500).json({ 
-            message: req.t('errors.retrieving_avvisi'), 
-            error: error.message 
+        res.status(500).json({
+            message: req.t('errors.retrieving_avvisi'),
+            error: error.message
         });
     }
 };
@@ -210,25 +210,25 @@ exports.markAsRead = async (req, res) => {
         // Use upsert to create or update read status
         const avvisoLetto = await AvvisoLetto.findOneAndUpdate(
             { utente: userId, avviso: avvisoId },
-            { 
-                utente: userId, 
-                avviso: avvisoId, 
-                dataLettura: new Date() 
+            {
+                utente: userId,
+                avviso: avvisoId,
+                dataLettura: new Date()
             },
-            { 
-                upsert: true, 
+            {
+                upsert: true,
                 new: true,
                 setDefaultsOnInsert: true
             }
         );
 
-        logger.db('UPSERT', 'AvvisoLetto', true, { 
-            userId, 
-            avvisoId, 
-            id: avvisoLetto._id 
+        logger.db('UPSERT', 'AvvisoLetto', true, {
+            userId,
+            avvisoId,
+            id: avvisoLetto._id
         });
 
-        res.status(200).json({ 
+        res.status(200).json({
             message: req.t('success.avviso_marked_read') || 'Notice marked as read',
             data: {
                 avvisoId: avvisoId,
@@ -239,19 +239,19 @@ exports.markAsRead = async (req, res) => {
     } catch (error) {
         // Handle duplicate key error (race condition)
         if (error.code === 11000) {
-            return res.status(200).json({ 
+            return res.status(200).json({
                 message: req.t('success.avviso_already_read') || 'Notice already marked as read'
             });
         }
 
-        logger.error('Error marking avviso as read', { 
-            error: error.message, 
+        logger.error('Error marking avviso as read', {
+            error: error.message,
             id: req.params.id,
-            userId: req.loggedUser?.id 
+            userId: req.loggedUser?.id
         });
-        res.status(500).json({ 
-            message: req.t('errors.marking_avviso_read') || 'Error marking notice as read', 
-            error: error.message 
+        res.status(500).json({
+            message: req.t('errors.marking_avviso_read') || 'Error marking notice as read',
+            error: error.message
         });
     }
 };
@@ -266,14 +266,14 @@ exports.getReadStatus = async (req, res) => {
         const { avvisiIds } = req.body; // Array of avviso IDs
 
         if (!userId) {
-            return res.status(401).json({ 
-                message: req.t('errors.unauthorized') || 'Authentication required' 
+            return res.status(401).json({
+                message: req.t('errors.unauthorized') || 'Authentication required'
             });
         }
 
         if (!avvisiIds || !Array.isArray(avvisiIds)) {
-            return res.status(400).json({ 
-                message: req.t('errors.invalid_input') || 'Invalid input: avvisiIds array required' 
+            return res.status(400).json({
+                message: req.t('errors.invalid_input') || 'Invalid input: avvisiIds array required'
             });
         }
 
@@ -290,22 +290,22 @@ exports.getReadStatus = async (req, res) => {
         });
 
         avvisiLetti.forEach(al => {
-            readStatusMap[al.avviso.toString()] = { 
-                letto: true, 
-                dataLettura: al.dataLettura 
+            readStatusMap[al.avviso.toString()] = {
+                letto: true,
+                dataLettura: al.dataLettura
             };
         });
 
         res.status(200).json({ data: readStatusMap });
 
     } catch (error) {
-        logger.error('Error retrieving read status', { 
-            error: error.message, 
-            userId: req.loggedUser?.id 
+        logger.error('Error retrieving read status', {
+            error: error.message,
+            userId: req.loggedUser?.id
         });
-        res.status(500).json({ 
-            message: req.t('errors.retrieving_read_status') || 'Error retrieving read status', 
-            error: error.message 
+        res.status(500).json({
+            message: req.t('errors.retrieving_read_status') || 'Error retrieving read status',
+            error: error.message
         });
     }
 };

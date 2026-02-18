@@ -1,11 +1,11 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
 const app = require('../../app');
-const Utente = require('../../model/utente');
+const Utente = require('../../model/user/utente');
 const bcrypt = require('bcrypt');
 
 // Mock del model Utente e bcrypt
-jest.mock('../../model/utente');
+jest.mock('../../model/user/utente');
 jest.mock('bcrypt');
 
 // Mock JWT middleware per bypassare autenticazione nei test

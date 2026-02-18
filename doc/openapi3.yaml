@@ -3444,6 +3444,75 @@ paths:
                     example: Errore durante l'eliminazione
                   error:
                     type: object
+  /api/v1/consigli:
+    post:
+      summary: Get AI-powered gardening tips
+      description: >
+        Generate personalized gardening tips based on the user's crops and
+        current weather conditions.
+
+        Uses Google Gemini AI to provide contextual advice.
+
+
+        **Access Control:**
+
+        - **Strictly reserved for Cittadini** - Only citizens with assigned
+        plots can request tips
+      tags:
+        - Consigli
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - colture
+              properties:
+                colture:
+                  type: array
+                  items:
+                    type: string
+                  description: List of crops the citizen is growing
+                  example:
+                    - Pomodori
+                    - Zucchine
+                    - Basilico
+                weather:
+                  type: object
+                  description: Current weather conditions (optional)
+                  properties:
+                    temperature:
+                      type: number
+                      example: 18.5
+                    humidity:
+                      type: number
+                      example: 65
+                    windSpeed:
+                      type: number
+                      example: 12
+                    condition:
+                      type: string
+                      example: Nuvoloso
+      responses:
+        "200":
+          description: Tips generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  consigli:
+                    type: string
+                    description: AI-generated gardening tips
+        "400":
+          description: Missing or invalid crops data
+        "401":
+          description: Unauthorized
+        "500":
+          description: Error generating tips (API key missing or AI service error)
   /api/v1/lotti:
     get:
       summary: Get list of lotti
@@ -4491,6 +4560,34 @@ paths:
       description: Retrieve a list of all users (utenti). Returns an array of utente
         objects with their details including nome, cognome, email, tipo, and
         references to associazione or comune if applicable.
+      tags:
+        - Utenti
+      responses:
+        "200":
+          description: Successfully retrieved list of utenti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Utente"
+        "500":
+          description: Error retrieving utenti
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error retrieving utenti
+                  error:
+                    type: object
+  /api/v1/utenti/comune:
+    get:
+      summary: Get list of users of the same comune
+      description: Retrieve a list of all users (utenti) that belong to the same
+        comune as the logged in user.
       tags:
         - Utenti
       responses:
