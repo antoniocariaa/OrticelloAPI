@@ -254,14 +254,20 @@ exports.removeComuneRole = async (req, res) => {
 
 exports.addComuneMember = async (req, res) => {
     try {
-        const { email, admin, comune } = req.body;
-        logger.debug('Adding comune member', { email, admin, comune });
+        const { email, admin } = req.body;
+        logger.debug('Adding comune member', { email, admin });
 
         if (!email) {
             return res.status(400).json({ message: req.t('validation.required_field') });
         }
 
-        const comuneId = comune || null;
+        const loggedUser = await Utente.findById(req.loggedUser.id);
+        if (!loggedUser || loggedUser.tipo !== 'comu' || !loggedUser.comune) {
+            logger.warn('User trying to add member is not authorized or has no comune', { id: req.loggedUser.id });
+            return res.status(403).json({ message: req.t('errors.authorization_error') });
+        }
+
+        const comuneId = loggedUser.comune;
 
         const utente = await Utente.findOne({ email });
         if (!utente) {
