@@ -16,6 +16,9 @@ jobs:
       SUPER_SECRET: ${{ secrets.SUPER_SECRET }}
       DB_URL: ${{ secrets.DB_URL }}
       LOG_ENABLED: false
+      GROQ_API_KEY: ${{secrets.GROQ_API_KEY}}
+      GROQ_MODEL: ${{secrets.GROQ_MODEL}}
+
     
     environment: production
 
