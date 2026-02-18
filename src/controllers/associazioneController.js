@@ -90,16 +90,60 @@ exports.updateAssociazione = async (req, res) => {
     }
 };
 
+const AffidaOrto = require('../model/assignment/affidaOrto');
+const AffidaLotto = require('../model/assignment/affidaLotto');
+const Orto = require('../model/garden/orto');
+
 exports.deleteAssociazione = async (req, res) => {
     try {
-        const associazioneEliminata = await Associazione.findByIdAndDelete(req.params.id);
+        const associazioneId = req.params.id;
+        const associazioneEliminata = await Associazione.findById(associazioneId);
 
         if (!associazioneEliminata) {
-            logger.warn('Associazione not found for deletion', { id: req.params.id });
+            logger.warn('Associazione not found for deletion', { id: associazioneId });
             return res.status(404).json({ message: req.t('notFound.associazione') });
         }
 
-        logger.db('DELETE', 'Associazione', true, { id: req.params.id });
+        // 1. Downgrade Users: 'asso' -> 'citt'
+        // Ensure we match regardless of whether validation happened or not
+        const downgradeResult = await Utente.updateMany(
+            { associazione: associazioneId },
+            {
+                $set: { tipo: 'citt' },
+                $unset: { associazione: 1, admin: 1 }
+            }
+        );
+        logger.debug('Downgraded users count:', { count: downgradeResult.modifiedCount, associazioneId });
+
+        // 2. Find Orti managed by this association
+        const affidaOrti = await AffidaOrto.find({ associazione: associazioneId });
+        const ortiIds = affidaOrti.map(ao => ao.orto);
+
+        // 3. Remove Lot Assignments in those Orti
+        if (ortiIds.length > 0) {
+            // Fetch Orti to get their Lotti
+            const orti = await Orto.find({ _id: { $in: ortiIds } });
+
+            // Extract all Lotto IDs from the fetched Orti
+            const lottiIds = orti.reduce((acc, orto) => {
+                if (orto.lotti && orto.lotti.length > 0) {
+                    return acc.concat(orto.lotti);
+                }
+                return acc;
+            }, []);
+
+            if (lottiIds.length > 0) {
+                await AffidaLotto.deleteMany({ lotto: { $in: lottiIds } });
+            }
+        }
+
+        // 4. Remove Orto Assignments
+        await AffidaOrto.deleteMany({ associazione: associazioneId });
+
+        // 5. Delete Associazione
+        await Associazione.findByIdAndDelete(associazioneId);
+
+        logger.db('DELETE', 'Associazione', true, { id: associazioneId });
         res.status(200).json({ message: req.t('success.associazione_deleted') });
     } catch (error) {
         logger.error('Error deleting associazione', { error: error.message, id: req.params.id });
