@@ -31,7 +31,7 @@ exports.getConsigli = async (req, res) => {
         // Build weather context
         let weatherContext = '';
         if (weather) {
-            weatherContext = `\nCurrent weather: temperature ${weather.temperature}°C, humidity ${weather.humidity}%, wind ${weather.windSpeed} km/h, condition: ${weather.condition}.`;
+            weatherContext = `\nCurrent weather: temperature ${weather.temperature}°C, humidity ${weather.humidity}%, wind ${weather.windSpeed} km/h, condition: ${weather.condition}, date: ${weather.date}.`;
         }
 
         const prompt = `You are an expert agronomist. Give exactly 4 practical tips for a citizen growing these ${lang.crops} in their ${lang.garden}: ${colture.join(', ')}.${weatherContext}
