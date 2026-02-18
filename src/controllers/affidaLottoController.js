@@ -40,7 +40,7 @@ exports.getRichiestePending = async (req, res) => {
             .populate("lotto")
             .populate("utente")
             .sort({ data_richiesta: -1 });
-        
+
         res.status(200).json(richiestePending);
     } catch (error) {
         logger.error('Error retrieving pending requests', { error: error.message });
@@ -61,49 +61,49 @@ exports.getStoricoAssegnazioni = async (req, res) => {
             const Utente = require('../model/user/utente');
             const AffidaOrto = require('../model/assignment/affidaOrto');
             const Orto = require('../model/garden/orto');
-            
+
             // Recupera l'utente completo per ottenere l'ID dell'associazione
             const utente = await Utente.findById(userId);
-            
+
             if (!utente || !utente.associazione) {
                 return res.status(400).json({ message: "Utente non associato a nessuna associazione" });
             }
 
             const associazioneId = utente.associazione;
-            
+
             // Trova gli orti assegnati all'associazione
-            const affidamentiOrti = await AffidaOrto.find({ 
-                associazione: associazioneId 
+            const affidamentiOrti = await AffidaOrto.find({
+                associazione: associazioneId
             });
-            
+
             if (affidamentiOrti.length === 0) {
                 return res.status(200).json([]);
             }
-            
+
             // Estrai gli ID degli orti
             const ortiIds = affidamentiOrti.map(aff => aff.orto);
-            
+
             // Trova tutti i lotti di questi orti
             const orti = await Orto.find({ _id: { $in: ortiIds } });
-            
+
             const lottiIds = [];
             orti.forEach(orto => {
                 if (orto.lotti && Array.isArray(orto.lotti)) {
                     lottiIds.push(...orto.lotti);
                 }
             });
-            
+
             if (lottiIds.length === 0) {
                 return res.status(200).json([]);
             }
-            
+
             // Query con $and per combinare correttamente le condizioni
             query = {
                 $and: [
                     {
                         $or: [
                             { stato: 'rejected' },
-                            { 
+                            {
                                 stato: 'accepted',
                                 data_fine: { $lt: now }
                             }
@@ -117,7 +117,7 @@ exports.getStoricoAssegnazioni = async (req, res) => {
             query = {
                 $or: [
                     { stato: 'rejected' },
-                    { 
+                    {
                         stato: 'accepted',
                         data_fine: { $lt: now }
                     }
@@ -129,7 +129,7 @@ exports.getStoricoAssegnazioni = async (req, res) => {
             .populate("lotto")
             .populate("utente")
             .sort({ data_richiesta: -1 });
-        
+
         res.status(200).json(storicoAssegnazioni);
     } catch (error) {
         logger.error('Error retrieving historical assignments', { error: error.message, stack: error.stack });
@@ -173,6 +173,20 @@ exports.gestisciRichiesta = async (req, res) => {
 
         if (azione === 'accetta') {
             const now = new Date();
+
+            const activeAssignment = await AffidaLotto.findOne({
+                utente: richiesta.utente,
+                stato: 'accepted',
+                data_fine: { $gt: now },
+                _id: { $ne: richiesta._id }
+            });
+
+            if (activeAssignment) {
+                return res.status(400).json({
+                    message: "L'utente ha già un lotto assegnato attivo. Impossibile assegnarne un altro."
+                });
+            }
+
             const dataFine = new Date();
             dataFine.setFullYear(now.getFullYear() + 1); // Dura 1 anno
 
@@ -183,8 +197,28 @@ exports.gestisciRichiesta = async (req, res) => {
 
             await richiesta.save();
 
-            logger.db('UPDATE', 'AffidaLotto', true, { id, action: 'approved' });
-            return res.status(200).json({ message: "Richiesta approvata con successo", data: richiesta });
+            // 2. Elimina tutte le altre richieste pending dell'utente
+            const deleteQuery = {
+                utente: richiesta.utente,
+                stato: 'pending',
+                _id: { $ne: richiesta._id }
+            };
+
+            logger.info('Deleting pending requests for user', { user: richiesta.utente, requestId: richiesta._id });
+
+            const deleteResult = await AffidaLotto.deleteMany(deleteQuery);
+
+            logger.info('Pending requests deleted', { count: deleteResult.deletedCount, user: richiesta.utente });
+
+            // Explicitly verify deletion (optional but good for debugging)
+            const remainingPending = await AffidaLotto.countDocuments(deleteQuery);
+            if (remainingPending > 0) {
+                logger.warn('WARNING: Pending requests still exist after deletion!', { count: remainingPending, user: richiesta.utente });
+            }
+
+            logger.db('UPDATE', 'AffidaLotto', true, { id, action: 'approved', cleanup: 'pending_deleted', count: deleteResult.deletedCount });
+            return res.status(200).json({ message: "Richiesta approvata con successo. Altre richieste in attesa eliminate.", data: richiesta, deletedCount: deleteResult.deletedCount });
+
 
         } else if (azione === 'rifiuta') {
             richiesta.stato = 'rejected';
@@ -220,56 +254,56 @@ exports.getAssociazioniVisibiliByUser = async (req, res) => {
     try {
         const { userId } = req.params;
         const now = new Date();
-        
+
         // Import dei modelli
-        const AffidaLotto = require('../model/assignment/affidaLotto'); 
+        const AffidaLotto = require('../model/assignment/affidaLotto');
         const Orto = require('../model/garden/orto');
         const AffidaOrto = require('../model/assignment/affidaOrto');
-        
+
         // 1. Trova Affidamenti Lotto
-        const affidaLotti = await AffidaLotto.find({ 
+        const affidaLotti = await AffidaLotto.find({
             utente: userId,
             stato: 'accepted'
         }).select('lotto');
-        
+
         if (!affidaLotti || affidaLotti.length === 0) {
             return res.json([]);
         }
 
         const lottiIds = affidaLotti.map(al => al.lotto);
-        
+
         // 2. Trova Orti
-        const orti = await Orto.find({ 
-            lotti: { $in: lottiIds } 
+        const orti = await Orto.find({
+            lotti: { $in: lottiIds }
         }).select('_id');
-        
+
         if (!orti || orti.length === 0) {
             return res.json([]);
         }
 
         const ortiIds = orti.map(o => o._id);
-        
+
         // 3. Trova Associazioni
         // NOTA: Ho commentato di nuovo le date. Se i dati nel DB sono vecchi/test, 
         // con le date attive non trovava nulla. Così funziona sicuro.
-        const affidaOrti = await AffidaOrto.find({ 
+        const affidaOrti = await AffidaOrto.find({
             orto: { $in: ortiIds }
             // data_inizio: { $lte: now },
             // data_fine: { $gte: now }
         }).select('associazione');
-        
+
         // 4. Estrai ID unici
         const associazioniIds = [...new Set(
             affidaOrti.map(ao => ao.associazione.toString())
         )];
-        
+
         res.json(associazioniIds);
-        
+
     } catch (error) {
         console.error('Errore getAssociazioniVisibiliByUser:', error);
-        res.status(500).json({ 
-            message: "Errore server", 
-            error: error.message 
+        res.status(500).json({
+            message: "Errore server",
+            error: error.message
         });
     }
 };
