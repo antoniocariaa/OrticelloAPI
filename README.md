@@ -36,33 +36,24 @@
 - Gestione ruoli multi-livello (Cittadini, Associazioni, Comuni)
 - Controllo accessi basato su permessi granulari
 
-### 🗺️ Gestione Geospaziale
-- Localizzazione orti e lotti con coordinate GeoJSON
-- Query geospaziali avanzate (ricerca per distanza e area)
-- Indicizzazione MongoDB 2dsphere per performance ottimali
+### 🗺️ Gestione Spaziale
+- Localizzazione orti e lotti
 
 ### 🌿 Amministrazione Orti e Lotti
 - Gestione completa di orti urbani e singoli lotti
 - Sistema di assegnazione e affidamento terreni
 - Tracciamento stato e disponibilità lotti
 
-### 📡 Monitoraggio Ambientale
-- Integrazione dati sensori IoT in tempo reale
-- Raccolta dati meteorologici
-- Storico condizioni ambientali
-
 ### 📣 Comunicazione
 - Sistema avvisi per comuni e associazioni
 - Gestione bandi di concorso
-- Notifiche mirate agli utenti
 
 ### 🌐 Internazionalizzazione
 - Supporto multilingua (🇮🇹 Italiano, 🇬🇧 Inglese, 🇩🇪 Tedesco)
 - Rilevamento automatico lingua preferita
-- Messaggi di errore localizzati
 
 ### 🤖 AI Integration
-- Integrazione Google Generative AI
+- Integrazione Generative AI
 - Consigli personalizzati per la coltivazione
 
 ---
@@ -77,7 +68,7 @@ Database:          MongoDB 9.0.0 con Mongoose ODM
 Autenticazione:    JWT + bcrypt
 Documentazione:    OpenAPI 3.0 / Swagger
 Testing:           Jest + Supertest
-Security:          Helmet, CORS, Validator
+Security:          CORS, Validator
 ```
 
 ### Struttura Moduli
@@ -109,19 +100,6 @@ Security:          Helmet, CORS, Validator
 ### Setup
 
 ```bash
-# Clona il repository
-git clone https://github.com/your-repo/orticello.git
-
-# Entra nella directory
-cd orticello
-
-# Installa le dipendenze
-npm install
-
-# Configura le variabili d'ambiente
-cp .env.example .env
-# Modifica .env con le tue configurazioni
-
 # Avvia l'applicazione
 npm start
 
@@ -129,32 +107,12 @@ npm start
 npm run dev
 ```
 
-### Variabili d'Ambiente
-
-Crea un file `.env` nella root del progetto:
-
-```env
-# Database
-MONGODB_URI=mongodb://localhost:27017/orticello
-
-# Server
-PORT=8080
-
-# JWT
-JWT_SECRET=your-secret-key-here
-
-# Google AI (opzionale)
-GOOGLE_API_KEY=your-google-api-key
-```
-
----
-
 ## 📚 Documentazione API
 
 La documentazione interattiva completa è disponibile tramite Swagger UI:
 
 ```
-http://localhost:8080/api-docs
+https://orticelloapi.onrender.com/api-docs
 ```
 
 ### Endpoints Principali
@@ -171,30 +129,6 @@ http://localhost:8080/api-docs
 | 🌤️ Meteo | `/api/v1/meteo` | Dati meteorologici |
 | 📡 Sensori | `/api/v1/sensor` | Dati sensori IoT |
 
-### Esempio Richiesta
-
-```javascript
-// Autenticazione
-const response = await fetch('http://localhost:8080/api/v1/authentication/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    email: 'user@example.com',
-    password: 'password123'
-  })
-});
-
-const { token } = await response.json();
-
-// Richiesta autenticata
-const orti = await fetch('http://localhost:8080/api/v1/orti', {
-  headers: {
-    'Authorization': `Bearer ${token}`,
-    'X-Language': 'it'
-  }
-});
-```
-
 ---
 
 ## 🧪 Testing
@@ -202,9 +136,6 @@ const orti = await fetch('http://localhost:8080/api/v1/orti', {
 ```bash
 # Esegui tutti i test
 npm test
-
-# Test con coverage
-npm test -- --coverage
 
 # Test specifici
 npm test -- controllers/ortoController.test.js
@@ -221,17 +152,6 @@ npm test -- controllers/ortoController.test.js
 ## 🌍 Internazionalizzazione
 
 L'API supporta richieste multilingua:
-
-```bash
-# Query parameter
-GET /api/v1/orti?lang=en
-
-# Header personalizzato
-X-Language: de
-
-# Accept-Language (automatico)
-Accept-Language: en-US,en;q=0.9
-```
 
 ---
 
